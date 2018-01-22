@@ -12,7 +12,7 @@ namespace ArgeMup.HazirKod
 {
     public class Ayarlar_ : IDisposable 
     {
-        public const string Sürüm = "V2.2";
+        public const string Sürüm = "V2.3";
         #region Değişkenler
         int DeğişiklikleriKaydetmeAralığı_Sn;
         int KaynaklarıBoşaltmaAralığı_Dk;
@@ -287,6 +287,29 @@ namespace ArgeMup.HazirKod
             catch (Exception) { }
             return BulunamamasıDurumundakiDeğeri;
         }
+        public bool Oku_AltDal_Yaz_SınıfDeğişkenleri(string Xml, ref object Sınıf)
+        {
+            try
+            {
+                foreach (FieldInfo field in Sınıf.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    string AltDal = Oku_AltDal(Xml, field.Name);
+                    if (!string.IsNullOrEmpty(AltDal))
+                    {
+                        if (field.FieldType.ToString() == Oku_AltDal(AltDal, "Tip"))
+                        {
+                            field.SetValue(Sınıf, D_Nesne.BaytDizisinden(D_HexMetin.BaytDizisine(Oku_AltDal(AltDal, "Bilgi"))));
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
         public bool Yaz(string Parametre, string Ayar)
         {
@@ -369,6 +392,19 @@ namespace ArgeMup.HazirKod
             catch (Exception) { }
             return false;
         }
+        public bool Yaz_AltDal_Oku_SınıfDeğişkenleri(ref string Xml, object Sınıf)
+        {
+            foreach (FieldInfo field in Sınıf.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+            {
+                string AltDal = "";
+                if (!Yaz_AltDal(ref AltDal, "Tip", field.FieldType.ToString())) return false;
+                if (!Yaz_AltDal(ref AltDal, "Bilgi", D_HexMetin.BaytDizisinden(D_Nesne.BaytDizisine(field.GetValue(Sınıf))))) return false;
+
+                if (!Yaz_AltDal(ref Xml, field.Name, AltDal)) return false;
+            }
+
+            return true;
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -433,37 +469,6 @@ namespace ArgeMup.HazirKod
             }
             catch (Exception) { }
             return false;
-        }
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public string SınıfDeğişkenleriniMetneYaz(object Sınıf)
-        {
-            string AnaDal = "";
-            foreach (FieldInfo field in Sınıf.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
-            {
-                string AltDal = "";
-                Yaz_AltDal(ref AltDal, "Tip", field.FieldType.ToString());
-                Yaz_AltDal(ref AltDal, "Bilgi", D_HexMetin.BaytDizisinden(D_Nesne.BaytDizisine(field.GetValue(Sınıf))));
-
-                Yaz_AltDal(ref AnaDal, field.Name, AltDal);
-            }
-            return AnaDal;
-        }
-
-        public void SınıfDeğişkenleriniMetindenOku(object Sınıf, string Ayar)
-        {
-            foreach (FieldInfo field in Sınıf.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
-            {
-                string AltDal = Oku_AltDal(Ayar, field.Name);
-                if (!string.IsNullOrEmpty(AltDal))
-                {
-                    if (field.FieldType.ToString() == Oku_AltDal(AltDal, "Tip"))
-                    {
-                        field.SetValue(Sınıf, D_Nesne.BaytDizisinden(D_HexMetin.BaytDizisine(Oku_AltDal(AltDal, "Bilgi"))));
-                    }
-                }
-            }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

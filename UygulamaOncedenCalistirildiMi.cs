@@ -1,20 +1,18 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using ArgeMup.HazirKod.Dönüştürme;
 
 namespace ArgeMup.HazirKod
 {
     public class UygulamaOncedenCalistirildiMi_ : IDisposable
     {
-        public const string Sürüm = "V1.3";
+        public const string Sürüm = "V1.4";
         Mutex OrtakNesne = null;
 
         public bool KontrolEt(string OrtakNesneAdı = "")
@@ -23,6 +21,7 @@ namespace ArgeMup.HazirKod
             if (OrtakNesne != null) { OrtakNesne.Dispose(); OrtakNesne = null; }
 
             bool Evet = true;
+            OrtakNesneAdı = "UygulamaOncedenCalistirildiMi_" + D_HexMetin.BaytDizisinden(D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(D_Metin.BaytDizisine(OrtakNesneAdı)));
             OrtakNesne = new Mutex(false, OrtakNesneAdı, out Evet);
 
             return !Evet;

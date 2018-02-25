@@ -7,9 +7,9 @@ using ArgeMup.HazirKod.Dönüştürme;
 
 namespace ArgeMup.HazirKod
 {
-    public class Karmasiklastirma_ : IDisposable
+    public class DahaCokKarmasiklastirma_ : IDisposable
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
         public string Karıştır(string Girdi, string Parola)
         {
             return D_HexMetin.BaytDizisinden(Karıştır(D_Metin.BaytDizisine(Girdi), D_Metin.BaytDizisine(Parola)));
@@ -37,6 +37,7 @@ namespace ArgeMup.HazirKod
             catch (Exception) { }
             return null;
         }
+
         public string Düzelt(string Girdi, string Parola)
         {
             return D_Metin.BaytDizisinden(Düzelt(D_HexMetin.BaytDizisine(Girdi), D_Metin.BaytDizisine(Parola)));
@@ -99,6 +100,24 @@ namespace ArgeMup.HazirKod
             // GC.SuppressFinalize(this);
         }
         #endregion
+    }
+}
+
+namespace ArgeMup.HazirKod.Dönüştürme
+{
+    public static class D_GeriDönülemezKarmaşıklaştırmaMetodu
+    {
+        public const string Sürüm = "V1.0";
+
+        /// <summary>
+        /// Sha256 Oluşturucu
+        /// </summary>
+        /// <param name="ÇıktıKarakterSayısı">Geçersiz, Sadece uyumluluk için</param>
+        /// <returns></returns>
+        public static byte[] BaytDizisinden(byte[] Dizi, int ÇıktıKarakterSayısı = 32)
+        {
+            return new SHA256Managed().ComputeHash(Dizi);
+        }
     }
 }
 

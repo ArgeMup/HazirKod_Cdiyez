@@ -45,6 +45,10 @@ namespace ArgeMup.HazirKod
         TepsiİkonuMetni_ TeİkMe = new TepsiİkonuMetni_();
         #endregion
 
+        /// <summary>
+        /// Form LOAD içerisinde çağırılmalı
+        /// </summary>
+        /// <param name="ŞeffafBaşlangıç">Kullanılacak ise form un OPACİTY özelliği SIFIR yapılmalı</param>
         public PencereVeTepsiIkonuKontrolu_(Form Pencere_, Ayarlar_ Ayarlar__ = null,  bool UygulamaKüçültüldüğündeGörevÇubuğundaGörünsün_ = false, string TakmaAd = "", int X = 0, int Y = 0, int Genişlik = -1, int Yükseklik = -1, bool ŞeffafBaşlangıç = true)
         {
             Pencere = Pencere_;
@@ -372,8 +376,6 @@ namespace ArgeMup.HazirKod
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.
-
-                
 
                 //disposedValue = true;
             }

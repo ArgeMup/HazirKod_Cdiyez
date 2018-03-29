@@ -12,7 +12,7 @@ namespace ArgeMup.HazirKod
 {
     public class PencereVeTepsiIkonuKontrolu_ : IDisposable
     {
-        public const string Sürüm = "V1.9";
+        public const string Sürüm = "V1.10";
 
         #region Değişkenler
         public NotifyIcon Tepsiİkonu = null;
@@ -168,39 +168,44 @@ namespace ArgeMup.HazirKod
         }
         public bool İlerlemeyiYüzdeOlarakGöster(GörevÇubuğundaYüzdeGösterimiDurumu Durum = GörevÇubuğundaYüzdeGösterimiDurumu.Normal, ulong İlerleme = 0, ulong Toplam = 1, Color Metin_Rengi = new Color(), Color ArkaPlan_Rengi = new Color())
         {
-            if (Tepsiİkonu != null)
+            try
             {
-                if (Durum == GörevÇubuğundaYüzdeGösterimiDurumu.Kapalı)
+                if (Tepsiİkonu != null)
                 {
-                    if (!MetniTepsiİkonundaGöster("")) return false;
+                    if (Durum == GörevÇubuğundaYüzdeGösterimiDurumu.Kapalı)
+                    {
+                        if (!MetniTepsiİkonundaGöster("")) return false;
+                    }
+                    else
+                    {
+                        if (!MetniTepsiİkonundaGöster("%" + ((float)İlerleme / (float)Toplam * 100).ToString("0.00"), Metin_Rengi, ArkaPlan_Rengi)) return false;
+                    }
                 }
-                else
+
+                if (Environment.OSVersion.Version >= new Version(6, 1))
                 {
-                    if (!MetniTepsiİkonundaGöster("%" + ((float)İlerleme / (float)Toplam * 100).ToString("0.00"), Metin_Rengi, ArkaPlan_Rengi)) return false;
+                    if (TaskbarÖrneği == null) TaskbarÖrneği = (ITaskbarListesi)new SanalTaskbarÖrneği();
+
+                    if (İlerlemeDeğeri_ != İlerleme || İlerlemeToplamDeğeri_ != Toplam)
+                    {
+                        İlerlemeDeğeri_ = İlerleme;
+                        İlerlemeToplamDeğeri_ = Toplam;
+                        if ((int)İlerlemeDurumu_ > (int)GörevÇubuğundaYüzdeGösterimiDurumu.Belirsiz) TaskbarÖrneği.SetProgressValue(Pencere.Handle, İlerlemeDeğeri_, İlerlemeToplamDeğeri_);
+                    }
+
+                    if (İlerlemeDurumu_ != Durum)
+                    {
+                        İlerlemeDurumu_ = Durum;
+                        TaskbarÖrneği.SetProgressState(Pencere.Handle, İlerlemeDurumu_);
+                        if ((int)İlerlemeDurumu_ > (int)GörevÇubuğundaYüzdeGösterimiDurumu.Belirsiz) TaskbarÖrneği.SetProgressValue(Pencere.Handle, İlerlemeDeğeri_, İlerlemeToplamDeğeri_);
+                    }
+
+                    return true;
                 }
             }
+            catch (Exception) { }
 
-            if (Environment.OSVersion.Version >= new Version(6, 1))
-            {
-                if (TaskbarÖrneği == null) TaskbarÖrneği = (ITaskbarListesi)new SanalTaskbarÖrneği();
-                
-                if (İlerlemeDeğeri_ != İlerleme || İlerlemeToplamDeğeri_ != Toplam)
-                {
-                    İlerlemeDeğeri_ = İlerleme;
-                    İlerlemeToplamDeğeri_ = Toplam;
-                    if ((int)İlerlemeDurumu_ > (int)GörevÇubuğundaYüzdeGösterimiDurumu.Belirsiz) TaskbarÖrneği.SetProgressValue(Pencere.Handle, İlerlemeDeğeri_, İlerlemeToplamDeğeri_);
-                }
-
-                if (İlerlemeDurumu_ != Durum)
-                {
-                    İlerlemeDurumu_ = Durum;
-                    TaskbarÖrneği.SetProgressState(Pencere.Handle, İlerlemeDurumu_);
-                    if ((int)İlerlemeDurumu_ > (int)GörevÇubuğundaYüzdeGösterimiDurumu.Belirsiz) TaskbarÖrneği.SetProgressValue(Pencere.Handle, İlerlemeDeğeri_, İlerlemeToplamDeğeri_);
-                }
-
-                return true;
-            }
-            else return false;
+            return false;
         }
 
         void Pencere_Shown(object sender, EventArgs e)
@@ -241,6 +246,7 @@ namespace ArgeMup.HazirKod
         private void Pencere_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (Tepsiİkonu != null) { Tepsiİkonu.Dispose(); Tepsiİkonu = null; }
+            Dispose();
         }
         void Tepsiİkonu_MouseClick(object sender, MouseEventArgs e)
         {

@@ -7,29 +7,27 @@ namespace ArgeMup.HazirKod
     //Değişkenler
     internal static class D
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         #region Değişkenler
         struct BirDeğişken_
         {
-            public object Sahibi;
             public string Adı;
-            public WeakReference Nesne;
+            public WeakReference İçeriği;
             
-            public BirDeğişken_(object Sahibi_, string Adı_, object Nesne_)
+            public BirDeğişken_(string Adı, object İçeriği)
             {
-                Sahibi = Sahibi_;
-                Adı = Adı_;
-                Nesne = new WeakReference(Nesne_, false); 
+                this.Adı = Adı;
+                this.İçeriği = new WeakReference(İçeriği, false); 
             }
         }
         static System.Collections.Generic.List<BirDeğişken_> Liste = new System.Collections.Generic.List<BirDeğişken_>();
         static System.Threading.Mutex Muteks = new System.Threading.Mutex();
         #endregion
 
-        static public object Oku(object Kendisi, string Adı, object BulunamamasıDurumundakiDeğeri = null, bool BulunamamasıDurumundaYaz = true)
+        static public object Oku(string Adı, object BulunamamasıDurumundakiİçeriği = null, bool BulunamamasıDurumundaYaz = false)
         {
-            if (string.IsNullOrEmpty(Adı)) return BulunamamasıDurumundakiDeğeri;
+            if (string.IsNullOrEmpty(Adı)) return BulunamamasıDurumundakiİçeriği;
 
             Muteks.WaitOne();
 
@@ -37,24 +35,23 @@ namespace ArgeMup.HazirKod
             {
                 if (Liste[i].Adı == Adı)
                 {
-                    if (!Liste[i].Nesne.IsAlive || Liste[i].Nesne.Target == null) { Liste.RemoveAt(i); break; }
-                    else { Muteks.ReleaseMutex(); return Liste[i].Nesne.Target; }
+                    if (!Liste[i].İçeriği.IsAlive || Liste[i].İçeriği.Target == null) { Liste.RemoveAt(i); break; }
+                    else { Muteks.ReleaseMutex(); return Liste[i].İçeriği.Target; }
                 }
             }
 
-            if (Kendisi != null && BulunamamasıDurumundakiDeğeri != null && BulunamamasıDurumundaYaz)
+            if (BulunamamasıDurumundakiİçeriği != null && BulunamamasıDurumundaYaz)
             {
-                Liste.Add(new BirDeğişken_(Kendisi, Adı, BulunamamasıDurumundakiDeğeri));
+                Liste.Add(new BirDeğişken_(Adı, BulunamamasıDurumundakiİçeriği));
             }
 
             Muteks.ReleaseMutex();
 
-            return BulunamamasıDurumundakiDeğeri;
+            return BulunamamasıDurumundakiİçeriği;
         }
-
-        static public bool Yaz(object Kendisi, string Adı, object Değeri)
+        static public void Yaz(string Adı, object İçeriği)
         {
-            if (string.IsNullOrEmpty(Adı)) return false;
+            if (string.IsNullOrEmpty(Adı)) return;
 
             Muteks.WaitOne();
 
@@ -62,29 +59,20 @@ namespace ArgeMup.HazirKod
             {
                 if (Liste[i].Adı == Adı)
                 {
-                    bool sahibi = false;
-                    if (Liste[i].Sahibi.Equals(Kendisi) &&
-                        Liste[i].Sahibi.GetHashCode() == Kendisi.GetHashCode() &&
-                        Liste[i].Sahibi.GetType() == Kendisi.GetType()) sahibi = true;
-
-                    if (sahibi)
-                    {
-                        if (Değeri != null) Liste.Add(new BirDeğişken_(Liste[i].Sahibi, Liste[i].Adı, Değeri));
-                        Liste.RemoveAt(i);
-                    }
+                    if (İçeriği != null) Liste.Add(new BirDeğişken_(Liste[i].Adı, İçeriği));
+                    Liste.RemoveAt(i);
+                    
                     Muteks.ReleaseMutex();
-                    return sahibi;
+                    return;
                 }
             }
 
-            if (Kendisi != null && Değeri != null) Liste.Add(new BirDeğişken_(Kendisi, Adı, Değeri));
+            if (İçeriği != null) Liste.Add(new BirDeğişken_(Adı, İçeriği));
 
             Muteks.ReleaseMutex();
 
-            return true;
+            return;
         }
-
-
     }
 }
 

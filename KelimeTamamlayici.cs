@@ -12,7 +12,7 @@ namespace ArgeMup.HazirKod
 {
     public class KelimeTamamlayici_ : IDisposable
     {
-        public const string Sürüm = "V1.6";
+        public const string Sürüm = "V1.7";
         #region Tanımlamalar
         public List<string> ÖnerilenKelimeler;
 
@@ -43,6 +43,7 @@ namespace ArgeMup.HazirKod
             public bool NoktaVirgülVeAltSatıraGeç_ArdındanBoşlukEkle;
             public bool FazlaBoşluklarıSil;
             public bool CümleSonlarınaNoktaEkle;
+            public char[] BaşındanSonundanSilinecekKarakterler;
         }
         public _İmlaKuralları İmlaKuralları = new _İmlaKuralları();
         #endregion
@@ -61,6 +62,7 @@ namespace ArgeMup.HazirKod
             İmlaKuralları.FazlaBoşluklarıSil = true;
             İmlaKuralları.ilkHarfleriBüyüt = true;
             İmlaKuralları.NoktaVirgülVeAltSatıraGeç_ArdındanBoşlukEkle = true;
+            İmlaKuralları.BaşındanSonundanSilinecekKarakterler = new char[0];
         }
         public bool Başlat(TextBox Kutucuk)
         {
@@ -102,7 +104,16 @@ namespace ArgeMup.HazirKod
             }
             catch (Exception) { }
             return false;
-        } 
+        }
+        public void İmlaKurallarınıKopyala(_İmlaKuralları kurallar)
+        {
+            İmlaKuralları.Anaİzin = kurallar.Anaİzin;
+            İmlaKuralları.CümleSonlarınaNoktaEkle = kurallar.CümleSonlarınaNoktaEkle;
+            İmlaKuralları.FazlaBoşluklarıSil = kurallar.FazlaBoşluklarıSil;
+            İmlaKuralları.ilkHarfleriBüyüt = kurallar.ilkHarfleriBüyüt;
+            İmlaKuralları.NoktaVirgülVeAltSatıraGeç_ArdındanBoşlukEkle = kurallar.NoktaVirgülVeAltSatıraGeç_ArdındanBoşlukEkle;
+            İmlaKuralları.BaşındanSonundanSilinecekKarakterler = kurallar.BaşındanSonundanSilinecekKarakterler;
+        }
         public bool ListeGörünüyorMu()
         {
             if (Tavsiyeler == null) return false;
@@ -347,7 +358,12 @@ namespace ArgeMup.HazirKod
                     else break;
                 }
                 if (Kursör > 0) Kursör++;
-                if (!string.IsNullOrEmpty(içerik)) ÖnerilenKelimeler.Add(içerik.Substring(Kursör, (KursörBitiş - Kursör) + 1).Trim(' ', ',', '.', '\r', '\n'));
+                if (!string.IsNullOrEmpty(içerik))
+                {
+                    string EklenecekOlan = içerik.Substring(Kursör, (KursörBitiş - Kursör) + 1).Trim(' ', ',', '.', '\r', '\n');
+                    if (İmlaKuralları.BaşındanSonundanSilinecekKarakterler != null) EklenecekOlan = EklenecekOlan.Trim(İmlaKuralları.BaşındanSonundanSilinecekKarakterler);
+                    ÖnerilenKelimeler.Add(EklenecekOlan);
+                }
             }
         }
         void _İçerikDeğişti(object sender, EventArgs e)

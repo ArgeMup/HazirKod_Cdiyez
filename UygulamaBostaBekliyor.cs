@@ -14,7 +14,7 @@ namespace ArgeMup.HazirKod
 {
     public class UygulamaBostaBekliyor_ : IDisposable
     {
-        public const string Sürüm = "V1.4";
+        public const string Sürüm = "V1.5";
 
         #region Değişkenler
         public Durum_ Durum = Durum_.Boşta;
@@ -81,8 +81,7 @@ namespace ArgeMup.HazirKod
             if (Süre_Sn < 5) ZamanAşımı = 5;
             else ZamanAşımı = Süre_Sn;
             
-            Gözlemci = new KlavyeFareGozlemcisi_(out var);
-            if (!var) { Gözlemci.Dispose(); return; }
+            Gözlemci = new KlavyeFareGozlemcisi_();
             
             if (!Directory.Exists(YerelKlasör)) Directory.CreateDirectory(YerelKlasör);
 
@@ -158,8 +157,8 @@ namespace ArgeMup.HazirKod
 
                             if (Durum != Durum_.GörüntüBaşlatılıyor)
                             {
-                                List<Ayarlar_.BirParametre_> Liste = Ayarlar.Listele();
-                                foreach (var nesne in Liste) Ayarlar.Sil(nesne.Parametre);
+                                List<Depo.Biri> Liste = Ayarlar.Listele();
+                                foreach (var nesne in Liste) Ayarlar.Sil(nesne.Adı);
                             }
                             break;
 

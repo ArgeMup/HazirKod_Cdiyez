@@ -168,10 +168,44 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
     public static class D_Süre
     {
-        public const string Sürüm = "V1.2";
+        public const string Sürüm = "V1.3";
 
         public static class Metne
         {
+            public static string SaatDakikaSaniye(int Saat, int Dakika = 0, int Saniye = 0)
+            {
+                TimeSpan bbb = new TimeSpan(Saat, Dakika, Saniye);
+
+                int gün = bbb.Days;
+                int yıl = gün / 365;
+                gün -= yıl * 365;
+
+                int ay = gün / 30;
+                gün -= ay * 30;
+
+                string Çıktı = "";
+                if (yıl > 0) Çıktı = Çıktı.Trim() + yıl + " yıl ";
+                if (ay > 0) Çıktı = Çıktı.Trim() + " " + ay + " ay ";
+                if (gün > 0) Çıktı = Çıktı.Trim() + " " + gün + " gün ";
+                if (bbb.Hours > 0) Çıktı = Çıktı.Trim() + " " + bbb.Hours + " sa. ";
+                if (bbb.Minutes > 0) Çıktı = Çıktı.Trim() + " " + bbb.Minutes + " dk. ";
+                if (Dakika > 0 || Saniye > 0)
+                {
+                    if (bbb.Seconds > 0) Çıktı = Çıktı.Trim() + " " + bbb.Seconds + " sn. ";
+
+                    if (Saniye > 0)
+                    {
+                        if (bbb.Milliseconds > 0) Çıktı = Çıktı.Trim() + " " + bbb.Milliseconds + " msn. ";
+                    }
+                }
+
+                if (Çıktı == "")
+                {
+                    if (Dakika > 0) Çıktı = "1 sn. den az";
+                    else Çıktı = "1 dk. dan az";
+                }
+                return Çıktı.Trim();
+            }
             public static string Saatten(int Saat)
             {
                 TimeSpan bbb = new TimeSpan(Saat, 0, 0);

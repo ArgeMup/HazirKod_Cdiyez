@@ -2,6 +2,8 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.Text;
 using System.Threading;
 
 namespace ArgeMup.HazirKod.DonanımHaberleşmesi
@@ -55,6 +57,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                         Uygulama.StartInfo.CreateNoWindow = true;
                         Uygulama.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         Uygulama.StartInfo.UseShellExecute = false;
+                        Uygulama.StartInfo.StandardOutputEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage); //veya Encoding.UTF8; veya Encoding.GetEncoding(1254) veya 857
+                        Uygulama.StartInfo.StandardErrorEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage); //diğer uygulamada da Console.OutputEncoding ve Console.InputEncoding için de yazılması gerekebiliyor
 
                         Uygulama.StartInfo.RedirectStandardError = true;
                         Uygulama.StartInfo.RedirectStandardOutput = true;

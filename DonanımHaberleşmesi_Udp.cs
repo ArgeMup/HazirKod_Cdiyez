@@ -20,7 +20,6 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
         #region İç Kullanım
         int ErişimNoktası = -1;
-        string IpVeyaAdı = "";
         bool Çalışşsın = true;
 
         GeriBildirim_Islemi_ GeriBildirim_Islemi = null;
@@ -28,12 +27,11 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         UdpClient Alıcı = null;
         #endregion
         
-        public Udp_Dinleyici_(int ErişimNoktası, string IpVeyaAdı = "127.0.0.1", GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000)
+        public Udp_Dinleyici_(int ErişimNoktası, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000)
         {
             if (ErişimNoktası < 0) return; //Sadece verici olarak çalışılacak
 
             this.ErişimNoktası = ErişimNoktası;
-            this.IpVeyaAdı = IpVeyaAdı;
             this.GeriBildirim_Islemi = GeriBildirim_Islemi;
             this.Hatırlatıcı = Hatırlatıcı;
             this.SatırSatırGönderVeAl = SatırSatırGönderVeAl;
@@ -80,7 +78,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                         Thread.Sleep(TekrarDeneme_ZamanAşımı_msn);
                     }
 
-                    GeriBildirim_Islemi?.Invoke(IpVeyaAdı, GeriBildirim_Türü_.BağlantıKurulmasıTekrarDenecek, null, Hatırlatıcı);
+                    GeriBildirim_Islemi?.Invoke(ErişimNoktası.ToString(), GeriBildirim_Türü_.BağlantıKurulmasıTekrarDenecek, null, Hatırlatıcı);
 
                     Durdur();
                 }
@@ -88,7 +86,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
             Durdur(true);
 
-            GeriBildirim_Islemi?.Invoke(IpVeyaAdı, GeriBildirim_Türü_.Durduruldu, null, Hatırlatıcı);
+            GeriBildirim_Islemi?.Invoke(ErişimNoktası.ToString(), GeriBildirim_Türü_.Durduruldu, null, Hatırlatıcı);
         }
         void Durdur(bool TamamenDurdur = false)
         {

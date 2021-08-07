@@ -377,6 +377,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         {
             if (Alıcı == null)
             {
+                if (İstemciler.Count == 0) throw new Exception("Henüz hiçbir bağlantı kurulu olmadığı için gönderilemedi");
+
                 //tümüne gönder
                 foreach (var biri in İstemciler.Keys)
                 {
@@ -392,6 +394,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         {
             if (Alıcı == null)
             {
+                if (İstemciler.Count == 0) throw new Exception("Henüz hiçbir bağlantı kurulu olmadığı için gönderilemedi");
+
                 //tümüne gönder
                 foreach (var biri in İstemciler.Keys)
                 {

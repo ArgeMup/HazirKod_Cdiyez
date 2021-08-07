@@ -11,6 +11,9 @@ namespace ArgeMup.HazirKod
 {
     public class KodKümesi_ : IDisposable
     {
+    	public string Sürüm = "V1.0";
+        public delegate void KodKümesi_GeriBildirim_(object Çıktı, object Hatırlatıcı, string HataMesajı);
+        
         class KodKümesi_İşlem_
         {
             public MethodInfo Metod = null;
@@ -42,7 +45,7 @@ namespace ArgeMup.HazirKod
             int KardeşAdet = 1;
             if (Kardeşleri != null) KardeşAdet += Kardeşleri.Length;
             string[] YeniKardeşleri = new string[KardeşAdet];
-            YeniKardeşleri[0] = AppDomain.CurrentDomain.FriendlyName;
+            YeniKardeşleri[0] = AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName;
             if (Kardeşleri != null)
             {
                 for (int i = 0; i < Kardeşleri.Length; i++) YeniKardeşleri[1 + i] = Kardeşleri[i];
@@ -126,12 +129,9 @@ namespace ArgeMup.HazirKod
 
             return Liste.ToArray();
         }
-        public object Çağır(string AlanAdıVeSınıf, string İşlem, object[] Parametreler = null, int ZamanAşımı = 0)
+        public object Çağır(string AlanAdıVeSınıf, string İşlem, object[] Parametreler = null)
         {
-            object çıktı = null;
-            KodKümesi_İşlem_ Kopyası = null;
-
-            if (!İşlemler.TryGetValue(AlanAdıVeSınıf + İşlem, out Kopyası))
+            if (!İşlemler.TryGetValue(AlanAdıVeSınıf + İşlem, out KodKümesi_İşlem_ Kopyası))
             {
                 Kopyası = new KodKümesi_İşlem_();
 
@@ -147,42 +147,59 @@ namespace ArgeMup.HazirKod
                 İşlemler[AlanAdıVeSınıf + İşlem] = Kopyası;
             }
 
-            if (ZamanAşımı <= 0) çıktı = Kopyası.Metod.Invoke(Kopyası.Örnek, Parametreler);
-            else
+            return Kopyası.Metod.Invoke(Kopyası.Örnek, Parametreler);
+        }
+        public Thread Çağır(string AlanAdıVeSınıf, string İşlem, object[] Parametreler, KodKümesi_GeriBildirim_ GeriBildirim = null, object Hatrırlatıcı = null)
+        {
+            Thread görev = new Thread(delegate () 
             {
+                object çıktı = null;
                 string HataMesajı = "";
-                Thread görev = new Thread(delegate () 
+
+                try
                 {
-                    try
+                    çıktı = Çağır(AlanAdıVeSınıf, İşlem, Parametreler);
+                }
+                catch (Exception ex) 
+                { 
+                    while (ex != null)
                     {
-                        çıktı = Kopyası.Metod.Invoke(Kopyası.Örnek, Parametreler);
+                        HataMesajı += '|' + ex.Message;
+                        ex = ex.InnerException;
                     }
-                    catch (Exception ex) 
-                    { 
-                        while (ex != null)
-                        {
-                            HataMesajı += '|' + ex.Message;
-                            ex = ex.InnerException;
-                        }
-                    }
-                });
-                görev.Start();
-
-                ZamanAşımı = Environment.TickCount + ZamanAşımı;
-                while (ZamanAşımı > Environment.TickCount && görev.IsAlive) { Thread.Sleep(1); }
-                if (görev.IsAlive)
-                {
-                    görev.Abort();
-                    throw new Exception(AlanAdıVeSınıf + "." + İşlem + " zaman aşımı sebebiyle durduruldu");
                 }
 
-                if (!string.IsNullOrEmpty(HataMesajı))
-                {
-                    throw new Exception(AlanAdıVeSınıf + "." + İşlem + " iç hata oluştu" + HataMesajı);
-                }
+                GeriBildirim?.Invoke(çıktı, Hatrırlatıcı, HataMesajı);
+            });
+            görev.Start();
+
+            return görev;
+        }
+        public object Çağır(string AlanAdıVeSınıf, string İşlem, object[] Parametreler, int ZamanAşımı = 0)
+        {
+            object Çıktı_iç = null;
+            string HataMesajı_iç = "";
+
+            Thread Görev = Çağır(AlanAdıVeSınıf, İşlem, Parametreler, (object Çıktı, object Hatırlatıcı, string HataMesajı) => 
+            {
+                Çıktı_iç = Çıktı;
+                HataMesajı_iç = HataMesajı;
+            });
+
+            ZamanAşımı = Environment.TickCount + ZamanAşımı;
+            while (ZamanAşımı > Environment.TickCount && Görev.IsAlive) { Thread.Sleep(1); }
+            if (Görev.IsAlive)
+            {
+                Görev.Abort();
+                throw new Exception(AlanAdıVeSınıf + "." + İşlem + " zaman aşımı sebebiyle durduruldu");
             }
 
-            return çıktı;
+            if (!string.IsNullOrEmpty(HataMesajı_iç))
+            {
+                throw new Exception(AlanAdıVeSınıf + "." + İşlem + " iç hata oluştu" + HataMesajı_iç);
+            }
+
+            return Çıktı_iç;
         }
 
         #region IDisposable Support

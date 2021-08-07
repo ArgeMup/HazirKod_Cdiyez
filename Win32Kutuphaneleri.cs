@@ -9,13 +9,10 @@ namespace ArgeMup.HazirKod
 {
     public static class W32_1
     {
-        public const string Sürüm = "V0.1";
+        public const string Sürüm = "V0.0";
 
         [DllImport("kernel32.dll")]
         public static extern IntPtr LoadLibrary(string lpFileName);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool AllocConsole();
     }
 
     public static class W32_2
@@ -107,5 +104,29 @@ namespace ArgeMup.HazirKod
 
         [DllImport("user32.dll")]
         public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wp, IntPtr lp);
+    }
+
+    public static class W32_Konsol
+    {
+        public const string Sürüm = "V0.0";
+
+        // [DllImport("kernel32.dll")]
+        // public static extern bool AllocConsole(); //Doğrudan açmak için
+
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        public static void AyrıPenceredeGöster(bool Evet)
+        {
+            const int SW_HIDE = 0;
+            const int SW_SHOW = 5;
+            var handle = GetConsoleWindow();
+
+            if (Evet) ShowWindow(handle, SW_SHOW);
+            else ShowWindow(handle, SW_HIDE);
+        }
     }
 }

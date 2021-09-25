@@ -111,6 +111,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
             try { if (SeriPort != null) { SeriPort.Close(); SeriPort.Dispose(); } } catch (Exception) { }
             SeriPort = null;
+
+            GeriBildirim_Islemi?.Invoke(ErişimNoktası, GeriBildirim_Türü_.BağlantıKoptu, null, Hatırlatıcı);
         }
 
         #region IDonanımHaberlleşmesi

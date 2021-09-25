@@ -35,5 +35,18 @@ namespace ArgeMup.HazirKod
             return Toplam / Kapasite;
         }
     }
+
+    public class Hesapla
+    {
+        public static double Normalleştir(double Bilgi, double BilgiDizisi_EnDüşükDeğeri, double BilgiDizisi_EnYüksekDeğeri, double AltSınır = 0, double ÜstSınır = 1)
+        {
+            double Fark_Bilgi = BilgiDizisi_EnYüksekDeğeri - BilgiDizisi_EnDüşükDeğeri;
+            double Fark_Sınır = ÜstSınır - AltSınır;
+
+            if (Fark_Bilgi == 0) return Fark_Sınır / 2;
+
+            return ( ( ( Bilgi - BilgiDizisi_EnDüşükDeğeri) / Fark_Bilgi) * Fark_Sınır) + AltSınır;
+        }
+    }
 }
 

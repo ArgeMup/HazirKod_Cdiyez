@@ -136,7 +136,7 @@ namespace ArgeMup.HazirKod
                     {
                         if (field.FieldType.ToString() == Oku(AltDal, "Tip"))
                         {
-                            field.SetValue(Sınıf, D_Nesne.BaytDizisinden(D_HexMetin.BaytDizisine(Oku(AltDal, "Bilgi"))));
+                            field.SetValue(Sınıf, D_Nesne.BaytDizisinden(D_HexYazı.BaytDizisine(Oku(AltDal, "Bilgi"))));
                         }
                     }
                 }
@@ -154,7 +154,7 @@ namespace ArgeMup.HazirKod
                 {
                     string AltDal = "";
                     if (!Yaz(ref AltDal, "Tip", field.FieldType.ToString())) return false;
-                    if (!Yaz(ref AltDal, "Bilgi", D_HexMetin.BaytDizisinden(D_Nesne.BaytDizisine(field.GetValue(Sınıf))))) return false;
+                    if (!Yaz(ref AltDal, "Bilgi", D_HexYazı.BaytDizisinden(D_Nesne.BaytDizisine(field.GetValue(Sınıf))))) return false;
                 
                     if (!Yaz(ref Xml, field.Name, AltDal)) return false;
                 }
@@ -335,17 +335,9 @@ namespace ArgeMup.HazirKod
 
                     XmlElement Uygulama = Döküman.CreateElement("Uygulama");
                     XmlElement Uygulama_1 = Döküman.CreateElement("Ad");
-					#if UUNNIITTYY
-					Uygulama_1.InnerText = UnityEngine.Application.productName;
-					#else
-					Uygulama_1.InnerText = System.Windows.Forms.Application.ProductName;
-					#endif
+					Uygulama_1.InnerText = HazirKod.Kendi.Adı();
                     XmlElement Uygulama_2 = Döküman.CreateElement("Surum");
-					#if UUNNIITTYY
-					Uygulama_2.InnerText = "V" + UnityEngine.Application.version;
-					#else
-					Uygulama_2.InnerText = "V" + System.Windows.Forms.Application.ProductVersion;
-					#endif
+					Uygulama_2.InnerText = "V" + HazirKod.Kendi.Sürümü_Dosya();
                     Uygulama.AppendChild(Uygulama_1);
                     Uygulama.AppendChild(Uygulama_2);
 
@@ -353,7 +345,7 @@ namespace ArgeMup.HazirKod
 
                     XmlElement DogrulamaKontrolu = Döküman.CreateElement("DogrulamaKontrolu");
                     XmlElement DogrulamaKontrolu_1 = Döküman.CreateElement("ButunlukKontrolu");
-                    DogrulamaKontrolu_1.InnerText = D_HexMetin.BaytDizisinden(D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(D_Metin.BaytDizisine(Ayarlar.OuterXml), 32));
+                    DogrulamaKontrolu_1.InnerText = D_HexYazı.BaytDizisinden(D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(D_Yazı.BaytDizisine(Ayarlar.OuterXml), 32));
                     XmlElement DogrulamaKontrolu_2 = Döküman.CreateElement("ParolaKontrolu");
                     if (Parola == "") DogrulamaKontrolu_2.InnerText = "ParolaKontroluBilgisi";
                     else DogrulamaKontrolu_2.InnerText = Karmaşıklaştırma.Karıştır("ParolaKontroluBilgisi", Parola);
@@ -387,7 +379,7 @@ namespace ArgeMup.HazirKod
                 if (File.Exists(AyarlarDosyasıYolu) && !File.Exists(AyarlarDosyasıYolu + ".yedek")) File.Copy(AyarlarDosyasıYolu, AyarlarDosyasıYolu + ".yedek", false);
 
                 Mutex_.WaitOne();
-                Döküman.ChildNodes[0].ChildNodes[3].ChildNodes[0].InnerText = D_HexMetin.BaytDizisinden(D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(D_Metin.BaytDizisine(Döküman.ChildNodes[0].ChildNodes[2].OuterXml), 32));
+                Döküman.ChildNodes[0].ChildNodes[3].ChildNodes[0].InnerText = D_HexYazı.BaytDizisinden(D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(D_Yazı.BaytDizisine(Döküman.ChildNodes[0].ChildNodes[2].OuterXml), 32));
                 Döküman.Save(AyarlarDosyasıYolu);
 
                 AyarlarDalı = null;
@@ -424,7 +416,7 @@ namespace ArgeMup.HazirKod
                     if (Parola == "") { if (Döküman.ChildNodes[0].ChildNodes[3].ChildNodes[1].InnerText != "ParolaKontroluBilgisi") return false; }
                     else if (Karmaşıklaştırma.Düzelt(Döküman.ChildNodes[0].ChildNodes[3].ChildNodes[1].InnerText, Parola) != "ParolaKontroluBilgisi") return false;
 
-                    string Hesaplanan_DoğrulukKontrolüBilgisi = D_HexMetin.BaytDizisinden(D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(D_Metin.BaytDizisine(Döküman.ChildNodes[0].ChildNodes[2].OuterXml), 32));
+                    string Hesaplanan_DoğrulukKontrolüBilgisi = D_HexYazı.BaytDizisinden(D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(D_Yazı.BaytDizisine(Döküman.ChildNodes[0].ChildNodes[2].OuterXml), 32));
                     string Okunan_DoğrulukKontrolüBilgisi = Döküman.ChildNodes[0].ChildNodes[3].ChildNodes[0].InnerText;
                     if (Hesaplanan_DoğrulukKontrolüBilgisi != Okunan_DoğrulukKontrolüBilgisi) return false;
 

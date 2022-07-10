@@ -3,6 +3,7 @@
 using System;
 using System.IO.Ports;
 using System.Threading;
+using System.Linq;
 
 namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 {
@@ -18,8 +19,12 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         #endregion
 
         #region İç Kullanım
-        string ErişimNoktası = "";
-        int BitHızı = 0;
+        string ErişimNoktası = "", ErişimNoktasıAçıklaması = "";
+        System.Collections.Generic.List<string> ErişimNoktaları = null;
+        int BitHızı = 921600;
+        int BitSayısı = 8;
+        Parity Doğrulama = Parity.None;
+        StopBits DurBitSayısı = StopBits.One;
         bool Çalışşsın = true;
 
         GeriBildirim_Islemi_ GeriBildirim_Islemi = null;
@@ -27,10 +32,14 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         SerialPort SeriPort = null;
         #endregion
         
-        public SeriPort_(string ErişimNoktası, int BitHızı, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000)
+        /// <param name="ErişimNoktası">COMX olması durumunda ilk mümkün olan erişim noktasını açar </param>
+        public SeriPort_(string ErişimNoktası, int BitHızı, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, int BitSayısı = 8, string Doğrulama = "Yok", double DurBitSayısı = 1.0)
         {
             this.ErişimNoktası = ErişimNoktası;
             this.BitHızı = BitHızı;
+            this.BitSayısı = BitSayısı;
+            this.Doğrulama = (Doğrulama == "Yok") ? Parity.None : (Doğrulama == "Tek") ? Parity.Odd : (Doğrulama == "Çift") ? Parity.Even : (Doğrulama == "Boşluk") ? Parity.Space : Parity.Mark;
+            this.DurBitSayısı = (DurBitSayısı == 1.0) ? StopBits.One : (DurBitSayısı == 1.5) ? StopBits.OnePointFive : (DurBitSayısı == 2.0) ? StopBits.Two : StopBits.None;
             this.GeriBildirim_Islemi = GeriBildirim_Islemi;
             this.Hatırlatıcı = Hatırlatıcı;
             this.SatırSatırGönderVeAl = SatırSatırGönderVeAl;
@@ -41,20 +50,38 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
         void Görev_İşlemi_SeriPort()
         {
+            string _erişim_noktası = ErişimNoktası;
+            ErişimNoktasıAçıklaması = ErişimNoktası;
+
             while (Çalışşsın)
             {
                 try
                 {
                     if (SeriPort == null || !SeriPort.IsOpen)
                     {
-                        SeriPort = new SerialPort(ErişimNoktası, BitHızı, Parity.None, 8, StopBits.One);
+                        if (ErişimNoktası == "COMx")
+                        {
+                            if (ErişimNoktaları == null || ErişimNoktaları.Count == 0)
+                            {
+                                string[] dizi = SerialPort.GetPortNames();
+                                if (dizi == null || dizi.Length == 0) throw new Exception("Hiçbir erişim noktası mevcut değil");
+
+                                ErişimNoktaları = dizi.ToList();
+                            }
+
+                            ErişimNoktasıAçıklaması = "COMx " + ErişimNoktaları[0];
+                            _erişim_noktası = ErişimNoktaları[0];
+                            ErişimNoktaları.RemoveAt(0);
+                        }
+
+                        SeriPort = new SerialPort(_erişim_noktası, BitHızı, Doğrulama, BitSayısı, DurBitSayısı);
                         SeriPort.Open();
                         SeriPort.DiscardOutBuffer();
                         SeriPort.DiscardInBuffer();
                         SeriPort.ReadTimeout = TekrarDeneme_ZamanAşımı_msn;
                         SeriPort.WriteTimeout = BilgiGönderme_ZamanAşımı_msn;
 
-                        GeriBildirim_Islemi?.Invoke(ErişimNoktası, GeriBildirim_Türü_.BağlantıKuruldu, null, Hatırlatıcı);
+                        GeriBildirim_Islemi?.Invoke(ErişimNoktasıAçıklaması, GeriBildirim_Türü_.BağlantıKuruldu, null, Hatırlatıcı);
                     }
 
                     int sayac = 0;
@@ -81,7 +108,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                         if (çıktı == null) throw new Exception();
                         else
                         {
-                            GeriBildirim_Islemi?.Invoke(ErişimNoktası, GeriBildirim_Türü_.BilgiGeldi, çıktı, Hatırlatıcı);
+                            GeriBildirim_Islemi?.Invoke(ErişimNoktasıAçıklaması, GeriBildirim_Türü_.BilgiGeldi, çıktı, Hatırlatıcı);
 
                             if (sayac++ > 100) { sayac = 0; Thread.Sleep(1); } //cpu yüzdesini düşürmek için
                         }
@@ -90,7 +117,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                 catch (TimeoutException) { Thread.Sleep(1); } //cpu yüzdesini düşürmek için
                 catch (Exception) 
                 {
-                    GeriBildirim_Islemi?.Invoke(ErişimNoktası, GeriBildirim_Türü_.BağlantıKurulmasıTekrarDenecek, null, Hatırlatıcı);
+                    GeriBildirim_Islemi?.Invoke(ErişimNoktasıAçıklaması, GeriBildirim_Türü_.BağlantıKurulmasıTekrarDenecek, null, Hatırlatıcı);
 
                     Durdur();
                     Thread.Sleep(TekrarDeneme_ZamanAşımı_msn); 
@@ -99,7 +126,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
             Durdur(true);
 
-            GeriBildirim_Islemi?.Invoke(ErişimNoktası, GeriBildirim_Türü_.Durduruldu, null, Hatırlatıcı);
+            GeriBildirim_Islemi?.Invoke(ErişimNoktasıAçıklaması, GeriBildirim_Türü_.Durduruldu, null, Hatırlatıcı);
         }
         void Durdur(bool TamamenDurdur = false)
         {
@@ -112,7 +139,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             try { if (SeriPort != null) { SeriPort.Close(); SeriPort.Dispose(); } } catch (Exception) { }
             SeriPort = null;
 
-            GeriBildirim_Islemi?.Invoke(ErişimNoktası, GeriBildirim_Türü_.BağlantıKoptu, null, Hatırlatıcı);
+            GeriBildirim_Islemi?.Invoke(ErişimNoktasıAçıklaması, GeriBildirim_Türü_.BağlantıKoptu, null, Hatırlatıcı);
         }
 
         #region IDonanımHaberlleşmesi

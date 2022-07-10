@@ -6,13 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Globalization;
 
-#if !UUNNIITTYY
+#if HazriKod_Cdiyez_Görsel
 using System.Drawing;
 #endif
 
 namespace ArgeMup.HazirKod.Dönüştürme
 {
-    public static class D_Metin
+    public static class D_Yazı
     {
         public const string Sürüm = "V1.1";
 
@@ -31,7 +31,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
         }
     }
 
-    public static class D_HexMetin
+    public static class D_HexYazı
     {
         public const string Sürüm = "V1.1";
 
@@ -59,35 +59,50 @@ namespace ArgeMup.HazirKod.Dönüştürme
     {
         public const string Sürüm = "V1.0";
 
-        public static readonly char ondalık_ayraç = Convert.ToChar(System.Globalization.CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
-        public static double Yazıdan(string Girdi)
+        public static readonly char ayraç_kesir = Convert.ToChar(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
+        public static readonly char ayraç_tamsayı = Convert.ToChar(CultureInfo.InvariantCulture.NumberFormat.NumberGroupSeparator);
+        public static double Yazıdan(string Girdi, bool TamKontrol = true, bool GeçersizKarakterleriSil = true)
         {
-            Girdi = Girdi.Replace('.', ondalık_ayraç).Replace(',', ondalık_ayraç);
+            if (TamKontrol)
+            {
+                //tamsayı   .
+                //kesir     ,
+                if (Girdi.LastIndexOf(ayraç_tamsayı) > Girdi.LastIndexOf(ayraç_kesir))
+                {
+                    //100,000,000.2
+                    Girdi = Girdi.Replace(ayraç_kesir.ToString(), "");
+                    //100000000.2
+                    Girdi = Girdi.Replace(ayraç_tamsayı, ayraç_kesir);
+                    //100000000,2
+                }
+            }
 
-            if (double.TryParse(Girdi, NumberStyles.Float, CultureInfo.InvariantCulture, out double Çıktı))
+            if (double.TryParse(Girdi, NumberStyles.AllowThousands | NumberStyles.Float, CultureInfo.InvariantCulture, out double Çıktı))
             {
                 return Çıktı;
             }
             
-            //geçersiz karakterleri sil
-            string yeni = "";
-            bool Enazbirkarakterbulundu = false;
-            foreach (char krt in Girdi)
+            if (GeçersizKarakterleriSil)
             {
-                if (krt == ondalık_ayraç || krt == '+' || krt == '-' || (krt >= '0' && krt <= '9'))
+                string yeni = "";
+                bool Enazbirkarakterbulundu = false;
+                foreach (char krt in Girdi)
                 {
-                    yeni += krt;
-                    Enazbirkarakterbulundu = true;
+                    if (krt == ayraç_kesir || krt == '+' || krt == '-' || (krt >= '0' && krt <= '9'))
+                    {
+                        yeni += krt;
+                        Enazbirkarakterbulundu = true;
+                    }
+                    else if (Enazbirkarakterbulundu) break;
                 }
-                else if (Enazbirkarakterbulundu) break;
-            }
 
-            //tekrar dene
-            if (double.TryParse(yeni, NumberStyles.Float, CultureInfo.InvariantCulture, out Çıktı))
-            {
-                return Çıktı;
+                //tekrar dene
+                if (double.TryParse(yeni, NumberStyles.Float, CultureInfo.InvariantCulture, out Çıktı))
+                {
+                    return Çıktı;
+                }
             }
-
+            
             throw new Exception(Girdi + " sayıya dönüştürülemiyor");
         }
         public static string Yazıya(double Girdi)
@@ -239,18 +254,18 @@ namespace ArgeMup.HazirKod.Dönüştürme
         }
     }
 		
-	#if !UUNNIITTYY
+	#if HazriKod_Cdiyez_Görsel
     public static class D_İkon
     {
         public const string Sürüm = "V1.0";
 
-        public static Icon Metinden(string Metin, Icon ikon, Font font, Color Renk, Point Konum, Color ArkaPlan)
+        public static Icon Yazıdan(string Yazı, Icon ikon, Font font, Color Renk, Point Konum, Color ArkaPlan)
         {
             Brush brush = new SolidBrush(Renk);
             Bitmap bitmap = new Bitmap(ikon.Width, ikon.Height);
             Graphics graphics = Graphics.FromImage(bitmap);
             graphics.Clear(ArkaPlan);
-            graphics.DrawString(Metin, font, brush, Konum.X, Konum.Y);
+            graphics.DrawString(Yazı, font, brush, Konum.X, Konum.Y);
             Icon createdIcon = Icon.FromHandle(bitmap.GetHicon());
 
             brush.Dispose();
@@ -273,7 +288,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
     {
         public const string Sürüm = "V1.1";
 
-        public static string Metne(decimal d, int NoktadanSonrakiKarakterSayısı = 2)
+        public static string Yazıya(decimal d, int NoktadanSonrakiKarakterSayısı = 2)
         {
             string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
             if (d < 1) return "0B";
@@ -288,7 +303,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
     {
         public const string Sürüm = "V1.3";
 
-        public static class Metne
+        public static class Yazıya
         {
             public static string SaatDakikaSaniye(int Saat, int Dakika = 0, int Saniye = 0)
             {
@@ -444,45 +459,45 @@ namespace ArgeMup.HazirKod.Dönüştürme
             }
         }
     }
-	
-//#if !UUNNIITTYY
- //   public static class D_Parmakİzi
- //   {
- //       public const string Sürüm = "V1.0";
 
- //       public static string Metne()
- //       {
- //           /* 
- //            * Kullanılacak ise  
- //            * Solution Explorer -> Proje -> References -> Add Reference
- //            * Assemblies -> Framework -> System.Management
- //            */
-
- //           string Çıktı = "";
- //           System.Management.ManagementClass mc = new System.Management.ManagementClass("Win32_DiskDrive");
- //           System.Management.ManagementObjectCollection moc = mc.GetInstances();
- //           foreach (System.Management.ManagementBaseObject mo in moc)
- //           {
- //               var gecici = mo["InterfaceType"];
- //               if (gecici == null || gecici.ToString() == "USB") continue;
-
- //               gecici = mo["Model"];
- //               if (gecici != null) Çıktı += gecici.ToString() + ", ";
-
- //               gecici = mo["SerialNumber"];
- //               if (gecici != null) Çıktı += gecici.ToString() + ", ";
-
- //               gecici = mo["Signature"];
- //               if (gecici != null) Çıktı += gecici.ToString();
-
- //               if (Çıktı != "") break;
- //           }
-
- //           moc.Dispose();
- //           mc.Dispose();
-
- //           return Çıktı;
- //       }
- //   }
- //#endif
+    #if HazriKod_Cdiyez_DeneyselEklentiler
+    public static class D_Parmakİzi
+    {
+        public const string Sürüm = "V1.0";
+    
+        public static string Metne()
+        {
+            /* 
+            * Kullanılacak ise  
+            * Solution Explorer -> Proje -> References -> Add Reference
+            * Assemblies -> Framework -> System.Management
+            */
+    
+            string Çıktı = "";
+            System.Management.ManagementClass mc = new System.Management.ManagementClass("Win32_DiskDrive");
+            System.Management.ManagementObjectCollection moc = mc.GetInstances();
+            foreach (System.Management.ManagementBaseObject mo in moc)
+            {
+                var gecici = mo["InterfaceType"];
+                if (gecici == null || gecici.ToString() == "USB") continue;
+    
+                gecici = mo["Model"];
+                if (gecici != null) Çıktı += gecici.ToString() + ", ";
+    
+                gecici = mo["SerialNumber"];
+                if (gecici != null) Çıktı += gecici.ToString() + ", ";
+    
+                gecici = mo["Signature"];
+                if (gecici != null) Çıktı += gecici.ToString();
+    
+                if (Çıktı != "") break;
+            }
+    
+            moc.Dispose();
+            mc.Dispose();
+    
+            return Çıktı;
+        }
+    }
+    #endif
 }

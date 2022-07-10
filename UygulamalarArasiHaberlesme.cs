@@ -144,7 +144,7 @@ namespace ArgeMup.HazirKod
         
         void Biriktir(ref byte[] Çıktı, string Girdi)
         {
-            Biriktir(ref Çıktı, D_Metin.BaytDizisine(Girdi));
+            Biriktir(ref Çıktı, D_Yazı.BaytDizisine(Girdi));
         }
         void Biriktir(ref byte[] Çıktı, byte[] Girdi)
         {
@@ -302,7 +302,7 @@ namespace ArgeMup.HazirKod
         string Oku(NamedPipeClientStream Akış, int ZamanAşımı_msn)
         {
             byte[] Okunan = null;
-            if (Oku(Akış, ZamanAşımı_msn, out Okunan)) return D_Metin.BaytDizisinden(Okunan);
+            if (Oku(Akış, ZamanAşımı_msn, out Okunan)) return D_Yazı.BaytDizisinden(Okunan);
             else return "";
         }
         bool Oku(NamedPipeClientStream Akış, int ZamanAşımı_msn, out byte[] Çıktı)
@@ -353,7 +353,7 @@ namespace ArgeMup.HazirKod
         }
         bool Yaz(NamedPipeClientStream Akış, int ZamanAşımı_msn, string Girdi)
         {
-            if (Yaz(Akış, ZamanAşımı_msn, D_Metin.BaytDizisine(Girdi))) return true;
+            if (Yaz(Akış, ZamanAşımı_msn, D_Yazı.BaytDizisine(Girdi))) return true;
             else return false;
         }
         bool Yaz(NamedPipeClientStream Akış, int ZamanAşımı_msn, byte[] Girdi)
@@ -458,9 +458,9 @@ namespace ArgeMup.HazirKod
                     Ortak.Alıcı[No] = null;
                 }
 
-                PipeSecurity ps = new PipeSecurity();
-                ps.AddAccessRule(new PipeAccessRule("Everyone", PipeAccessRights.ReadWrite | PipeAccessRights.CreateNewInstance, System.Security.AccessControl.AccessControlType.Allow));
-                Ortak.Alıcı[No] = new NamedPipeServerStream(Ortak.Adı, PipeDirection.InOut, Ortak.Alıcı_AzamiSayısı, PipeTransmissionMode.Byte, PipeOptions.Asynchronous, 1024, 1024, ps);
+                //PipeSecurity ps = new PipeSecurity();
+                //ps.AddAccessRule(new PipeAccessRule("Everyone", PipeAccessRights.ReadWrite | PipeAccessRights.CreateNewInstance, System.Security.AccessControl.AccessControlType.Allow));
+                Ortak.Alıcı[No] = new NamedPipeServerStream(Ortak.Adı, PipeDirection.InOut, Ortak.Alıcı_AzamiSayısı, PipeTransmissionMode.Byte, PipeOptions.Asynchronous, 1024, 1024/*, ps*/);
                 Ortak.Alıcı[No].BeginWaitForConnection(new AsyncCallback(Alıcı_İşlemi), No);
             }
             catch (Exception) { }
@@ -502,7 +502,7 @@ namespace ArgeMup.HazirKod
         string Oku(NamedPipeServerStream Akış, int ZamanAşımı_msn)
         {
             byte[] Okunan = null;
-            if (Oku(Akış, ZamanAşımı_msn, out Okunan)) return D_Metin.BaytDizisinden(Okunan);
+            if (Oku(Akış, ZamanAşımı_msn, out Okunan)) return D_Yazı.BaytDizisinden(Okunan);
             else return "";
         }
         bool Oku(NamedPipeServerStream Akış, int ZamanAşımı_msn, out byte[] Çıktı)
@@ -553,7 +553,7 @@ namespace ArgeMup.HazirKod
         }
         bool Yaz(NamedPipeServerStream Akış, int ZamanAşımı_msn, string Girdi)
         {
-            if (Yaz(Akış, ZamanAşımı_msn, D_Metin.BaytDizisine(Girdi))) return true;
+            if (Yaz(Akış, ZamanAşımı_msn, D_Yazı.BaytDizisine(Girdi))) return true;
             else return false;
         }
         bool Yaz(NamedPipeServerStream Akış, int ZamanAşımı_msn, byte[] Girdi)

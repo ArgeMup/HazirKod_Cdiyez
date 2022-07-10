@@ -1,77 +1,67 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod>
 
 using System;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace ArgeMup.HazirKod
 {
-    //Değişkenler
-    internal static class D
+    //static
+    public class D
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
 
         #region Değişkenler
-        struct BirDeğişken_
-        {
-            public string Adı;
-            public WeakReference İçeriği;
-            
-            public BirDeğişken_(string Adı, object İçeriği)
-            {
-                this.Adı = Adı;
-                this.İçeriği = new WeakReference(İçeriği, false); 
-            }
-        }
-        static System.Collections.Generic.List<BirDeğişken_> Liste = new System.Collections.Generic.List<BirDeğişken_>();
-        static System.Threading.Mutex Muteks = new System.Threading.Mutex();
+        readonly static Değişkenler De = new Değişkenler();
+        readonly static Mutex Kilit = new Mutex();
         #endregion
 
-        static public object Oku(string Adı, object BulunamamasıDurumundakiİçeriği = null, bool BulunamamasıDurumundaYaz = false)
+        public static object Oku(string Adı, object BulunamamasıDurumundakiİçeriği = null)
+        {
+            Kilit.WaitOne();
+            object çıktı = De.Oku(Adı, BulunamamasıDurumundakiİçeriği);
+            Kilit.ReleaseMutex();
+
+            return çıktı;
+        }
+        public static void Yaz(string Adı, object İçeriği)
+        {
+            Kilit.WaitOne();
+            De.Yaz(Adı, İçeriği);
+            Kilit.ReleaseMutex();
+        }
+    }
+
+    //Dinamik
+    [Serializable]
+    public class Değişkenler
+    {
+        public const string Sürüm = "V1.0";
+
+        #region Değişkenler
+        Dictionary<string, object> Liste = new Dictionary<string, object>();
+        #endregion
+
+        public object Oku(string Adı, object BulunamamasıDurumundakiİçeriği = null)
         {
             if (string.IsNullOrEmpty(Adı)) return BulunamamasıDurumundakiİçeriği;
 
-            Muteks.WaitOne();
-
-            for (int i = 0; i < Liste.Count; i++)
-            {
-                if (Liste[i].Adı == Adı)
-                {
-                    if (!Liste[i].İçeriği.IsAlive || Liste[i].İçeriği.Target == null) { Liste.RemoveAt(i); break; }
-                    else { Muteks.ReleaseMutex(); return Liste[i].İçeriği.Target; }
-                }
-            }
-
-            if (BulunamamasıDurumundakiİçeriği != null && BulunamamasıDurumundaYaz)
-            {
-                Liste.Add(new BirDeğişken_(Adı, BulunamamasıDurumundakiİçeriği));
-            }
-
-            Muteks.ReleaseMutex();
-
+            if (!Liste.TryGetValue(Adı, out object okunan)) return BulunamamasıDurumundakiİçeriği;
+            
+            if (okunan != null) return okunan;
+                
+            Liste.Remove(Adı);
             return BulunamamasıDurumundakiİçeriği;
         }
-        static public void Yaz(string Adı, object İçeriği)
+        public void Yaz(string Adı, object İçeriği)
         {
-            if (string.IsNullOrEmpty(Adı)) return;
+            if (string.IsNullOrEmpty(Adı)) throw new Exception("Adı boş olamaz");
 
-            Muteks.WaitOne();
-
-            for (int i = 0; i < Liste.Count; i++)
+            if (İçeriği == null)
             {
-                if (Liste[i].Adı == Adı)
-                {
-                    if (İçeriği != null) Liste.Add(new BirDeğişken_(Liste[i].Adı, İçeriği));
-                    Liste.RemoveAt(i);
-                    
-                    Muteks.ReleaseMutex();
-                    return;
-                }
+                if (Liste.ContainsKey(Adı)) Liste.Remove(Adı);
             }
-
-            if (İçeriği != null) Liste.Add(new BirDeğişken_(Adı, İçeriği));
-
-            Muteks.ReleaseMutex();
-
-            return;
+            else Liste[Adı] = İçeriği;
         }
     }
 }

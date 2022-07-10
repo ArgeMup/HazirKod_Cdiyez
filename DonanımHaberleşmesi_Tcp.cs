@@ -11,7 +11,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 {
     public class Tcpİstemci_ : IDisposable, IDonanımHaberlleşmesi
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         #region Genel Görüşe Açık
         public object Hatırlatıcı = null;
@@ -238,7 +238,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
     public class TcpSunucu_ : IDisposable, IDonanımHaberlleşmesi
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         #region Genel Görüşe Açık
         public object Hatırlatıcı = null;
@@ -250,6 +250,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         #region İç Kullanım
         int ErişimNoktası;
         bool Çalışşsın = true;
+        bool SadeceYerel = true;
 
         GeriBildirim_Islemi_ GeriBildirim_Islemi = null;
 
@@ -257,7 +258,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         Dictionary<string, IDonanımHaberlleşmesi> İstemciler = new Dictionary<string, IDonanımHaberlleşmesi>();
         #endregion
 
-        public TcpSunucu_(int ErişimNoktası, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000)
+        public TcpSunucu_(int ErişimNoktası, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, bool SadeceYerel = true)
         {
             this.ErişimNoktası = ErişimNoktası;
             this.GeriBildirim_Islemi = GeriBildirim_Islemi;
@@ -265,6 +266,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             this.SatırSatırGönderVeAl = SatırSatırGönderVeAl;
             this.TekrarDeneme_ZamanAşımı_msn = TekrarDeneme_ZamanAşımı_msn;
             this.BilgiGönderme_ZamanAşımı_msn = BilgiGönderme_ZamanAşımı_msn;
+            this.SadeceYerel = SadeceYerel;
 
             new Thread(() => Görev_İşlemi_TcpSunucu()).Start();
         }
@@ -276,7 +278,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                 {
                     if (Sunucu == null)
                     {
-                        Sunucu = new TcpListener(IPAddress.Any, ErişimNoktası);
+                        Sunucu = new TcpListener(SadeceYerel ? IPAddress.Loopback : IPAddress.Any, ErişimNoktası);
                         Sunucu.Start();
                     }
 
@@ -314,6 +316,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             }
 
             Durdur(true);
+
+            GeriBildirim_Islemi?.Invoke(ErişimNoktası.ToString(), GeriBildirim_Türü_.Durduruldu, null, Hatırlatıcı);
         }
         void Durdur(bool TamamenDurdur = false)
         {
@@ -363,6 +367,12 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                 throw new Exception("Alıcı ile bağlantı koptuğu için gönderilemedi");
             }
         }
+        public int EtkinErişimNoktası()
+        {
+            if (Sunucu == null) return 0;
+
+            return ((IPEndPoint)Sunucu.LocalEndpoint).Port;
+        }
 
         #region IDonanımHaberlleşmesi
         bool IDonanımHaberlleşmesi.BağlantıKurulduMu()
@@ -375,7 +385,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
         void IDonanımHaberlleşmesi.Gönder(byte[] Bilgi, string Alıcı)
         {
-            if (Alıcı == null)
+            if (string.IsNullOrEmpty(Alıcı))
             {
                 if (İstemciler.Count == 0) throw new Exception("Henüz hiçbir bağlantı kurulu olmadığı için gönderilemedi");
 
@@ -392,7 +402,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
         void IDonanımHaberlleşmesi.Gönder(string Bilgi, string Alıcı)
         {
-            if (Alıcı == null)
+            if (string.IsNullOrEmpty(Alıcı))
             {
                 if (İstemciler.Count == 0) throw new Exception("Henüz hiçbir bağlantı kurulu olmadığı için gönderilemedi");
 

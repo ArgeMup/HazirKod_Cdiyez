@@ -95,7 +95,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         {
             object çıktı;
             if (SatırSatırGönderVeAl) çıktı = e.Data;
-            else çıktı = Dönüştürme.D_Metin.BaytDizisine(e.Data);
+            else çıktı = Dönüştürme.D_Yazı.BaytDizisine(e.Data);
 
             if (çıktı == null) return;
 

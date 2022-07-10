@@ -10,11 +10,12 @@ namespace ArgeMup.HazirKod
 {
     public class YeniYazılımKontrolü_ : IDisposable
     {
-    	public string Sürüm = "V1.0";
+    	public string Sürüm = "V1.1";
         public delegate void YeniYazılımKontrolü_GeriBildirim_(bool Sonuç, string Açıklama);
 
         WebClient İstemci = null;
         YeniYazılımKontrolü_GeriBildirim_ GeriBildirim_İşlemi = null;
+        string İndirilenDosyanınAdı = "ArgeMuP.HazirKod.YeniYazılımKontrolü." + Path.GetRandomFileName();
 
         public void Başlat(Uri DosyaKonumu, YeniYazılımKontrolü_GeriBildirim_ GeriBildirim = null)
         {
@@ -22,7 +23,7 @@ namespace ArgeMup.HazirKod
 
             GeriBildirim_İşlemi = GeriBildirim;
 
-            İstemci.DownloadFileAsync(DosyaKonumu, "ArgeMuP.HazirKod.YeniYazılımKontrolü");
+            İstemci.DownloadFileAsync(DosyaKonumu, İndirilenDosyanınAdı);
             İstemci.DownloadFileCompleted += new AsyncCompletedEventHandler(İstemci_DownloadFileCompleted);
         }
         public void Durdur()
@@ -38,8 +39,8 @@ namespace ArgeMup.HazirKod
         {
             if (e.Error == null)
             {
-                string şimdiki_dosya_yolu = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                FileVersionInfo gelen = FileVersionInfo.GetVersionInfo("ArgeMuP.HazirKod.YeniYazılımKontrolü");
+                string şimdiki_dosya_yolu = Kendi.DosyaYolu();
+                FileVersionInfo gelen = FileVersionInfo.GetVersionInfo(İndirilenDosyanınAdı);
                 FileVersionInfo şimdiki = FileVersionInfo.GetVersionInfo(şimdiki_dosya_yolu);
 
                 bool gelen_daha_yeni = false;
@@ -54,7 +55,7 @@ namespace ArgeMup.HazirKod
                     try
                     {
                         File.Move(şimdiki_dosya_yolu, şimdiki_dosya_yolu + ".V" + şimdiki.FileVersion);
-                        File.Move("ArgeMuP.HazirKod.YeniYazılımKontrolü", şimdiki_dosya_yolu);
+                        File.Move(İndirilenDosyanınAdı, şimdiki_dosya_yolu);
 
                         GeriBildirim_İşlemi?.Invoke(true, "Eski:V" + şimdiki.FileVersion + " Yeni:V" + gelen.FileVersion);
                     }
@@ -67,7 +68,7 @@ namespace ArgeMup.HazirKod
             }
             else GeriBildirim_İşlemi?.Invoke(false, e.Error.Message);
 
-            if (File.Exists("ArgeMuP.HazirKod.YeniYazılımKontrolü")) File.Delete("ArgeMuP.HazirKod.YeniYazılımKontrolü");
+            if (File.Exists(İndirilenDosyanınAdı)) File.Delete(İndirilenDosyanınAdı);
         }
 
         #region IDisposable Support

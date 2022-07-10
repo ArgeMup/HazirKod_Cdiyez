@@ -12,7 +12,7 @@ namespace ArgeMup.HazirKod
         public const string Sürüm = "V1.2";
         public string Karıştır(string Girdi, string Parola)
         {
-            return D_HexMetin.BaytDizisinden(Karıştır(D_Metin.BaytDizisine(Girdi), D_Metin.BaytDizisine(Parola)));
+            return D_HexYazı.BaytDizisinden(Karıştır(D_Yazı.BaytDizisine(Girdi), D_Yazı.BaytDizisine(Parola)));
         }
         public byte[] Karıştır(byte[] Girdi, byte[] Parola)
         {
@@ -40,7 +40,7 @@ namespace ArgeMup.HazirKod
 
         public string Düzelt(string Girdi, string Parola)
         {
-            return D_Metin.BaytDizisinden(Düzelt(D_HexMetin.BaytDizisine(Girdi), D_Metin.BaytDizisine(Parola)));
+            return D_Yazı.BaytDizisinden(Düzelt(D_HexYazı.BaytDizisine(Girdi), D_Yazı.BaytDizisine(Parola)));
         }
         public byte[] Düzelt(byte[] Girdi, byte[] Parola)
         {
@@ -121,9 +121,9 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
         public static string Metinden(string Girdi, int ÇıktıKarakterSayısı = 32)
         {
-            byte[] Dizi1 = D_Metin.BaytDizisine(Girdi);
+            byte[] Dizi1 = D_Yazı.BaytDizisine(Girdi);
             byte[] Dizi2 = BaytDizisinden(Dizi1, ÇıktıKarakterSayısı);
-            return D_HexMetin.BaytDizisinden(Dizi2);
+            return D_HexYazı.BaytDizisinden(Dizi2);
         }
     }
 }

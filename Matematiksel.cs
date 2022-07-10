@@ -6,12 +6,13 @@ namespace ArgeMup.HazirKod
 {
     public class Ortalama_
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         double[] Tampon = null;
         int Kapasite = 0;
         double Toplam = 0;
         int Konum = 0;
+        public double Ortalaması = 0;
 
         public Ortalama_(int Kapasite)
         {
@@ -32,7 +33,8 @@ namespace ArgeMup.HazirKod
 
             if (++Konum >= Kapasite) Konum = 0;
 
-            return Toplam / Kapasite;
+            Ortalaması = Toplam / Kapasite;
+            return Ortalaması;
         }
     }
 

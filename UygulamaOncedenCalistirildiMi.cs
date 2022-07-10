@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 using ArgeMup.HazirKod.Dönüştürme;
 
 namespace ArgeMup.HazirKod
@@ -28,7 +27,7 @@ namespace ArgeMup.HazirKod
                 {
                     if (string.IsNullOrEmpty(KilitDosyasiYolu))
                     {
-                        KilitDosyasiYolu = Application.ExecutablePath + ".Kilit.mup";
+                        KilitDosyasiYolu = Kendi.DosyaYolu() + ".Kilit.mup";
                     }
 
                     KilitDosyası = new FileStream(KilitDosyasiYolu, FileMode.OpenOrCreate, FileAccess.Read, FileShare.None);
@@ -94,11 +93,11 @@ namespace ArgeMup.HazirKod
 
         public bool KontrolEt(string OrtakNesneAdı = "")
         {
-            if (OrtakNesneAdı == "") OrtakNesneAdı = Application.ProductName;
+            if (OrtakNesneAdı == "") OrtakNesneAdı = Kendi.Adı();
             if (OrtakNesne != null) { OrtakNesne.Dispose(); OrtakNesne = null; }
 
             bool Evet = true;
-            OrtakNesneAdı = "UygulamaOncedenCalistirildiMi_" + D_HexMetin.BaytDizisinden(D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(D_Metin.BaytDizisine(OrtakNesneAdı)));
+            OrtakNesneAdı = "UygulamaOncedenCalistirildiMi_" + D_HexYazı.BaytDizisinden(D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(D_Yazı.BaytDizisine(OrtakNesneAdı)));
             OrtakNesne = new Mutex(false, OrtakNesneAdı, out Evet);
 
             return !Evet;

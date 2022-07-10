@@ -7,9 +7,9 @@ using System.Threading;
 
 namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 {
-    public class Udp_Dinleyici_ : IDisposable, IDonanımHaberlleşmesi
+    public class UdpDinleyici_ : IDisposable, IDonanımHaberlleşmesi
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         #region Genel Görüşe Açık
         public object Hatırlatıcı = null;
@@ -21,22 +21,25 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         #region İç Kullanım
         int ErişimNoktası = -1;
         bool Çalışşsın = true;
+        bool SadeceYerel = true;
 
         GeriBildirim_Islemi_ GeriBildirim_Islemi = null;
 
         UdpClient Alıcı = null;
         #endregion
         
-        public Udp_Dinleyici_(int ErişimNoktası, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000)
+        public UdpDinleyici_(int ErişimNoktası, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, bool SadeceYerel = true)
         {
-            if (ErişimNoktası < 0) return; //Sadece verici olarak çalışılacak
-
             this.ErişimNoktası = ErişimNoktası;
             this.GeriBildirim_Islemi = GeriBildirim_Islemi;
             this.Hatırlatıcı = Hatırlatıcı;
+
+            if (ErişimNoktası < 0) return; //Sadece verici olarak çalışılacak
+
             this.SatırSatırGönderVeAl = SatırSatırGönderVeAl;
             this.TekrarDeneme_ZamanAşımı_msn = TekrarDeneme_ZamanAşımı_msn;
             this.BilgiGönderme_ZamanAşımı_msn = BilgiGönderme_ZamanAşımı_msn;
+            this.SadeceYerel = SadeceYerel;
 
             new Thread(() => Görev_İşlemi_Udp_Dinleyici()).Start();
         }
@@ -44,13 +47,16 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         {
             int sayac = 0;
 
+			IPAddress AdresTipi = IPAddress.Loopback;
+            if (!SadeceYerel) AdresTipi = IPAddress.Any;
+
             while (Çalışşsın)
             {
                 try
                 {
                     if (Alıcı == null)
                     {
-                        Alıcı = new UdpClient(ErişimNoktası);
+                        Alıcı = new UdpClient(new IPEndPoint(AdresTipi, ErişimNoktası));
                         Alıcı.Client.ReceiveTimeout = TekrarDeneme_ZamanAşımı_msn;
                     }
 
@@ -59,7 +65,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                     if (dizi == null) throw new Exception();
 
                     object çıktı = null;
-                    if (SatırSatırGönderVeAl) çıktı = Dönüştürme.D_Metin.BaytDizisinden(dizi).TrimEnd(' ', '\r', '\n');
+                    if (SatırSatırGönderVeAl) çıktı = Dönüştürme.D_Yazı.BaytDizisinden(dizi).TrimEnd(' ', '\r', '\n');
                     else çıktı = dizi;
 
                     GeriBildirim_Islemi?.Invoke(RemoteIpEndPoint.ToString(), GeriBildirim_Türü_.BilgiGeldi, çıktı, Hatırlatıcı);
@@ -98,6 +104,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
             try { if (Alıcı != null) { Alıcı.Close(); Alıcı.Dispose(); } } catch (Exception) { }
             Alıcı = null;
+
+            if (ErişimNoktası < 0) GeriBildirim_Islemi?.Invoke(ErişimNoktası.ToString(), GeriBildirim_Türü_.Durduruldu, null, Hatırlatıcı);
         }
         void Gönder(byte[] Bilgi, string Alıcı)
         {
@@ -109,6 +117,12 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             UdpClient Verici = new UdpClient(dizi[0], Convert.ToInt32(dizi[1]));
             Verici.Client.SendTimeout = BilgiGönderme_ZamanAşımı_msn;
             Verici.Send(Bilgi, Bilgi.Length);
+        }
+        public int EtkinErişimNoktası()
+        {
+            if (Alıcı == null) return 0;
+
+            return ((IPEndPoint)Alıcı.Client.LocalEndPoint).Port;
         }
 
         #region IDonanımHaberlleşmesi
@@ -126,7 +140,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
         void IDonanımHaberlleşmesi.Gönder(string Bilgi, string Alıcı)
         {
-            byte[] dizi = Dönüştürme.D_Metin.BaytDizisine(Bilgi);
+            byte[] dizi = Dönüştürme.D_Yazı.BaytDizisine(Bilgi);
             Gönder(dizi, Alıcı);
         }
         #endregion
@@ -153,7 +167,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
 
         // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        ~Udp_Dinleyici_()
+        ~UdpDinleyici_()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(false);

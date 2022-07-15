@@ -119,7 +119,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
             return new SHA256Managed().ComputeHash(Dizi);
         }
 
-        public static string Metinden(string Girdi, int ÇıktıKarakterSayısı = 32)
+        public static string Yazıdan(string Girdi, int ÇıktıKarakterSayısı = 32)
         {
             byte[] Dizi1 = D_Yazı.BaytDizisine(Girdi);
             byte[] Dizi2 = BaytDizisinden(Dizi1, ÇıktıKarakterSayısı);

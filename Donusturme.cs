@@ -470,7 +470,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
         {
             public const string Sürüm = "V1.0";
         
-            public static string Metne()
+            public static string Yazıya()
             {
                 /* 
                 * Kullanılacak ise  

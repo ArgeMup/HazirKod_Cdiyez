@@ -275,16 +275,9 @@ namespace ArgeMup.HazirKod
                 Dispose();
                 disposedValue = false;
 
-				#if UUNNIITTYY
-					#if UNITY_EDITOR
-						AyarlarDosyası = AyarlarDosyası.Replace('/', '\\');
-					#endif
-					AyarlarDosyasıYolu = AyarlarDosyası;
-				#else
-					if (AyarlarDosyası == "") AyarlarDosyasıYolu = GetType().Assembly.Location + ".Ayarlar";    
-					else if (AyarlarDosyası.Contains("\\")) AyarlarDosyasıYolu = AyarlarDosyası;               
-					else AyarlarDosyasıYolu = Path.GetDirectoryName(GetType().Assembly.Location) + "\\" + AyarlarDosyası + ".Ayarlar";
-				#endif
+                if (AyarlarDosyası == "") AyarlarDosyasıYolu = Kendi.DosyaYolu() + ".Ayarlar";    
+                else if (AyarlarDosyası.Contains("\\")) AyarlarDosyasıYolu = AyarlarDosyası;               
+                else AyarlarDosyasıYolu = Kendi.Klasörü() + "\\" + AyarlarDosyası + ".Ayarlar";
 			
 				if (!File.Exists(AyarlarDosyasıYolu)) 
                 {
@@ -443,11 +436,7 @@ namespace ArgeMup.HazirKod
         {
             try
             {
-				#if UUNNIITTYY
-				if (Mutex_ != null) { Mutex_.Close(); Mutex_ = null; }
-				#else
 				if (Mutex_ != null) { Mutex_.Dispose(); Mutex_ = null; }
-				#endif
 
                 if (Zamanlayıcı != null) { Zamanlayıcı.Dispose(); Zamanlayıcı = null; }
                 if (Karmaşıklaştırma != null) { Karmaşıklaştırma.Dispose(); Karmaşıklaştırma = null; }

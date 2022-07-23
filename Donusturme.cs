@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Globalization;
 
-#if HazriKod_Cdiyez_Görsel
-using System.Drawing;
+#if HazirKod_Cdiyez_Görsel
+    using System.Drawing;
 #endif
 
 namespace ArgeMup.HazirKod.Dönüştürme
@@ -149,6 +149,10 @@ namespace ArgeMup.HazirKod.Dönüştürme
         {
             return Yazıya(Tarihe(Girdi), Şablon, Kültür);
         }
+        public static DateTime Tarihe(string Girdi)
+        {
+            return Tarihe(Sayıya(Girdi));
+        }
         public static DateTime Tarihe(double Girdi)
         {
             return DateTime.FromOADate(Girdi);
@@ -254,34 +258,34 @@ namespace ArgeMup.HazirKod.Dönüştürme
         }
     }
 		
-	#if HazriKod_Cdiyez_Görsel
-    public static class D_İkon
-    {
-        public const string Sürüm = "V1.0";
-
-        public static Icon Yazıdan(string Yazı, Icon ikon, Font font, Color Renk, Point Konum, Color ArkaPlan)
+	#if HazirKod_Cdiyez_Görsel
+        public static class D_İkon
         {
-            Brush brush = new SolidBrush(Renk);
-            Bitmap bitmap = new Bitmap(ikon.Width, ikon.Height);
-            Graphics graphics = Graphics.FromImage(bitmap);
-            graphics.Clear(ArkaPlan);
-            graphics.DrawString(Yazı, font, brush, Konum.X, Konum.Y);
-            Icon createdIcon = Icon.FromHandle(bitmap.GetHicon());
+            public const string Sürüm = "V1.0";
 
-            brush.Dispose();
-            graphics.Dispose();
-            bitmap.Dispose();
+            public static Icon Yazıdan(string Yazı, Icon ikon, Font font, Color Renk, Point Konum, Color ArkaPlan)
+            {
+                Brush brush = new SolidBrush(Renk);
+                Bitmap bitmap = new Bitmap(ikon.Width, ikon.Height);
+                Graphics graphics = Graphics.FromImage(bitmap);
+                graphics.Clear(ArkaPlan);
+                graphics.DrawString(Yazı, font, brush, Konum.X, Konum.Y);
+                Icon createdIcon = Icon.FromHandle(bitmap.GetHicon());
 
-            return createdIcon;
+                brush.Dispose();
+                graphics.Dispose();
+                bitmap.Dispose();
+
+                return createdIcon;
+            }
+
+            public static void Yoket(Icon ikon)
+            {
+                W32_8.DestroyIcon(ikon.Handle);
+                ikon.Dispose();
+                ikon = null;
+            }
         }
-
-        public static void Yoket(Icon ikon)
-        {
-            W32_8.DestroyIcon(ikon.Handle);
-            ikon.Dispose();
-            ikon = null;
-        }
-    }
 	#endif
 
     public static class D_DosyaBoyutu
@@ -461,43 +465,43 @@ namespace ArgeMup.HazirKod.Dönüştürme
     }
 
     #if HazriKod_Cdiyez_DeneyselEklentiler
-    public static class D_Parmakİzi
-    {
-        public const string Sürüm = "V1.0";
-    
-        public static string Metne()
+        public static class D_Parmakİzi
         {
-            /* 
-            * Kullanılacak ise  
-            * Solution Explorer -> Proje -> References -> Add Reference
-            * Assemblies -> Framework -> System.Management
-            */
-    
-            string Çıktı = "";
-            System.Management.ManagementClass mc = new System.Management.ManagementClass("Win32_DiskDrive");
-            System.Management.ManagementObjectCollection moc = mc.GetInstances();
-            foreach (System.Management.ManagementBaseObject mo in moc)
+            public const string Sürüm = "V1.0";
+        
+            public static string Metne()
             {
-                var gecici = mo["InterfaceType"];
-                if (gecici == null || gecici.ToString() == "USB") continue;
-    
-                gecici = mo["Model"];
-                if (gecici != null) Çıktı += gecici.ToString() + ", ";
-    
-                gecici = mo["SerialNumber"];
-                if (gecici != null) Çıktı += gecici.ToString() + ", ";
-    
-                gecici = mo["Signature"];
-                if (gecici != null) Çıktı += gecici.ToString();
-    
-                if (Çıktı != "") break;
+                /* 
+                * Kullanılacak ise  
+                * Solution Explorer -> Proje -> References -> Add Reference
+                * Assemblies -> Framework -> System.Management
+                */
+        
+                string Çıktı = "";
+                System.Management.ManagementClass mc = new System.Management.ManagementClass("Win32_DiskDrive");
+                System.Management.ManagementObjectCollection moc = mc.GetInstances();
+                foreach (System.Management.ManagementBaseObject mo in moc)
+                {
+                    var gecici = mo["InterfaceType"];
+                    if (gecici == null || gecici.ToString() == "USB") continue;
+        
+                    gecici = mo["Model"];
+                    if (gecici != null) Çıktı += gecici.ToString() + ", ";
+        
+                    gecici = mo["SerialNumber"];
+                    if (gecici != null) Çıktı += gecici.ToString() + ", ";
+        
+                    gecici = mo["Signature"];
+                    if (gecici != null) Çıktı += gecici.ToString();
+        
+                    if (Çıktı != "") break;
+                }
+        
+                moc.Dispose();
+                mc.Dispose();
+        
+                return Çıktı;
             }
-    
-            moc.Dispose();
-            mc.Dispose();
-    
-            return Çıktı;
         }
-    }
     #endif
 }

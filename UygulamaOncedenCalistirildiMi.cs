@@ -126,15 +126,17 @@ namespace ArgeMup.HazirKod
                     W32_4.GetWindowText(hWnd, stringBuilder, length + 1);
                     if (stringBuilder.ToString().Contains(Adı))
                     {
-                        W32_7.WINDOWPLACEMENT wp = new W32_7.WINDOWPLACEMENT();
-                        W32_7.GetWindowPlacement(hWnd, ref wp);
-                        if (wp.showCmd == 0 || wp.showCmd == 2 || EkranıKapla)
-                        {
-                            if (EkranıKapla) wp.showCmd = 3;
-                            else wp.showCmd = 1;
+                        #if HazirKod_Cdiyez_Görsel
+                            W32_7.WINDOWPLACEMENT wp = new W32_7.WINDOWPLACEMENT();
+                            W32_7.GetWindowPlacement(hWnd, ref wp);
+                            if (wp.showCmd == 0 || wp.showCmd == 2 || EkranıKapla)
+                            {
+                                if (EkranıKapla) wp.showCmd = 3;
+                                else wp.showCmd = 1;
 
-                            W32_7.SetWindowPlacement(hWnd, ref wp);
-                        }
+                                W32_7.SetWindowPlacement(hWnd, ref wp);
+                            }
+                        #endif
                         W32_3.SetForegroundWindow(hWnd);
                         Adet++;
                     }
@@ -151,9 +153,9 @@ namespace ArgeMup.HazirKod
             {
                 string Adı = Path.GetFileNameWithoutExtension(AppDomain.CurrentDomain.FriendlyName);
                 
-                #if DEBUG
+#if DEBUG
                 if (Adı.EndsWith(".vshost")) Adı = Adı.Remove(Adı.Length - ".vshost".Length);
-                #endif
+#endif
 
                 W32_6.EnumWindows(delegate (IntPtr hWnd, int lParam)
                 {
@@ -181,7 +183,7 @@ namespace ArgeMup.HazirKod
             return Adet;
         }
 
-        #region IDisposable Support
+#region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
@@ -216,7 +218,7 @@ namespace ArgeMup.HazirKod
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
-        #endregion
+#endregion
     }
 }
 

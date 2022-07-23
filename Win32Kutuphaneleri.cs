@@ -68,27 +68,29 @@ namespace ArgeMup.HazirKod
         public static extern bool EnumWindows(EnumWindowsProc enumFunc, int lParam);
     }
 
-    public static class W32_7
-    {
-        public const string Sürüm = "V0.0";
-
-        public struct WINDOWPLACEMENT
+    #if HazirKod_Cdiyez_Görsel
+        public static class W32_7
         {
-            public uint length;
-            public uint flags;
-            public uint showCmd; //0 gizli, 1 normal, 2 mini, 3 maxi, 5 olduğu gibi
-            public Point ptMinPosition;
-            public Point ptMaxPosition;
-            public Rectangle rcNormalPosition;
-        };
+            public const string Sürüm = "V0.0";
 
-        [DllImport("user32.dll")]
-        public static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WINDOWPLACEMENT lpwndpl);
+            public struct WINDOWPLACEMENT
+            {
+                public uint length;
+                public uint flags;
+                public uint showCmd; //0 gizli, 1 normal, 2 mini, 3 maxi, 5 olduğu gibi
+                public Point ptMinPosition;
+                public Point ptMaxPosition;
+                public Rectangle rcNormalPosition;
+            };
 
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
-    }
+            [DllImport("user32.dll")]
+            public static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WINDOWPLACEMENT lpwndpl);
+
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+        }
+    #endif
 
     public static class W32_8
     {

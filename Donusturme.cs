@@ -1,4 +1,4 @@
-﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod>
+﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
 using System;
 using System.IO;
@@ -232,15 +232,16 @@ namespace ArgeMup.HazirKod.Dönüştürme
             }
             return Çıktı;
         }
-        public static object BaytDizisinden(byte[] Girdi)
+        public static object BaytDizisinden(byte[] Girdi, int BaşlangıçKonumu = 0, int Adet = -1)
         {
             if (Girdi == null) return null;
+            if (Adet == -1) Adet = Girdi.Length - BaşlangıçKonumu;
 
             object Çıktı;
             using (var mS = new MemoryStream())
             {
                 var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                mS.Write(Girdi, 0, Girdi.Length);
+                mS.Write(Girdi, BaşlangıçKonumu, Adet);
                 mS.Seek(0, SeekOrigin.Begin);
                 Çıktı = bf.Deserialize(mS);
             }
@@ -464,7 +465,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
         }
     }
 
-    #if HazriKod_Cdiyez_DeneyselEklentiler
+    #if HazirKod_Cdiyez_DeneyselEklentiler
         public static class D_Parmakİzi
         {
             public const string Sürüm = "V1.0";

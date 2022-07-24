@@ -113,16 +113,22 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
     public static class D_DosyaKlasörAdı
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         public readonly static string KullanılmayacakKarakterler = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars()); 
         
-        public static string Düzelt(string Girdi)
+        public static string Düzelt(string Girdi, bool GeçersizKarakterleriSil = true)
         {
-            foreach (char c in KullanılmayacakKarakterler)
+            Girdi = Girdi.Trim().TrimEnd('\\');
+
+            if (GeçersizKarakterleriSil)
             {
-                Girdi = Girdi.Replace(c.ToString(), ""); 
+                foreach (char c in KullanılmayacakKarakterler)
+                {
+                    Girdi = Girdi.Replace(c.ToString(), "");
+                }
             }
+            
             return Girdi;
         }
     }

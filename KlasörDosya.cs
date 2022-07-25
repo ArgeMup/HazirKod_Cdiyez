@@ -51,7 +51,7 @@ namespace ArgeMup.HazirKod
             Klasör_ Sağdaki = new Klasör_(Sağ);
             Klasör_.Farklılık_ Farklar = Soldaki.Karşılaştır(Sağdaki);
 
-            return ( (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0) );
+            return Soldaki.FizikselOlarakMevcut && Sağdaki.FizikselOlarakMevcut && (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0);
         }
         public static bool Eşitle(string Sol, string Sağ)
         {
@@ -59,7 +59,7 @@ namespace ArgeMup.HazirKod
             Klasör_ Sağdaki = new Klasör_(Sağ);
             Klasör_.Farklılık_ Farklar = Soldaki.Eşitle(Sağdaki);
 
-            return ( (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0) );
+            return (Soldaki.FizikselOlarakMevcut || Sağdaki.FizikselOlarakMevcut) && (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0);
         }
         public static bool AslınaUygunHaleGetir(string Asıl, string Kopya, bool FazlaKlasörVeDosyalarıSil = false)
         {
@@ -67,8 +67,52 @@ namespace ArgeMup.HazirKod
             Klasör_ Kopyası = new Klasör_(Kopya);
             Klasör_.Farklılık_ Farklar = Kopyası.AslınaUygunHaleGetir(Aslolan, FazlaKlasörVeDosyalarıSil);
 
-            return ( (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0) );
+            return Aslolan.FizikselOlarakMevcut && (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0);
         }
+
+        public enum Kapsamı { Geçici, TümKullanıcılar, BuKullanıcı_BuİşletimSistemi, BuKullanıcı_TümİşletimSistemleri };
+        
+        /// <summary>
+        /// Geçici                              : C:\Users\<Kullanıcı Adı>\AppData\Local\Temp\<Aile>\<Uygulama>\<Sürüm>
+        /// TümKullanıcılar                     : C:\ProgramData\<Aile>\<Uygulama>\<Sürüm>
+        /// BuKullanıcı_BuİşletimSistemi        : C:\Users\<Kullanıcı Adı>\AppData\Local\<Aile>\<Uygulama>\<Sürüm>
+        /// BuKullanıcı_TümİşletimSistemleri    : C:\Users\<Kullanıcı Adı>\AppData\Roaming\<Aile>\<Uygulama>\<Sürüm>
+        /// </summary>
+        public static string Depolama(Kapsamı HedeflenenKapsamı = Kapsamı.BuKullanıcı_BuİşletimSistemi, string Aile = null, string Uygulama = null, string Sürüm = null)
+        {
+            Environment.SpecialFolder Tür = 0;
+            if (Aile == null) Aile = "ArGeMuP";
+            if (Uygulama == null) Uygulama = Kendi.Adı();
+            if (Sürüm == null) Sürüm = Kendi.Sürümü_Dosya();
+
+            string kls = null;
+            if (HedeflenenKapsamı == Kapsamı.Geçici) kls = Path.GetTempPath().TrimEnd('\\');
+            else
+            {
+                switch (HedeflenenKapsamı)
+                {
+                    case Kapsamı.TümKullanıcılar:
+                        Tür = Environment.SpecialFolder.CommonApplicationData;
+                        break;
+
+                    case Kapsamı.BuKullanıcı_BuİşletimSistemi:
+                        Tür = Environment.SpecialFolder.LocalApplicationData;
+                        break;
+
+                    case Kapsamı.BuKullanıcı_TümİşletimSistemleri:
+                        Tür = Environment.SpecialFolder.ApplicationData;
+                        break;
+                }
+
+                kls = Environment.GetFolderPath(Tür);
+            }
+
+            if (!string.IsNullOrEmpty(Aile)) kls += @"\" + Aile;
+            if (!string.IsNullOrEmpty(Uygulama)) kls += @"\" + Uygulama;
+            if (!string.IsNullOrEmpty(Sürüm)) kls += @"\" + Sürüm;
+
+            return kls;
+        } 
     }
 
     public class Dosya
@@ -131,6 +175,7 @@ namespace ArgeMup.HazirKod
 
         public string Kök = "";
         public long KapladığıAlan_bayt = 0;
+        public bool FizikselOlarakMevcut = false;
         public List<string> Klasörler = new List<string>();
         public List<İçerik_Dosya_> Dosyalar = new List<İçerik_Dosya_>();
 
@@ -186,8 +231,18 @@ namespace ArgeMup.HazirKod
 
         public Klasör_(string KökKlasör, string Filtre_Klasör = "*", string Filtre_Dosya = "*.*", bool TümAltKlasörlerleBirlikte = true)
         {
+            Güncelle(KökKlasör, Filtre_Klasör, Filtre_Dosya, TümAltKlasörlerleBirlikte);
+        }
+        public void Güncelle(string KökKlasör, string Filtre_Klasör = "*", string Filtre_Dosya = "*.*", bool TümAltKlasörlerleBirlikte = true)
+        {
+            KapladığıAlan_bayt = 0;
+            FizikselOlarakMevcut = false;
+            Klasörler.Clear();
+            Dosyalar.Clear();
+
             Kök = KökKlasör.TrimEnd('\\');
             if (!Directory.Exists(Kök)) return;
+            FizikselOlarakMevcut = true;
 
             //Kendi klasörü
             string[] dosyalar = Directory.GetFiles(Kök, Filtre_Dosya, SearchOption.TopDirectoryOnly);
@@ -214,15 +269,6 @@ namespace ArgeMup.HazirKod
             }
         }
        
-        bool MevcutMu_Klasör(string Yolu)
-        {
-            return Klasörler.Contains(Yolu);
-        }
-        İçerik_Dosya_ MevcutMu_Dosya(string KısaYolu)
-        {
-            return Dosyalar.Find( x => x.Yolu == KısaYolu);
-        }
-
         public Farklılık_ Karşılaştır(Klasör_ Sağdaki)
         {
             Klasör_ soldaki = (Klasör_)D_Nesne.BaytDizisinden(D_Nesne.BaytDizisine(this));
@@ -322,7 +368,6 @@ namespace ArgeMup.HazirKod
 
             return Farklar;
         }
-
         public Farklılık_ Eşitle(Klasör_ Sağdaki)
         {
             Farklılık_ Güncel = Karşılaştır(Sağdaki);
@@ -360,7 +405,6 @@ namespace ArgeMup.HazirKod
 
             return Sonuç;
         }
-
         public Farklılık_ AslınaUygunHaleGetir(Klasör_ AsılKlasör, bool FazlaKlasörVeDosyalarıSil = false)
         {
             Farklılık_ Güncel = Karşılaştır(AsılKlasör);
@@ -410,6 +454,15 @@ namespace ArgeMup.HazirKod
             }
 
             return Sonuç;
+        }
+
+        bool MevcutMu_Klasör(string Yolu)
+        {
+            return Klasörler.Contains(Yolu);
+        }
+        İçerik_Dosya_ MevcutMu_Dosya(string KısaYolu)
+        {
+            return Dosyalar.Find(x => x.Yolu == KısaYolu);
         }
     }
 }

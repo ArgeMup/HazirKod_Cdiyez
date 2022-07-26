@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using ArgeMup.HazirKod.Dönüştürme;
+using System.Runtime.CompilerServices;
 
 namespace ArgeMup.HazirKod
 {
@@ -165,6 +166,97 @@ namespace ArgeMup.HazirKod
 
             return false;
         }
+        public static bool Sil_TarihineGöre(string Klasörü, double Gün, string Filtre)
+        {
+            Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true);
+            bool EnAz1HataOldu = false;
+            
+            if (kls.FizikselOlarakMevcut)
+            {
+                foreach (var dsy in kls.Dosyalar)
+                {
+                    if (dsy.DeğiştirilmeTarihi.AddDays(Gün) < DateTime.Now) 
+                    {
+                        if (!Dosya.Sil(kls.Kök + dsy.Yolu)) EnAz1HataOldu = true;
+                    }
+                }
+            }
+
+            return EnAz1HataOldu;
+        }
+        public static bool Sil_BoyutunaGöre(string Klasörü, long TümDosyaların_KapladığıAlan_bayt, string Filtre)
+        {
+            Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true);
+            bool EnAz1HataOldu = false;
+
+            if (kls.FizikselOlarakMevcut)
+            {
+                kls.Sırala_EskidenYeniye();
+
+                foreach (var dsy in kls.Dosyalar)
+                {
+                    if (kls.KapladığıAlan_bayt <= TümDosyaların_KapladığıAlan_bayt) break;
+                    
+                    if (!Dosya.Sil(kls.Kök + dsy.Yolu)) EnAz1HataOldu = true;
+                    
+                    kls.KapladığıAlan_bayt -= dsy.KapladığıAlan_bayt;
+                }
+            }
+
+            return EnAz1HataOldu;
+        }
+        public static bool Sil_SayısınaGöre(string Klasörü, int AzamiToplamDosyaSayısı, string Filtre)
+        {
+            Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true);
+            bool EnAz1HataOldu = false;
+            
+            if (kls.FizikselOlarakMevcut)
+            {
+                kls.Sırala_EskidenYeniye();
+
+                AzamiToplamDosyaSayısı = kls.Dosyalar.Count - AzamiToplamDosyaSayısı;
+                foreach (var dsy in kls.Dosyalar)
+                {
+                    if (AzamiToplamDosyaSayısı-- <= 0) break;
+                    
+                    if (!Dosya.Sil(kls.Kök + dsy.Yolu)) EnAz1HataOldu = true;
+                }
+            }
+
+            return EnAz1HataOldu;
+        }
+    }
+
+    public class Günlük
+    {
+        public const string Sürüm = "V1.0";
+        public static int Seviyesi = 0;
+        static string Yolu = null;
+
+        //Hedef : \\?\C:\Users\<KullanıcıAdı>\AppData\Local\Temp\<Aile>\<Uygulama>\<Sürüm>\dd_MM_yyyy_HH_mm_ss.Gunluk
+        public static void Başlat(string Klasörü = null)
+        {
+            if (Klasörü == null) Klasörü = Klasör.Depolama(Klasör.Kapsamı.Geçici);
+            else Klasörü = D_DosyaKlasörAdı.Düzelt(Klasörü, false);
+            Klasör.Oluştur(Klasörü);
+
+            Yolu = @"\\?\" + Klasörü + @"\" + D_TarihSaat.Yazıya(DateTime.Now, D_TarihSaat.Şablon_DosyaAdı) + ".Gunluk";
+
+            Dosya.Sil_TarihineGöre(Klasörü, 30, "*.Gunluk");
+            Dosya.Sil_BoyutunaGöre(Klasörü, 50 * 1024 * 1024 /*50 MiB*/, "*.Gunluk");
+            Dosya.Sil_SayısınaGöre(Klasörü, 500, "*.Gunluk");
+
+            Ekle("Başladı " + Kendi.DosyaYolu() + " V" + Kendi.Sürümü_Dosya());
+        }
+        public static void Ekle(string Mesaj, int Seviye = 0, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
+        {
+            if (Seviye > Seviyesi) return; //Seviyesi nden küçük eşit mesajları yazdıracak
+
+            string içerik = D_TarihSaat.Yazıya(DateTime.Now) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " " + Mesaj.Replace(Environment.NewLine, "|").Replace('\r', '|').Replace('\n', '|') + Environment.NewLine;
+            
+            Console.Write(içerik);
+            if (Yolu != null) File.AppendAllText(Yolu, içerik);
+        }
     }
 
     [Serializable]
@@ -229,6 +321,7 @@ namespace ArgeMup.HazirKod
         }
         #endregion
 
+        #region Genel İşlemler
         public Klasör_(string KökKlasör, string Filtre_Klasör = "*", string Filtre_Dosya = "*.*", bool TümAltKlasörlerleBirlikte = true)
         {
             Güncelle(KökKlasör, Filtre_Klasör, Filtre_Dosya, TümAltKlasörlerleBirlikte);
@@ -455,7 +548,41 @@ namespace ArgeMup.HazirKod
 
             return Sonuç;
         }
+        #endregion
 
+        #region Sıralama
+        class _Sıralayıcı_EskidenYeniye : IComparer<İçerik_Dosya_>
+        {
+            public int Compare(İçerik_Dosya_ x, İçerik_Dosya_ y)
+            {
+                if (x.DeğiştirilmeTarihi > y.DeğiştirilmeTarihi) return 1;  
+                else if (x.DeğiştirilmeTarihi == y.DeğiştirilmeTarihi) return 0;
+                else return -1;   
+            }
+        }
+        class _Sıralayıcı_DosyaBoyutuKüçüktenBüyüğe : IComparer<İçerik_Dosya_>
+        {
+            public int Compare(İçerik_Dosya_ x, İçerik_Dosya_ y)
+            {
+                if (x.KapladığıAlan_bayt > y.KapladığıAlan_bayt) return 1;  
+                else if (x.KapladığıAlan_bayt == y.KapladığıAlan_bayt) return 0;
+                else return -1;   
+            }
+        }
+
+        public void Sırala_EskidenYeniye()
+        {
+            _Sıralayıcı_EskidenYeniye srl = new _Sıralayıcı_EskidenYeniye();
+            Dosyalar.Sort(srl);
+        }
+        public void Sırala_DosyaBoyutuKüçüktenBüyüğe()
+        {
+            _Sıralayıcı_DosyaBoyutuKüçüktenBüyüğe srl = new _Sıralayıcı_DosyaBoyutuKüçüktenBüyüğe();
+            Dosyalar.Sort(srl);
+        }
+        #endregion
+
+        #region İçKullanım
         bool MevcutMu_Klasör(string Yolu)
         {
             return Klasörler.Contains(Yolu);
@@ -464,5 +591,6 @@ namespace ArgeMup.HazirKod
         {
             return Dosyalar.Find(x => x.Yolu == KısaYolu);
         }
+        #endregion
     }
 }

@@ -29,6 +29,22 @@ namespace ArgeMup.HazirKod
         }
 
         /// <summary>
+        /// Çıktısı : Argemup
+        /// </summary>
+        public static string KullanıcıAdı()
+        {
+            return System.Environment.UserName;
+        }
+
+        /// <summary>
+        /// Çıktısı : Argemup
+        /// </summary>
+        public static string BilgisayarAdı()
+        {
+            return System.Environment.MachineName;
+        }
+
+        /// <summary>
         /// Çıktısı : C:\\Klasör\\Argemup_HazirKod_C_diyez.exe
         /// </summary>
         public static string DosyaYolu()

@@ -118,7 +118,7 @@ namespace ArgeMup.HazirKod
 
     public class Dosya
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         public static bool Kopyala(string Kaynak, string Hedef)
         {
@@ -132,6 +132,7 @@ namespace ArgeMup.HazirKod
 
                     File.Move(Hedef, yedek_dosya_adı);
                 }
+                else Klasör.Oluştur(Path.GetDirectoryName(Hedef));
 
                 File.Copy(Kaynak, Hedef);
                 File.SetAttributes(Hedef, File.GetAttributes(Kaynak));
@@ -229,18 +230,19 @@ namespace ArgeMup.HazirKod
 
     public class Günlük
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
         public static int Seviyesi = 0;
         static string Yolu = null;
+        static System.Threading.Mutex Kilit = new System.Threading.Mutex();
 
         //Hedef : \\?\C:\Users\<KullanıcıAdı>\AppData\Local\Temp\<Aile>\<Uygulama>\<Sürüm>\dd_MM_yyyy_HH_mm_ss.Gunluk
         public static void Başlat(string Klasörü = null)
         {
-            if (Klasörü == null) Klasörü = Klasör.Depolama(Klasör.Kapsamı.Geçici);
+            if (Klasörü == null) Klasörü = @"\\?\" + Klasör.Depolama(Klasör.Kapsamı.Geçici) + @"\Gunluk";
             else Klasörü = D_DosyaKlasörAdı.Düzelt(Klasörü, false);
             Klasör.Oluştur(Klasörü);
 
-            Yolu = @"\\?\" + Klasörü + @"\" + D_TarihSaat.Yazıya(DateTime.Now, D_TarihSaat.Şablon_DosyaAdı) + ".Gunluk";
+            Yolu = Klasörü + @"\" + D_TarihSaat.Yazıya(DateTime.Now, D_TarihSaat.Şablon_DosyaAdı) + ".Gunluk";
 
             Dosya.Sil_TarihineGöre(Klasörü, 30, "*.Gunluk");
             Dosya.Sil_BoyutunaGöre(Klasörü, 50 * 1024 * 1024 /*50 MiB*/, "*.Gunluk");
@@ -248,14 +250,23 @@ namespace ArgeMup.HazirKod
 
             Ekle("Başladı " + Kendi.DosyaYolu() + " V" + Kendi.Sürümü_Dosya());
         }
-        public static void Ekle(string Mesaj, int Seviye = 0, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static void Ekle(string Mesaj, int Seviye = 0, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0, int DosyayaKaydetmeZamanAşımı_msn = 1000)
         {
             if (Seviye > Seviyesi) return; //Seviyesi nden küçük eşit mesajları yazdıracak
 
             string içerik = D_TarihSaat.Yazıya(DateTime.Now) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " " + Mesaj.Replace(Environment.NewLine, "|").Replace('\r', '|').Replace('\n', '|') + Environment.NewLine;
             
             Console.Write(içerik);
-            if (Yolu != null) File.AppendAllText(Yolu, içerik);
+
+            if (Yolu != null)
+            {
+                if (Kilit.WaitOne(DosyayaKaydetmeZamanAşımı_msn))
+                {
+                    try { File.AppendAllText(Yolu, içerik); } catch (Exception) { }
+                    
+                    Kilit.ReleaseMutex();
+                }
+            }
         }
     }
 
@@ -263,7 +274,7 @@ namespace ArgeMup.HazirKod
     public class Klasör_
     {
         [NonSerialized]
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         public string Kök = "";
         public long KapladığıAlan_bayt = 0;
@@ -278,11 +289,11 @@ namespace ArgeMup.HazirKod
             public string Yolu;
             public long KapladığıAlan_bayt;
             public DateTime DeğiştirilmeTarihi;
-            public byte[] Doğrulama_Kodu;
+            public string Doğrulama_Kodu;
 
             public İçerik_Dosya_(string Kök, string DosyaYolu)
             {
-                Yolu = D_DosyaKlasörAdı.Düzelt(DosyaYolu.Remove(0, Kök.Length), false);
+                Yolu = D_DosyaKlasörAdı.Düzelt(DosyaYolu.Substring(Kök.Length + 1), false);
 
                 if (File.Exists(DosyaYolu))
                 {
@@ -341,7 +352,7 @@ namespace ArgeMup.HazirKod
             string[] dosyalar = Directory.GetFiles(Kök, Filtre_Dosya, SearchOption.TopDirectoryOnly);
             foreach (string dsy in dosyalar)
             {
-                İçerik_Dosya_ yeni = new İçerik_Dosya_(KökKlasör, dsy);
+                İçerik_Dosya_ yeni = new İçerik_Dosya_(Kök, dsy);
                 Dosyalar.Add(yeni);
                 KapladığıAlan_bayt += yeni.KapladığıAlan_bayt;
             }
@@ -350,15 +361,18 @@ namespace ArgeMup.HazirKod
             Klasörler = Directory.GetDirectories(Kök, Filtre_Klasör, TümAltKlasörlerleBirlikte ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList();
             for (int i = 0; i < Klasörler.Count; i++)
             {
-                dosyalar = Directory.GetFiles(Klasörler[i], Filtre_Dosya, SearchOption.TopDirectoryOnly);
-                foreach (string dsy in dosyalar)
+                if (TümAltKlasörlerleBirlikte)
                 {
-                    İçerik_Dosya_ yeni = new İçerik_Dosya_(KökKlasör, dsy);
-                    Dosyalar.Add(yeni);
-                    KapladığıAlan_bayt += yeni.KapladığıAlan_bayt;
+                    dosyalar = Directory.GetFiles(Klasörler[i], Filtre_Dosya, SearchOption.TopDirectoryOnly);
+                    foreach (string dsy in dosyalar)
+                    {
+                        İçerik_Dosya_ yeni = new İçerik_Dosya_(Kök, dsy);
+                        Dosyalar.Add(yeni);
+                        KapladığıAlan_bayt += yeni.KapladığıAlan_bayt;
+                    }
                 }
-
-                Klasörler[i] = Klasörler[i].Remove(0, Kök.Length).Trim(' ');
+                
+                Klasörler[i] = Klasörler[i].Substring(Kök.Length + 1).Trim(' ');
             }
         }
        
@@ -417,7 +431,7 @@ namespace ArgeMup.HazirKod
                     else if (soldaki.Dosyalar[0].DeğiştirilmeTarihi > dsy.DeğiştirilmeTarihi) f_dsy.Farklılık = Farklılık_Dosya.SoldakiDahaYeni;
                     else f_dsy.Farklılık = Farklılık_Dosya.AynıTarihli;
 
-                    f_dsy.Aynı_Doğrulama_Kodu = soldaki.Dosyalar[0].Doğrulama_Kodu.SequenceEqual(dsy.Doğrulama_Kodu);
+                    f_dsy.Aynı_Doğrulama_Kodu = soldaki.Dosyalar[0].Doğrulama_Kodu == dsy.Doğrulama_Kodu;
                     f_dsy.Aynı_KapladığıAlan_bayt = soldaki.Dosyalar[0].KapladığıAlan_bayt == dsy.KapladığıAlan_bayt;
 
                     sağdaki.Dosyalar.Remove(dsy);
@@ -443,7 +457,7 @@ namespace ArgeMup.HazirKod
                     else if (sağdaki.Dosyalar[0].DeğiştirilmeTarihi > dsy.DeğiştirilmeTarihi) f_dsy.Farklılık = Farklılık_Dosya.SağdakiDahaYeni;
                     else f_dsy.Farklılık = Farklılık_Dosya.AynıTarihli;
 
-                    f_dsy.Aynı_Doğrulama_Kodu = sağdaki.Dosyalar[0].Doğrulama_Kodu.SequenceEqual(dsy.Doğrulama_Kodu);
+                    f_dsy.Aynı_Doğrulama_Kodu = sağdaki.Dosyalar[0].Doğrulama_Kodu == dsy.Doğrulama_Kodu;
                     f_dsy.Aynı_KapladığıAlan_bayt = sağdaki.Dosyalar[0].KapladığıAlan_bayt == dsy.KapladığıAlan_bayt;
 
                     soldaki.Dosyalar.Remove(dsy);

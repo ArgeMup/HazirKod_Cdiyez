@@ -8,16 +8,19 @@ namespace ArgeMup.HazirKod
 {
     public class Kendi
     {
-        static Assembly Kendisi = Assembly.GetExecutingAssembly();
-        //static FileInfo fi = new FileInfo(Kendisi.Location);
-        static FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(Kendisi.Location);
+        public const string Sürüm = "V1.0";
+        static string KendiKonumu = null; 
+        static FileVersionInfo fvi = null; 
+        //static FileInfo fi = null;
 
         /// <summary>
         /// Çıktısı : Argemup_HazirKod_C_diyez
         /// </summary>
         public static string Adı()
         {
-            return Path.GetFileNameWithoutExtension(Kendisi.Location);
+            Başlat();
+
+            return Path.GetFileNameWithoutExtension(KendiKonumu);
         }
 
         /// <summary>
@@ -25,7 +28,9 @@ namespace ArgeMup.HazirKod
         /// </summary>
         public static string DosyaAdı()
         {
-            return Path.GetFileName(Kendisi.Location);
+            Başlat();
+
+            return Path.GetFileName(KendiKonumu);
         }
 
         /// <summary>
@@ -49,7 +54,9 @@ namespace ArgeMup.HazirKod
         /// </summary>
         public static string DosyaYolu()
         {
-            return Kendisi.Location;
+            Başlat();
+
+            return KendiKonumu;
         }
 
         /// <summary>
@@ -57,7 +64,9 @@ namespace ArgeMup.HazirKod
         /// </summary>
         public static string Klasörü()
         {
-            return Path.GetDirectoryName(Kendisi.Location);
+            Başlat();
+
+            return Path.GetDirectoryName(KendiKonumu);
         }
 
         /// <summary>
@@ -65,6 +74,8 @@ namespace ArgeMup.HazirKod
         /// </summary>
         public static string Sürümü_Dosya()
         {
+            Başlat();
+
             return fvi.FileVersion;
         }
 
@@ -73,7 +84,25 @@ namespace ArgeMup.HazirKod
         /// </summary>
         public static string Sürümü_Ürün()
         {
+            Başlat();
+
             return fvi.ProductVersion;
+        }
+
+        static void Başlat()
+        {
+            if (string.IsNullOrEmpty(KendiKonumu))
+            {
+                KendiKonumu = Assembly.GetExecutingAssembly().Location;
+
+                if (string.IsNullOrEmpty(KendiKonumu) || !File.Exists(KendiKonumu)) KendiKonumu = Process.GetCurrentProcess().MainModule.FileName;
+
+                if (string.IsNullOrEmpty(KendiKonumu) || !File.Exists(KendiKonumu)) KendiKonumu = AppContext.BaseDirectory + @"\" + Assembly.GetExecutingAssembly().ManifestModule.Name;
+
+                if (string.IsNullOrEmpty(KendiKonumu) || !File.Exists(KendiKonumu)) throw new Exception("Kodun konumu okunamadı");
+        
+                fvi = FileVersionInfo.GetVersionInfo(KendiKonumu);
+            }
         }
     }
 }

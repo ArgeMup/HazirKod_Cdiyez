@@ -9,7 +9,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 {
     public class SeriPort_ : IDisposable, IDonanımHaberlleşmesi
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         #region Genel Görüşe Açık
         public object Hatırlatıcı = null;
@@ -74,6 +74,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                             ErişimNoktaları.RemoveAt(0);
                         }
 
+                        Thread.Sleep(1); //Bazen oluşan açamama hatasını gidermek için 
                         SeriPort = new SerialPort(_erişim_noktası, BitHızı, Doğrulama, BitSayısı, DurBitSayısı);
                         SeriPort.Open();
                         SeriPort.DiscardOutBuffer();
@@ -83,12 +84,12 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
                         GeriBildirim_Islemi?.Invoke(ErişimNoktasıAçıklaması, GeriBildirim_Türü_.BağlantıKuruldu, null, Hatırlatıcı);
                     }
-
+                    
                     int sayac = 0;
                     while (Çalışşsın && SeriPort.IsOpen)
                     {
                         object çıktı = null;
-                        if (SatırSatırGönderVeAl) çıktı = SeriPort.ReadLine();
+                        if (SatırSatırGönderVeAl) çıktı = SatırSonu.Sil(SeriPort.ReadLine());
                         else
                         {
                             int ilk_gelen_bilgi = SeriPort.ReadByte();
@@ -161,7 +162,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         {
             if (SeriPort == null || !SeriPort.IsOpen) throw new Exception("Bağlantı Kurulmadı");
 
-            SeriPort.WriteLine(Bilgi);
+            SeriPort.Write(Bilgi + SatırSonu.Karakteri);
         }
         #endregion
 

@@ -10,7 +10,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 {
     public class KomutSatırıUygulaması_ : IDisposable, IDonanımHaberlleşmesi
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         #region Genel Görüşe Açık
         public object Hatırlatıcı = null;
@@ -57,8 +57,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                         Uygulama.StartInfo.CreateNoWindow = true;
                         Uygulama.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         Uygulama.StartInfo.UseShellExecute = false;
-                        Uygulama.StartInfo.StandardOutputEncoding = Encoding.GetEncoding(1254); // veya 857 veya Encoding.UTF8; veya Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage); 
-                        Uygulama.StartInfo.StandardErrorEncoding = Encoding.GetEncoding(1254);  //Çlıştırılan uygulamada da Console.OutputEncoding ve Console.InputEncoding için de yazılması gerekebiliyor
+                        //Uygulama.StartInfo.StandardOutputEncoding = Encoding.UTF8; // Encoding.GetEncoding(1254); veya Encoding.GetEncoding(857); veya Encoding.UTF8; veya Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage); 
+                        //Uygulama.StartInfo.StandardErrorEncoding = Encoding.UTF8;  // Çalıştırılan uygulamada da Console.OutputEncoding ve Console.InputEncoding için de yazılması gerekebiliyor
 
                         Uygulama.StartInfo.RedirectStandardError = true;
                         Uygulama.StartInfo.RedirectStandardOutput = true;
@@ -94,7 +94,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         private void Uygulama_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             object çıktı;
-            if (SatırSatırGönderVeAl) çıktı = e.Data;
+            if (SatırSatırGönderVeAl) çıktı = SatırSonu.Sil(e.Data);
             else çıktı = Dönüştürme.D_Yazı.BaytDizisine(e.Data);
 
             if (çıktı == null) return;
@@ -139,7 +139,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         {
             if (Uygulama == null || Uygulama.HasExited) throw new Exception("Bağlantı Kurulmadı");
 
-            Uygulama.StandardInput.WriteLine(Bilgi);
+            Uygulama.StandardInput.Write(Bilgi + SatırSonu.Karakteri);
             Uygulama.StandardInput.Flush();
         }
         #endregion

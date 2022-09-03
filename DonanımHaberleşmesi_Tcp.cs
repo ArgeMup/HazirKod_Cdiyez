@@ -11,7 +11,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 {
     public class Tcpİstemci_ : IDisposable, IDonanımHaberlleşmesi
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
 
         #region Genel Görüşe Açık
         public object Hatırlatıcı = null;
@@ -88,7 +88,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                     while (Çalışşsın && İstemci.Connected)
                     {
                         object çıktı = null;
-                        if (SatırSatırGönderVeAl) çıktı = Alıcı.ReadLine();
+                        if (SatırSatırGönderVeAl) çıktı = SatırSonu.Sil(Alıcı.ReadLine());
                         else
                         {
                             int ilk_gelen_bilgi = Aracı.ReadByte();
@@ -192,7 +192,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         {
             if (İstemci == null || !İstemci.Connected || Verici == null) throw new Exception("Bağlantı Kurulmadı");
 
-            Verici.WriteLine(Bilgi);
+            Verici.Write(Bilgi + SatırSonu.Karakteri);
             Verici.Flush();
         }
         #endregion

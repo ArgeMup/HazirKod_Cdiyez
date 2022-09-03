@@ -13,4 +13,19 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         void Gönder(byte[] Bilgi, string Alıcı = null);
         void Gönder(string Bilgi, string Alıcı = null);
     }
+
+    public class SatırSonu
+    {
+        public const string Sürüm = "V1.0";
+        public const string Karakteri = "\r\n";
+
+        public static string Sil(string Cümle)
+        {
+            return Cümle == null ? null : Cümle.TrimEnd('\r', '\n', ' ');
+        }
+        public static string Düzelt(string Cümle)
+        {
+            return Cümle == null ? null : Sil(Cümle) + Karakteri;
+        }
+    }
 }

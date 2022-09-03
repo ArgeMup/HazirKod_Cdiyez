@@ -9,7 +9,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 {
     public class UdpDinleyici_ : IDisposable, IDonanımHaberlleşmesi
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
 
         #region Genel Görüşe Açık
         public object Hatırlatıcı = null;
@@ -27,7 +27,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
         UdpClient Alıcı = null;
         #endregion
-        
+
         public UdpDinleyici_(int ErişimNoktası, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, bool SadeceYerel = true)
         {
             this.ErişimNoktası = ErişimNoktası;
@@ -47,7 +47,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         {
             int sayac = 0;
 
-			IPAddress AdresTipi = IPAddress.Loopback;
+            IPAddress AdresTipi = IPAddress.Loopback;
             if (!SadeceYerel) AdresTipi = IPAddress.Any;
 
             while (Çalışşsın)
@@ -65,7 +65,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                     if (dizi == null) throw new Exception();
 
                     object çıktı = null;
-                    if (SatırSatırGönderVeAl) çıktı = Dönüştürme.D_Yazı.BaytDizisinden(dizi).TrimEnd(' ', '\r', '\n');
+                    if (SatırSatırGönderVeAl) çıktı = SatırSonu.Sil(Dönüştürme.D_Yazı.BaytDizisinden(dizi));
                     else çıktı = dizi;
 
                     GeriBildirim_Islemi?.Invoke(RemoteIpEndPoint.ToString(), GeriBildirim_Türü_.BilgiGeldi, çıktı, Hatırlatıcı);
@@ -114,9 +114,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             string[] dizi = Alıcı.Split(':');
             if (dizi.Length != 2) throw new Exception("Alıcı Adres:Port şeklinde olmalı");
 
-            UdpClient Verici = new UdpClient(dizi[0], Convert.ToInt32(dizi[1]));
-            Verici.Client.SendTimeout = BilgiGönderme_ZamanAşımı_msn;
-            Verici.Send(Bilgi, Bilgi.Length);
+            UdpVerici.Gönder(Bilgi, Convert.ToInt32(dizi[1]), dizi[0], BilgiGönderme_ZamanAşımı_msn);
         }
         public int EtkinErişimNoktası()
         {
@@ -140,7 +138,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
         void IDonanımHaberlleşmesi.Gönder(string Bilgi, string Alıcı)
         {
-            byte[] dizi = Dönüştürme.D_Yazı.BaytDizisine(Bilgi);
+            byte[] dizi = Dönüştürme.D_Yazı.BaytDizisine(Bilgi + SatırSonu.Karakteri);
             Gönder(dizi, Alıcı);
         }
         #endregion
@@ -182,5 +180,30 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             // GC.SuppressFinalize(this);
         }
         #endregion
+    }
+
+    public class UdpVerici
+    {
+        public const string Sürüm = "V1.0";
+
+        public static bool Gönder(byte[] Bilgi, int ErişimNoktası, string Alıcı = "127.0.0.1", int ZamanAşımı_msn = 500)
+        {
+            try
+            {
+                UdpClient Verici = new UdpClient(Alıcı, ErişimNoktası);
+                Verici.Client.SendTimeout = ZamanAşımı_msn;
+                Verici.Send(Bilgi, Bilgi.Length);
+                
+                return true;
+            }
+            catch (Exception) { }
+
+            return false;
+        }
+        public static bool Gönder(string Bilgi, int ErişimNoktası, string Alıcı = "127.0.0.1", int ZamanAşımı_msn = 500)
+        {
+            byte[] Giden = Dönüştürme.D_Yazı.BaytDizisine(Bilgi + SatırSonu.Karakteri);
+            return Gönder(Giden, ErişimNoktası, Alıcı, ZamanAşımı_msn);
+        }
     }
 }

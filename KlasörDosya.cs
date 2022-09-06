@@ -177,7 +177,7 @@ namespace ArgeMup.HazirKod
                 {
                     if (dsy.DeğiştirilmeTarihi.AddDays(Gün) < DateTime.Now) 
                     {
-                        if (!Dosya.Sil(kls.Kök + dsy.Yolu)) EnAz1HataOldu = true;
+                        if (!Dosya.Sil(kls.Kök + @"\" + dsy.Yolu)) EnAz1HataOldu = true;
                     }
                 }
             }
@@ -197,7 +197,7 @@ namespace ArgeMup.HazirKod
                 {
                     if (kls.KapladığıAlan_bayt <= TümDosyaların_KapladığıAlan_bayt) break;
                     
-                    if (!Dosya.Sil(kls.Kök + dsy.Yolu)) EnAz1HataOldu = true;
+                    if (!Dosya.Sil(kls.Kök + @"\" + dsy.Yolu)) EnAz1HataOldu = true;
                     
                     kls.KapladığıAlan_bayt -= dsy.KapladığıAlan_bayt;
                 }
@@ -219,7 +219,7 @@ namespace ArgeMup.HazirKod
                 {
                     if (AzamiToplamDosyaSayısı-- <= 0) break;
                     
-                    if (!Dosya.Sil(kls.Kök + dsy.Yolu)) EnAz1HataOldu = true;
+                    if (!Dosya.Sil(kls.Kök + @"\" + dsy.Yolu)) EnAz1HataOldu = true;
                 }
             }
 

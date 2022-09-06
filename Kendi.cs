@@ -1,5 +1,6 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;

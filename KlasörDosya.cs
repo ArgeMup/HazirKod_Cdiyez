@@ -41,6 +41,22 @@ namespace ArgeMup.HazirKod
 
             return false;
         }
+        public static void Sil_İçiBoşOlanları(string Yolu)
+        {
+            string[] klsler = Directory.GetDirectories(Yolu, "*", SearchOption.AllDirectories);
+            for (int i = klsler.Length - 1; i >= 0; i--)
+            {
+                _Sil_(klsler[i]);
+            }
+            _Sil_(Yolu);
+
+            void _Sil_(string _Yolu_)
+            {
+                string[] dsy_lar = Directory.GetFiles(_Yolu_, "*.*", SearchOption.TopDirectoryOnly);
+                string[] kls_ler = Directory.GetDirectories(_Yolu_, "*", SearchOption.TopDirectoryOnly);
+                if (dsy_lar.Length == 0 && kls_ler.Length == 0) Sil(_Yolu_);
+            }
+        }
         public static bool Kopyala(string Kaynak, string Hedef)
         {
             return AslınaUygunHaleGetir(Kaynak, Hedef, false);
@@ -70,8 +86,7 @@ namespace ArgeMup.HazirKod
             return Aslolan.FizikselOlarakMevcut && (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0);
         }
 
-        public enum Kapsamı { Geçici, TümKullanıcılar, BuKullanıcı_BuİşletimSistemi, BuKullanıcı_TümİşletimSistemleri };
-        
+		public enum Kapsamı { Geçici, TümKullanıcılar, BuKullanıcı_BuİşletimSistemi, BuKullanıcı_TümİşletimSistemleri };     
         /// <summary>
         /// Geçici                              : C:\Users\<Kullanıcı Adı>\AppData\Local\Temp\<Aile>\<Uygulama>\<Sürüm>
         /// TümKullanıcılar                     : C:\ProgramData\<Aile>\<Uygulama>\<Sürüm>
@@ -112,7 +127,38 @@ namespace ArgeMup.HazirKod
             if (!string.IsNullOrEmpty(Sürüm)) kls += @"\" + Sürüm;
 
             return kls;
-        } 
+		} 
+
+        public static string ÜstKlasör(string Yolu, int Seviye = 1, bool KökeUlaşıncaDur = false)
+        {
+            Yolu = D_DosyaKlasörAdı.Düzelt(Yolu);
+
+            string kök = Path.GetPathRoot(Yolu).TrimEnd(Path.DirectorySeparatorChar);
+            if (string.IsNullOrEmpty(kök))
+            {
+                int konum_bölüm = Yolu.TrimStart(Path.DirectorySeparatorChar).IndexOf(Path.DirectorySeparatorChar);
+                if (konum_bölüm < 0) return null;
+                
+                kök = Yolu.Substring(0, konum_bölüm);
+            }
+            Yolu = Yolu.Substring(kök.Length);
+
+            while (Seviye-- > 0)
+            {
+                int konum_bölüm = Yolu.LastIndexOf(Path.DirectorySeparatorChar);
+                if (konum_bölüm < 0)
+                {
+                    if (KökeUlaşıncaDur) return kök;
+
+                    if (Seviye >= 0) return null;
+                    else return kök;
+                }
+
+                Yolu = Yolu.Substring(0, konum_bölüm);
+            }
+
+            return kök + Yolu;
+        }
     }
 
     public class Dosya

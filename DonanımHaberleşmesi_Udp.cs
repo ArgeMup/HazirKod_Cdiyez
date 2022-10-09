@@ -192,9 +192,9 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             {
                 UdpClient Verici = new UdpClient(Alıcı, ErişimNoktası);
                 Verici.Client.SendTimeout = ZamanAşımı_msn;
-                Verici.Send(Bilgi, Bilgi.Length);
-                
-                return true;
+                int adet = Verici.Send(Bilgi, Bilgi.Length);
+                              
+                return adet == Bilgi.Length;
             }
             catch (Exception) { }
 

@@ -37,20 +37,23 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
         public static byte[] BaytDizisine(string Girdi)
         {
+            int BaşlangıçKonumu = 0;
+            if (Girdi.StartsWith("0x")) BaşlangıçKonumu += 2;
+
             if (string.IsNullOrEmpty(Girdi)) return null;
-            return Enumerable.Range(0, Girdi.Length)
+            return Enumerable.Range(BaşlangıçKonumu, Girdi.Length - BaşlangıçKonumu)
                      .Where(x => x % 2 == 0)
                      .Select(x => Convert.ToByte(Girdi.Substring(x, 2), 16))
                      .ToArray();
         }
-        public static string BaytDizisinden(byte[] Girdi, int Boyut = int.MinValue)
+        public static string BaytDizisinden(byte[] Girdi, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
         {
             if (Girdi == null) return "";
-            if (Boyut == int.MinValue) Boyut = Girdi.Length;
-            if (Boyut > Girdi.Length) Boyut = Girdi.Length;
+            if (Adet == int.MinValue) Adet = Girdi.Length - BaşlangıçKonumu;
+            if (Adet > Girdi.Length - BaşlangıçKonumu) Adet = Girdi.Length - BaşlangıçKonumu;
 
             string Çıktı = "";
-            for (int w = 0; w < Boyut; w++) Çıktı += Girdi[w].ToString("X2");
+            for (int w = 0; w < Adet; w++) Çıktı += Girdi[w].ToString("X2");
             return Çıktı;
         }
     }
@@ -113,9 +116,10 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
     public static class D_DosyaKlasörAdı
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
 
-        public readonly static string KullanılmayacakKarakterler = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars()); 
+        public static string KullanılmayacakKarakterler_DosyaAdı { get { return new string(Path.GetInvalidFileNameChars()); } }
+        public static string KullanılmayacakKarakterler_KlasörYolu { get { return new string(Path.GetInvalidPathChars()); } }
         
         public static string Düzelt(string Girdi, bool GeçersizKarakterleriSil = true)
         {
@@ -123,10 +127,35 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
             if (GeçersizKarakterleriSil)
             {
-                foreach (char c in KullanılmayacakKarakterler)
+                string kök = "", kls = "", dsy = "";
+
+                int konum_bölüm = Girdi.LastIndexOf(Path.DirectorySeparatorChar);
+                if (konum_bölüm >= 0)
                 {
-                    Girdi = Girdi.Replace(c.ToString(), "");
+                    dsy = Girdi.Substring(konum_bölüm + 1);
+                    kls = Girdi.Substring(0, konum_bölüm + 1);
                 }
+                else dsy = Girdi;
+
+                foreach (char c in KullanılmayacakKarakterler_DosyaAdı)
+                {
+                    dsy = dsy.Replace(c.ToString(), "");
+                }
+
+                foreach (char c in KullanılmayacakKarakterler_KlasörYolu)
+                {
+                    kls = kls.Replace(c.ToString(), "");
+                }
+
+                string birleştirilmiş = (string.IsNullOrEmpty(kls) ? null : kls) + dsy;
+
+                kök = Path.GetPathRoot(birleştirilmiş);
+                string kls_köksüz = birleştirilmiş.Substring(kök.Length);
+                string tekli = Path.DirectorySeparatorChar.ToString();
+                string ikili = tekli + tekli;
+                while (kls_köksüz.Contains(ikili)) kls_köksüz = kls_köksüz.Replace(ikili, tekli);
+
+                Girdi = kök + kls_köksüz;
             }
             
             return Girdi;
@@ -211,19 +240,19 @@ namespace ArgeMup.HazirKod.Dönüştürme
             Girdi.Read(Çıktı, 0, Boyut);
             return Çıktı;
         }
-        public static void BaytDizisinden(byte[] Girdi, ref MemoryStream Çıktı, int Boyut = int.MinValue)
+        public static void BaytDizisinden(byte[] Girdi, ref MemoryStream Çıktı, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
         {
             if (Girdi == null) return;
-            if (Boyut == int.MinValue) Boyut = Girdi.Length;
-            if (Boyut > Girdi.Length) Boyut = Girdi.Length;
+            if (Adet == int.MinValue) Adet = Girdi.Length - BaşlangıçKonumu;
+            if (Adet > Girdi.Length - BaşlangıçKonumu) Adet = Girdi.Length - BaşlangıçKonumu;
 
-            Çıktı.Write(Girdi, 0, Boyut);
+            Çıktı.Write(Girdi, 0, Adet);
         }
     }
 
     public static class D_Nesne
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         public static byte[] BaytDizisine(object Girdi)
         {
@@ -238,10 +267,11 @@ namespace ArgeMup.HazirKod.Dönüştürme
             }
             return Çıktı;
         }
-        public static object BaytDizisinden(byte[] Girdi, int BaşlangıçKonumu = 0, int Adet = -1)
+        public static object BaytDizisinden(byte[] Girdi, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
         {
             if (Girdi == null) return null;
-            if (Adet == -1) Adet = Girdi.Length - BaşlangıçKonumu;
+            if (Adet == int.MinValue) Adet = Girdi.Length - BaşlangıçKonumu;
+            if (Adet > Girdi.Length - BaşlangıçKonumu) Adet = Girdi.Length - BaşlangıçKonumu;
 
             object Çıktı;
             using (var mS = new MemoryStream())
@@ -471,7 +501,24 @@ namespace ArgeMup.HazirKod.Dönüştürme
         }
     }
 
-    #if HazirKod_Cdiyez_DeneyselEklentiler
+    public static class D_BaytDizisi
+    {
+        public const string Sürüm = "V1.0";
+
+        public static byte[] TümünüDeğiştir(byte[] Kaynak, byte[] Aranan, byte[] YeniBilgi)
+        {
+            if (Kaynak == null || Kaynak.Length == 0 || Aranan == null || Aranan.Length == 0 || YeniBilgi == null || YeniBilgi.Length == 0) return null;
+
+            string Kay = D_HexYazı.BaytDizisinden(Kaynak);
+            string Ara = D_HexYazı.BaytDizisinden(Aranan);
+            string Yen = D_HexYazı.BaytDizisinden(YeniBilgi);
+            string Çık = Kay.Replace(Ara, Yen);
+
+            return D_HexYazı.BaytDizisine(Çık);
+        }
+    }
+
+	#if HazirKod_Cdiyez_DeneyselEklentiler
         public static class D_Parmakİzi
         {
             public const string Sürüm = "V1.0";
@@ -510,5 +557,5 @@ namespace ArgeMup.HazirKod.Dönüştürme
                 return Çıktı;
             }
         }
-    #endif
+	#endif
 }

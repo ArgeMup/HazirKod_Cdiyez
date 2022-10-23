@@ -7,10 +7,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ArgeMup.HazirKod
+namespace ArgeMup.HazirKod.ArkaPlan
 {
     public class Görev_
     {
+        public const string Sürüm = "V0.0";
+
         /// <summary>
         /// Görev içinde bekleme yapılacak ise Thread.Sleep(1000); kullanılmalı
         /// </summary>

@@ -10,7 +10,7 @@ namespace ArgeMup.HazirKod
 {
     public class YeniYazılımKontrolü_ : IDisposable
     {
-    	public string Sürüm = "V1.1";
+    	public string Sürüm = "V1.2";
         public delegate void YeniYazılımKontrolü_GeriBildirim_(bool Sonuç, string Açıklama);
 
         WebClient İstemci = null;
@@ -30,8 +30,9 @@ namespace ArgeMup.HazirKod
         {
             if (İstemci == null) return;
 
-            İstemci.CancelAsync();
+            if (İstemci.IsBusy) İstemci.CancelAsync();
             İstemci.Dispose();
+            İstemci = null;
 
             GeriBildirim_İşlemi?.Invoke(false, "Durduruldu");
         }
@@ -48,6 +49,10 @@ namespace ArgeMup.HazirKod
                 else if (gelen.FileMajorPart == şimdiki.FileMajorPart)
                 {
                     if (gelen.FileMinorPart > şimdiki.FileMinorPart) gelen_daha_yeni = true;
+                    else if (gelen.FileMinorPart == şimdiki.FileMinorPart)
+                    {
+                        if (DoğrulamaKodu.Üret.Dosyadan(İndirilenDosyanınAdı) != DoğrulamaKodu.Üret.Dosyadan(şimdiki_dosya_yolu)) gelen_daha_yeni = true; //uzaktaki dosyanın daha sağlıklı oduğunu varsayarak devam et
+                    }
                 }
 
                 if (gelen_daha_yeni)
@@ -69,6 +74,8 @@ namespace ArgeMup.HazirKod
             else GeriBildirim_İşlemi?.Invoke(false, e.Error.Message);
 
             if (File.Exists(İndirilenDosyanınAdı)) File.Delete(İndirilenDosyanınAdı);
+
+            Durdur();
         }
 
         #region IDisposable Support

@@ -1,2 +1,8 @@
 # HazirKod Genel Amaçlı Kütüphane
 ArgeMup@yandex.com
+
+Anahtarlar
+HazirKod_Cdiyez_Görsel
+HazirKod_Cdiyez_SeriPort
+HazirKod_Cdiyez_Derleyici
+HazirKod_Cdiyez_DeneyselEklentiler

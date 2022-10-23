@@ -29,6 +29,15 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
             return Encoding.UTF8.GetString(Girdi, 0, Boyut).TrimEnd('\0');
         }
+
+        public static string Karıştır(string Girdi)
+        {
+            return Convert.ToBase64String(BaytDizisine(Girdi));
+        }
+        public static string Düzelt(string Girdi)
+        {
+            return BaytDizisinden(Convert.FromBase64String(Girdi));
+        }
     }
 
     public static class D_HexYazı

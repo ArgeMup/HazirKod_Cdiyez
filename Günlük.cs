@@ -11,11 +11,13 @@ namespace ArgeMup.HazirKod
 {
     public class Günlük
     {
-        public const string Sürüm = "V1.3";
-        public static int Seviyesi = 0;
-        public static int ZamanAşımı_msn = 1000;
+        public const string Sürüm = "V1.4";
+
+        public enum Seviye { Kapalı, BeklenmeyenDurum, Hata, Uyarı, Bilgi, Geveze, HazirKod };
+        public static Seviye GenelSeviye = Seviye.Geveze;
+
         public static int BaytDizisi_BirSatirdakiBilgiSayisi = 16;
-        public static string Şablon_Tarih_Saat_MiliSaniye = "dd.MM.yyyy_HH:mm:ss.fff";
+        public static string Şablon_Tarih_Saat_MiliSaniye = "dd.MM.yyyy-HH:mm:ss.fff";
 
         static string Yolu = null;
         static int UdpSunucusuErişimNoktası = 0;
@@ -44,14 +46,14 @@ namespace ArgeMup.HazirKod
                 Dosya.Sil_BoyutunaGöre(Klasörü, 50 * 1024 * 1024 /*50 MiB*/, "*.Gunluk");
                 Dosya.Sil_SayısınaGöre(Klasörü, 500, "*.Gunluk");
 
-                Dosyalama = new Öğütücü_<string>(İşlem_Dosyalama);
+                Dosyalama = new Öğütücü_<string>(İşlem_Dosyalama, AzamiElemanSayısı:5555);
             }
 
             if (UdpSunucusununErişimNoktası > 0)
             {
                 UdpSunucusuErişimNoktası = UdpSunucusununErişimNoktası;
 
-                UdpSunucusu = new Öğütücü_<string>(İşlem_UdpSunucusu);
+                UdpSunucusu = new Öğütücü_<string>(İşlem_UdpSunucusu, AzamiElemanSayısı: 5555);
             }
 
             Ekle("Başladı " + Kendi.DosyaYolu() + " V" + Kendi.Sürümü_Dosya());
@@ -70,27 +72,28 @@ namespace ArgeMup.HazirKod
                 UdpSunucusu = null;
             }
         }
-        public static void Ekle(string Mesaj, int Seviye = 0, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
+        
+        public static void Ekle(string Mesaj, Seviye Seviyesi = Seviye.Geveze, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
         {
-            if (Seviye > Seviyesi) return; //Seviyesi nden küçük eşit mesajları yazdıracak
+            if (Seviyesi > GenelSeviye) return;
 
             string içerik = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " " + Mesaj.Replace("\r\n", "|").Replace('\r', '|').Replace('\n', '|');
 
-            Ekle_(içerik);
+            Ekle_(içerik, Seviyesi);
         }
-        public static void Ekle(byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, int Seviye = 0, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static void Ekle(byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, Seviye Seviyesi = Seviye.Geveze, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
         {
-            if (Seviye > Seviyesi) return; //Seviyesi nden küçük eşit mesajları yazdıracak
+            if (Seviyesi > GenelSeviye) return;
 
             string başlık = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " ";
 
-            if (BaytDizisi == null) Ekle_(başlık + "null");
+            if (BaytDizisi == null) Ekle_(başlık + "null", Seviyesi);
             else
             {
                 if (Adet == int.MinValue) Adet = BaytDizisi.Length - BaşlangıçKonumu;
                 if (Adet > BaytDizisi.Length - BaşlangıçKonumu) Adet = BaytDizisi.Length - BaşlangıçKonumu;
                 
-                if (Adet < 0) Ekle_(başlık + "dizideki " + Adet + " kadar bilginin yazdırılması mümkün olmadığından atlandı");
+                if (Adet < 0) Ekle_(başlık + "dizideki " + Adet + " kadar bilginin yazdırılması mümkün olmadığından atlandı", Seviyesi);
                 else
                 {
                     string içerik = başlık + "[" + BaşlangıçKonumu + " - " + (BaşlangıçKonumu + Adet - 1) + "] : " + Adet + " Hex | Aralık | Ascii" + Environment.NewLine;
@@ -122,12 +125,21 @@ namespace ArgeMup.HazirKod
                         Adet -= şimdiki_adet;
                     }
 
-                    Ekle_(içerik);
+                    Ekle_(içerik.TrimEnd(Environment.NewLine.ToCharArray()), Seviyesi);
                 }
             }
         }
-        static void Ekle_(string Mesaj)
+        static void Ekle_(string Mesaj, Seviye Seviyesi)
         {
+            switch (Seviyesi)
+            {
+                case Seviye.BeklenmeyenDurum:   Mesaj = Vt100.Yazı.Renklendir(Mesaj, Vt100.Renk.Beyaz, Vt100.Renk.Kırmızı); break;
+                case Seviye.Hata:               Mesaj = Vt100.Yazı.Renklendir(Mesaj, Vt100.Renk.Kırmızı, Vt100.Renk.Siyah); break;
+                case Seviye.Uyarı:              Mesaj = Vt100.Yazı.Renklendir(Mesaj, Vt100.Renk.Sarı, Vt100.Renk.Siyah);    break;
+                case Seviye.Bilgi:              Mesaj = Vt100.Yazı.Renklendir(Mesaj, Vt100.Renk.Yeşil, Vt100.Renk.Siyah);   break;
+                default: break;
+            }
+
             Console.WriteLine(Mesaj);
 
             if (Dosyalama != null) Dosyalama.Ekle(Mesaj);
@@ -135,7 +147,7 @@ namespace ArgeMup.HazirKod
             if (UdpSunucusu != null) UdpSunucusu.Ekle(Mesaj);
         }
 
-        #region Takipçi
+        #region Öğütücü
         static Öğütücü_<string> Dosyalama = null;
         static Öğütücü_<string> UdpSunucusu = null;
 
@@ -149,8 +161,62 @@ namespace ArgeMup.HazirKod
         }
         static void İşlem_UdpSunucusu(string içerik, object Hatırlatıcı)
         {
-            bool asd = UdpVerici.Gönder(içerik + SatırSonu.Karakteri, UdpSunucusuErişimNoktası, "127.0.0.1", ZamanAşımı_msn);
+            UdpVerici.Gönder(içerik + SatırSonu.Karakteri, UdpSunucusuErişimNoktası);
         }
         #endregion
+    }
+
+    public class Vt100
+    {
+    	public const string Sürüm = "V1.0";
+        public enum Renk { DüzYazı, Siyah, Kırmızı, Yeşil, Sarı, Mavi, Eflatun, CamGöbeği, Beyaz };
+
+        public class Yazı
+        {
+            public static string Renklendir(string Yazı, Renk YazınınRengi, Renk YüzeyinRengi)
+            {
+                if (YazınınRengi == Renk.DüzYazı && YüzeyinRengi == Renk.DüzYazı) return Yazı;
+
+                return "\u001b[1" + (YazınınRengi == Renk.DüzYazı ? null : ";" + (YazınınRengi + 29)) + (YüzeyinRengi == Renk.DüzYazı ? null : ";" + (YüzeyinRengi + 39)) + "m" + Yazı + "\u001b[0m";
+            }
+
+            public static string Ayıkla(string Yazı, out Renk YazınınRengi, out Renk YüzeyinRengi)
+            {
+                // \033[1;% d;% dmMesaj\033[0m-> \033 0x1b
+
+                YazınınRengi = Renk.DüzYazı;
+                YüzeyinRengi = Renk.DüzYazı;
+                Yazı = Yazı.Trim(' ', '\r', '\n');
+
+                try
+                {
+                    if (Yazı[0] == '\u001b')
+                    {
+                        int komum_m = Yazı.IndexOf('m');
+                        string[] renkler_yazı = Yazı.Substring(4, komum_m - 4).Split(';');
+                        Yazı = Yazı.Substring(komum_m + 1);
+                        Yazı = Yazı.Remove(Yazı.IndexOf('\u001b'));
+
+                        foreach(var y in renkler_yazı)
+                        {
+                            int s = int.Parse(y);
+                            if (s > 39)
+                            {
+                                //Yüzey
+                                YüzeyinRengi = (Renk)(s - 39);
+                            }
+                            else if (s > 29)
+                            {
+                                //Yazı
+                                YazınınRengi = (Renk)(s - 29);
+                            }
+                        }
+                    }
+                }
+                catch (Exception) { }
+
+                return Yazı;
+            }
+        }
     }
 }

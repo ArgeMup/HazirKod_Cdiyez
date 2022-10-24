@@ -206,7 +206,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
 
             if (!string.IsNullOrEmpty(Ayarlar))
             {
-                Ayarlar = D_Yazı.Düzelt(Ayarlar);
+                Ayarlar = D_Yazı.Taban64ten(Ayarlar);
                 string[] hatırlatıcı_biri_ler = Ayarlar.Split('^');
                 foreach (string h in hatırlatıcı_biri_ler)
                 {
@@ -406,7 +406,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
                 tümü += "^" + b.TakmaAdı + "'" + D_TarihSaat.Yazıya(b.HesaplananTetiklemeAnı) + "'" + b.TekrarlayıcıKomutCümlesi; 
             }
 
-            return D_Yazı.Karıştır(tümü);
+            return D_Yazı.Taban64e(tümü);
         }
 
         void ArkaPlanGörevi_Başlat()

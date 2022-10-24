@@ -2,6 +2,48 @@
 
 #if HazirKod_Cdiyez_DeneyselEklentiler
 
+namespace ArgeMup.HazirKod.Dönüştürme
+{
+    public static class D_Parmakİzi
+    {
+        public const string Sürüm = "V1.0";
+        
+        public static string Yazıya()
+        {
+            /* 
+            * Kullanılacak ise  
+            * Solution Explorer -> Proje -> References -> Add Reference
+            * Assemblies -> Framework -> System.Management
+            */
+        
+            string Çıktı = "";
+            System.Management.ManagementClass mc = new System.Management.ManagementClass("Win32_DiskDrive");
+            System.Management.ManagementObjectCollection moc = mc.GetInstances();
+            foreach (System.Management.ManagementBaseObject mo in moc)
+            {
+                var gecici = mo["InterfaceType"];
+                if (gecici == null || gecici.ToString() == "USB") continue;
+        
+                gecici = mo["Model"];
+                if (gecici != null) Çıktı += gecici.ToString() + ", ";
+        
+                gecici = mo["SerialNumber"];
+                if (gecici != null) Çıktı += gecici.ToString() + ", ";
+        
+                gecici = mo["Signature"];
+                if (gecici != null) Çıktı += gecici.ToString();
+        
+                if (Çıktı != "") break;
+            }
+        
+            moc.Dispose();
+            mc.Dispose();
+        
+            return Çıktı;
+        }
+    }
+}
+
 using System;
 using System.Collections.Generic;
 using System.Threading;

@@ -76,6 +76,7 @@ namespace ArgeMup.HazirKod
         public static void Ekle(string Mesaj, Seviye Seviyesi = Seviye.Geveze, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
         {
             if (Seviyesi > GenelSeviye) return;
+            if (Mesaj == null) Mesaj = "";
 
             string içerik = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " " + Mesaj.Replace("\r\n", "|").Replace('\r', '|').Replace('\n', '|');
 

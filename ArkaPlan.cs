@@ -175,7 +175,6 @@ namespace ArgeMup.HazirKod.ArkaPlan
         /// Kur_SonrakiTetikleme komutu çağırıldığında, sonraki zamanlama komut cümlesine göre hesaplanır ve kalıcı olarak kaydedilir
         /// </summary>
 
-        //enum GeriBildirim_Islemini_ { çalıştır, çalıştırılıyor, çalıştırıldı, çalıştırma };
         class Biri_
         {
             public string TakmaAdı;
@@ -235,11 +234,12 @@ namespace ArgeMup.HazirKod.ArkaPlan
         }
         public void Kur(string TakmaAdı, DateTime İlkTetikleyeceğiZaman, string TekrarlayıcıKomutCümlesi = null, Func<string, object, int> GeriBildirim_Islemi = null, object Hatırlatıcı = null)
         {
-            if (TakmaAdı.Contains("'") || TakmaAdı.Contains("^") ||
-                TekrarlayıcıKomutCümlesi.Contains("'") || TekrarlayıcıKomutCümlesi.Contains("^")) throw new Exception("TakmaAdı ve TekrarlayıcıKomutCümlesi içinde ' ve ^ karakterleri bulunmamalı");
+            if (TakmaAdı.Contains("'") || TakmaAdı.Contains("^")) throw new Exception("TakmaAdı içinde ' ve ^ karakterleri bulunmamalı");
 
             if (!string.IsNullOrEmpty(TekrarlayıcıKomutCümlesi))
             {
+                if (TekrarlayıcıKomutCümlesi.Contains("'") || TekrarlayıcıKomutCümlesi.Contains("^")) throw new Exception("TekrarlayıcıKomutCümlesi içinde ' ve ^ karakterleri bulunmamalı");
+
                 DateTime gecici = İlkTetikleyeceğiZaman;
                 if (!SonrakiTetikleme_Hesapla(ref gecici, TekrarlayıcıKomutCümlesi)) throw new Exception("TekrarlayıcıKomutCümlesi uygun değil");
             }
@@ -411,11 +411,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
 
         void ArkaPlanGörevi_Başlat()
         {
-            if (Interlocked.Increment(ref UcuzKilit) > 1)
-            {
-                Interlocked.Decrement(ref UcuzKilit);
-                return;
-            }
+            if (Interlocked.Increment(ref UcuzKilit) > 1) return;
 
             if (İptalEtmeAnahtarıKaynağı != null)
             {
@@ -425,8 +421,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
                 İptalEtmeAnahtarıKaynağı = null;
             }
 
-            if (Çalışsın &&
-                Ortak.Çalışsın)
+            if (Çalışsın && Ortak.Çalışsın)
             {
                 DateTime EnYakınTetikleme = DateTime.MaxValue;
                 Biri_ EnYakınİşlem = null;
@@ -455,7 +450,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
                 }
             }
 
-            Interlocked.Decrement(ref UcuzKilit);
+            Interlocked.Exchange(ref UcuzKilit, 0);
         }
         void ArkaPlanGörevi(Biri_ EnYakınİşlem, CancellationToken İptalEtmeAnahtarı)
         {
@@ -484,8 +479,11 @@ namespace ArgeMup.HazirKod.ArkaPlan
                         if (TekrarHatırlatmaGecikmesi_msn > 0) EnYakınİşlem.Ertele(TekrarHatırlatmaGecikmesi_msn);
                         //else                                      //tekrarlama kıstasları üzerinden tetiklet
                     }
+
+                    ArkaPlanGörevi_Başlat();                        //biten görev dolayısıyla zamanlamayı tekrar gözden geçir
                 });
             }
+            else EnYakınİşlem.GeriBildirim_Islemini_çalıştır = true;
         }
     }
 }

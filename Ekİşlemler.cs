@@ -146,4 +146,29 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return Girdi;
         }
     }
+
+    public static class _Ekİşlemler_İstisna
+    {
+        public const string Sürüm = "V1.0";
+
+        public static System.Exception Günlük(this System.Exception Girdi, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.BeklenmeyenDurum, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
+        {
+            string çıktı = "";
+            System.Exception ist = Girdi;
+
+            try
+            {
+                while (ist != null)
+                {
+                    çıktı += ist.ToString() + "|";
+                    ist = ist.InnerException;
+                }
+
+                ArgeMup.HazirKod.Günlük.Ekle(çıktı.TrimEnd('|'), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
+            }
+            catch (System.Exception) { }
+
+            return Girdi;
+        }
+    }
 }

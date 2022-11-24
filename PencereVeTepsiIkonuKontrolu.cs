@@ -18,7 +18,7 @@
             public NotifyIcon Tepsiİkonu = null;
 
             Form Pencere;
-            Ayarlar_ Ayarlar;
+            Ayarlar_Xml_ Ayarlar;
             GörevÇubuğundaYüzdeGösterimiDurumu İlerlemeDurumu_ = GörevÇubuğundaYüzdeGösterimiDurumu.Kapalı;
             FormWindowState PencereDurumu;
             bool UygulamaKüçültüldüğündeGörevÇubuğundaGörünsün = true;
@@ -49,7 +49,7 @@
             /// Form LOAD içerisinde çağırılmalı
             /// </summary>
             /// <param name="ŞeffafBaşlangıç">Kullanılacak ise form un OPACİTY özelliği SIFIR yapılmalı</param>
-            public PencereVeTepsiIkonuKontrolu_(Form Pencere_, Ayarlar_ Ayarlar__ = null,  bool UygulamaKüçültüldüğündeGörevÇubuğundaGörünsün_ = false, string TakmaAd = "", int X = 0, int Y = 0, int Genişlik = -1, int Yükseklik = -1, bool ŞeffafBaşlangıç = true)
+            public PencereVeTepsiIkonuKontrolu_(Form Pencere_, Ayarlar_Xml_ Ayarlar__ = null,  bool UygulamaKüçültüldüğündeGörevÇubuğundaGörünsün_ = false, string TakmaAd = "", int X = 0, int Y = 0, int Genişlik = -1, int Yükseklik = -1, bool ŞeffafBaşlangıç = true)
             {
                 Pencere = Pencere_;
                 Pencere.Shown += Pencere_Shown;
@@ -68,7 +68,7 @@
                 else şeffaflık = 1;
 
                 bool sonuç;
-                if (Ayarlar__ == null) Ayarlar = new Ayarlar_(out sonuç, "", "", false, 0, 0);
+                if (Ayarlar__ == null) Ayarlar = new Ayarlar_Xml_(out sonuç, "", "", false, 0, 0);
                 else Ayarlar = Ayarlar__;
 
                 if (Genişlik == -1) Genişlik = Screen.PrimaryScreen.WorkingArea.Width;

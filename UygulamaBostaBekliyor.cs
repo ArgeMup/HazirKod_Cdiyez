@@ -28,7 +28,7 @@
             bool DurdurKapat, DosyalarıÖnceKopyalaSonraOynat;
             BackgroundWorker ArkaPlan;
             Process Oynatıcı;
-            Ayarlar_ Ayarlar;
+            Ayarlar_Xml_ Ayarlar;
             KlavyeFareGozlemcisi_ Gözlemci; 
             #endregion
 
@@ -51,7 +51,7 @@
                 else YerelKlasör = Kendi.Klasörü() + "\\" + YerelDepolamaKonumu + "\\UygulamaBoştaBekliyor\\";
 
                 bool var;
-                Ayarlar = new Ayarlar_(out var, "", YerelKlasör + "UygulamaBostaBekliyor.Ayarlar");
+                Ayarlar = new Ayarlar_Xml_(out var, "", YerelKlasör + "UygulamaBostaBekliyor.Ayarlar");
                 
                 if (UzaktakiOynatılacakVideolarListesi.Count == 0)
                 {
@@ -158,7 +158,7 @@
 
                                 if (Durum != Durum_.GörüntüBaşlatılıyor)
                                 {
-                                    List<Depo.Biri> Liste = Ayarlar.Listele();
+                                    List<Depo_Xml.Biri> Liste = Ayarlar.Listele();
                                     foreach (var nesne in Liste) Ayarlar.Sil(nesne.Adı);
                                 }
                                 break;

@@ -142,7 +142,7 @@ namespace ArgeMup.HazirKod.Ekİşlemler
 
         public static object Günlük(this object Girdi, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
         {
-            ArgeMup.HazirKod.Günlük.Ekle(Girdi == null ? "null" : Girdi.GetType().ToString() + " " + Girdi.ToString(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
+            ArgeMup.HazirKod.Günlük.Ekle(Girdi == null ? "null" : Girdi.GetType().FullName + " " + Girdi.ToString(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
             return Girdi;
         }
     }

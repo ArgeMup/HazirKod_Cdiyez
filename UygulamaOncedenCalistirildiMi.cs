@@ -27,7 +27,7 @@ namespace ArgeMup.HazirKod
                 {
                     if (string.IsNullOrEmpty(KilitDosyasiYolu))
                     {
-                        KilitDosyasiYolu = Kendi.DosyaYolu() + ".Kilit.mup";
+                        KilitDosyasiYolu = Kendi.DosyaYolu + ".Kilit.mup";
                     }
 
                     KilitDosyası = new FileStream(KilitDosyasiYolu, FileMode.OpenOrCreate, FileAccess.Read, FileShare.None);
@@ -93,7 +93,7 @@ namespace ArgeMup.HazirKod
 
         public bool KontrolEt(string OrtakNesneAdı = "")
         {
-            if (OrtakNesneAdı == "") OrtakNesneAdı = Kendi.Adı();
+            if (OrtakNesneAdı == "") OrtakNesneAdı = Kendi.Adı;
             if (OrtakNesne != null) { OrtakNesne.Dispose(); OrtakNesne = null; }
 
             bool Evet = true;

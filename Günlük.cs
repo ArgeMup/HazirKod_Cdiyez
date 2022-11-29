@@ -56,7 +56,7 @@ namespace ArgeMup.HazirKod
                 UdpSunucusu = new Öğütücü_<string>(İşlem_UdpSunucusu, AzamiElemanSayısı: 5555);
             }
 
-            Ekle("Başladı " + Kendi.DosyaYolu() + " V" + Kendi.Sürümü_Dosya());
+            Ekle("Başladı " + Kendi.DosyaYolu + " V" + Kendi.Sürümü_Dosya);
         }
         public static void Durdur()
         {

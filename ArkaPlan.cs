@@ -106,7 +106,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
 
     public class Hatırlatıcı_
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
         public class Durum_
         {
             public string TakmaAdı;
@@ -157,10 +157,8 @@ namespace ArgeMup.HazirKod.ArkaPlan
         /// Tekrarlayıcı Sistem Komut Cümlesi       örnek son tetikleme anı : 01.02.3000 04:05:06
         /// y2071   yıl 2071 olarak düzeltilir      01.02.2071 04:05:06
         /// y+1     + 1 yıl                         01.02.3001 04:05:06
-        /// a3      ay 3 olarak düzeltilir          01.03.3000 04:05:06
         /// a+4     + 4 ay                          01.06.3000 04:05:06
         /// h+1     + 1 hafta                       08.02.3000 04:05:06
-        /// g6      gün 6 olarak düzeltilir         06.02.3000 04:05:06
         /// g+7     + 7 gün                         08.02.3000 04:05:06
         /// s8      saat 8 olarak düzeltilir        01.02.3000 08:05:06
         /// s+9     + 9 saat                        01.02.3000 13:05:06
@@ -202,17 +200,23 @@ namespace ArgeMup.HazirKod.ArkaPlan
         public Hatırlatıcı_(string Ayarlar = null, int TekrarHatırlatmaGecikmesi_msn = int.MinValue)
         {
             this.TekrarHatırlatmaGecikmesi_msn = TekrarHatırlatmaGecikmesi_msn;
-
+            
             if (!string.IsNullOrEmpty(Ayarlar))
             {
-                Ayarlar = D_Yazı.Taban64ten(Ayarlar);
-                string[] hatırlatıcı_biri_ler = Ayarlar.Split('^');
-                foreach (string h in hatırlatıcı_biri_ler)
+                Depo_ depo = new Depo_(Ayarlar);
+                Depo_.IEleman te = depo.Bul("Tetikleyiciler");
+                if (te != null)
                 {
-                    string[] içeriği = h.Split('\'');
-                    if (içeriği == null || içeriği.Length != 3) continue;
+                    foreach (Depo_.IEleman biri in te.Elemanları)
+                    {
+                        string TakmaAdı = biri.Oku(null, null, 0);
+                        DateTime İlkTetikleyeceğiZaman = biri.Oku_TarihSaat(null, default, 1);
+                        string TekrarlayıcıKomutCümlesi = biri.Oku(null, null, 2);
 
-                    Kur(içeriği[0], D_TarihSaat.Tarihe(içeriği[1]), içeriği[2]);
+                        if (string.IsNullOrEmpty(TakmaAdı) || İlkTetikleyeceğiZaman == default(DateTime)) continue;
+
+                        Kur(TakmaAdı, İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi);
+                    }
                 }
             }
         }
@@ -234,12 +238,8 @@ namespace ArgeMup.HazirKod.ArkaPlan
         }
         public void Kur(string TakmaAdı, DateTime İlkTetikleyeceğiZaman, string TekrarlayıcıKomutCümlesi = null, Func<string, object, int> GeriBildirim_Islemi = null, object Hatırlatıcı = null)
         {
-            if (TakmaAdı.Contains("'") || TakmaAdı.Contains("^")) throw new Exception("TakmaAdı içinde ' ve ^ karakterleri bulunmamalı");
-
             if (!string.IsNullOrEmpty(TekrarlayıcıKomutCümlesi))
             {
-                if (TekrarlayıcıKomutCümlesi.Contains("'") || TekrarlayıcıKomutCümlesi.Contains("^")) throw new Exception("TekrarlayıcıKomutCümlesi içinde ' ve ^ karakterleri bulunmamalı");
-
                 DateTime gecici = İlkTetikleyeceğiZaman;
                 if (!SonrakiTetikleme_Hesapla(ref gecici, TekrarlayıcıKomutCümlesi)) throw new Exception("TekrarlayıcıKomutCümlesi uygun değil");
             }
@@ -282,63 +282,73 @@ namespace ArgeMup.HazirKod.ArkaPlan
         {
             if (string.IsNullOrEmpty(KomutCümlesi)) return false;
 
-            bool sonuç = false;
-            string[] d = KomutCümlesi.Split(' ');
-            if (d != null && d.Length > 0)
+            try
             {
-                foreach (string s in d)
+                bool sonuç = false;
+                string[] d = KomutCümlesi.Split(' ');
+                if (d != null && d.Length > 0)
                 {
-                    double aralık = D_Sayı.Yazıdan(s);
-                    bool ekle = s.Contains("+");
+                    foreach (string s in d)
+                    {
+                        double aralık = D_Sayı.Yazıdan(s);
+                        bool ekle = s.Contains("+");
 
-                    if (s.StartsWith("y"))
-                    {
-                        sonuç = true;
-                        if (ekle) BaşlangıçNoktası = BaşlangıçNoktası.AddYears((int)aralık);
-                        else BaşlangıçNoktası = new DateTime((int)aralık, BaşlangıçNoktası.Month, BaşlangıçNoktası.Day, BaşlangıçNoktası.Hour, BaşlangıçNoktası.Minute, BaşlangıçNoktası.Second);
-                    }
-                    else if (s.StartsWith("a"))
-                    {
-                        sonuç = true;
-                        if (ekle) BaşlangıçNoktası = BaşlangıçNoktası.AddMonths((int)aralık);
-                        else BaşlangıçNoktası = new DateTime(BaşlangıçNoktası.Year, (int)aralık, BaşlangıçNoktası.Day, BaşlangıçNoktası.Hour, BaşlangıçNoktası.Minute, BaşlangıçNoktası.Second);
-                    }
-                    else if (s.StartsWith("g"))
-                    {
-                        sonuç = true;
-                        if (ekle) BaşlangıçNoktası = BaşlangıçNoktası.AddDays(aralık);
-                        else BaşlangıçNoktası = new DateTime(BaşlangıçNoktası.Year, BaşlangıçNoktası.Month, (int)aralık, BaşlangıçNoktası.Hour, BaşlangıçNoktası.Minute, BaşlangıçNoktası.Second);
-                    }
-                    else if (s.StartsWith("h"))
-                    {
-                        if (ekle)
+                        if (s.StartsWith("y"))
                         {
                             sonuç = true;
-                            BaşlangıçNoktası = BaşlangıçNoktası.AddDays(aralık * 7);
+                            if (ekle) BaşlangıçNoktası = BaşlangıçNoktası.AddYears((int)aralık);
+                            else BaşlangıçNoktası = new DateTime((int)aralık, BaşlangıçNoktası.Month, BaşlangıçNoktası.Day, BaşlangıçNoktası.Hour, BaşlangıçNoktası.Minute, BaşlangıçNoktası.Second);
+                        }
+                        else if (s.StartsWith("a"))
+                        {
+                            if (ekle)
+                            {
+                                sonuç = true;
+                                BaşlangıçNoktası = BaşlangıçNoktası.AddMonths((int)aralık);
+                            }
+                        }
+                        else if (s.StartsWith("g"))
+                        {
+                            if (ekle)
+                            {
+                                sonuç = true;
+                                BaşlangıçNoktası = BaşlangıçNoktası.AddDays(aralık);
+                            }
+                        }
+                        else if (s.StartsWith("h"))
+                        {
+                            if (ekle)
+                            {
+                                sonuç = true;
+                                BaşlangıçNoktası = BaşlangıçNoktası.AddDays(aralık * 7);
+                            }
+                        }
+                        else if (s.StartsWith("d"))
+                        {
+                            sonuç = true;
+                            if (ekle) BaşlangıçNoktası = BaşlangıçNoktası.AddMinutes(aralık);
+                            else BaşlangıçNoktası = new DateTime(BaşlangıçNoktası.Year, BaşlangıçNoktası.Month, BaşlangıçNoktası.Day, BaşlangıçNoktası.Hour, (int)aralık, BaşlangıçNoktası.Second);
+                        }
+                        else if (s.StartsWith("sn"))
+                        {
+                            sonuç = true;
+                            if (ekle) BaşlangıçNoktası = BaşlangıçNoktası.AddSeconds(aralık);
+                            else BaşlangıçNoktası = new DateTime(BaşlangıçNoktası.Year, BaşlangıçNoktası.Month, BaşlangıçNoktası.Day, BaşlangıçNoktası.Hour, BaşlangıçNoktası.Minute, (int)aralık);
+                        }
+                        else if (s.StartsWith("s"))
+                        {
+                            sonuç = true;
+                            if (ekle) BaşlangıçNoktası = BaşlangıçNoktası.AddHours(aralık);
+                            else BaşlangıçNoktası = new DateTime(BaşlangıçNoktası.Year, BaşlangıçNoktası.Month, BaşlangıçNoktası.Day, (int)aralık, BaşlangıçNoktası.Minute, BaşlangıçNoktası.Second);
                         }
                     }
-                    else if (s.StartsWith("d"))
-                    {
-                        sonuç = true;
-                        if (ekle) BaşlangıçNoktası = BaşlangıçNoktası.AddMinutes(aralık);
-                        else BaşlangıçNoktası = new DateTime(BaşlangıçNoktası.Year, BaşlangıçNoktası.Month, BaşlangıçNoktası.Day, BaşlangıçNoktası.Hour, (int)aralık, BaşlangıçNoktası.Second);
-                    }
-                    else if (s.StartsWith("sn"))
-                    {
-                        sonuç = true;
-                        if (ekle) BaşlangıçNoktası = BaşlangıçNoktası.AddSeconds(aralık);
-                        else BaşlangıçNoktası = new DateTime(BaşlangıçNoktası.Year, BaşlangıçNoktası.Month, BaşlangıçNoktası.Day, BaşlangıçNoktası.Hour, BaşlangıçNoktası.Minute, (int)aralık);
-                    }
-                    else if (s.StartsWith("s"))
-                    {
-                        sonuç = true;
-                        if (ekle) BaşlangıçNoktası = BaşlangıçNoktası.AddHours(aralık);
-                        else BaşlangıçNoktası = new DateTime(BaşlangıçNoktası.Year, BaşlangıçNoktası.Month, BaşlangıçNoktası.Day, (int)aralık, BaşlangıçNoktası.Minute, BaşlangıçNoktası.Second);
-                    }
                 }
-            }
 
-            return sonuç;
+                return sonuç;
+            }
+            catch (Exception) { }
+
+            return false;
         }
         
         public void Sil(string TakmaAdı)
@@ -399,14 +409,19 @@ namespace ArgeMup.HazirKod.ArkaPlan
                 Çalışsın = false;
                 ArkaPlanGörevi_Başlat();
             }
-            
-            string tümü = Sürüm;
+
+            Depo_ depo = new Depo_();
+            depo.Yaz("sürüm", Sürüm);
+            int syc = 0;
             foreach (Biri_ b in Liste)
             {
-                tümü += "^" + b.TakmaAdı + "'" + D_TarihSaat.Yazıya(b.HesaplananTetiklemeAnı) + "'" + b.TekrarlayıcıKomutCümlesi; 
+                syc++;
+                depo.Yaz("Tetikleyiciler/" + syc, b.TakmaAdı, 0);
+                depo.Yaz("Tetikleyiciler/" + syc, b.HesaplananTetiklemeAnı, 1);
+                depo.Yaz("Tetikleyiciler/" + syc, b.TekrarlayıcıKomutCümlesi, 2);
             }
 
-            return D_Yazı.Taban64e(tümü);
+            return depo.YazıyaDönüştür();
         }
 
         void ArkaPlanGörevi_Başlat()

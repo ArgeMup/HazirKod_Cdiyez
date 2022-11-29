@@ -40,7 +40,7 @@ namespace ArgeMup.HazirKod
         {
             if (e.Error == null)
             {
-                string şimdiki_dosya_yolu = Kendi.DosyaYolu();
+                string şimdiki_dosya_yolu = Kendi.DosyaYolu;
                 FileVersionInfo gelen = FileVersionInfo.GetVersionInfo(İndirilenDosyanınAdı);
                 FileVersionInfo şimdiki = FileVersionInfo.GetVersionInfo(şimdiki_dosya_yolu);
 

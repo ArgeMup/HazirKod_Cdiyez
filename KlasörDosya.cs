@@ -106,8 +106,8 @@ namespace ArgeMup.HazirKod
         {
             Environment.SpecialFolder Tür = 0;
             if (Aile == null) Aile = "ArGeMuP";
-            if (Uygulama == null) Uygulama = Kendi.Adı();
-            if (Sürüm == null) Sürüm = Kendi.Sürümü_Dosya();
+            if (Uygulama == null) Uygulama = Kendi.Adı;
+            if (Sürüm == null) Sürüm = Kendi.Sürümü_Dosya;
 
             string kls = null;
             if (HedeflenenKapsamı == Kapsamı.Geçici) kls = Path.GetTempPath().TrimEnd('\\');

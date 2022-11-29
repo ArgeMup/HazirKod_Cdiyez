@@ -7,9 +7,9 @@ using System.Threading;
 
 namespace ArgeMup.HazirKod
 {
-    public class Ayarlar_ : IDisposable 
+    public class Ayarlar_ 
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V5.0";
         public string AyarlarDosyasıYolu
         {
             get
@@ -21,15 +21,15 @@ namespace ArgeMup.HazirKod
         #region Değişkenler
         string Parola;
         string _AyarlarDosyasıYolu;
-        Depo_ Depo = null;
+        Depo_ Depo;
         Mutex Kilit;
-        System.Timers.Timer Zamanlayıcı;
+        System.Timers.Timer Zamanlayıcı = null;
         DahaCokKarmasiklastirma_ Karmaşıklaştırma;
         #endregion
        
         public Ayarlar_(string AyarlarİçinParola = null, string AyarlarDosyası = null, int DeğişiklikleriKaydetmeAralığı_Sn = 5*60)
         {
-            if (string.IsNullOrEmpty(AyarlarDosyası)) _AyarlarDosyasıYolu = Kendi.DosyaYolu() + ".Ayarlar";    
+            if (string.IsNullOrEmpty(AyarlarDosyası)) _AyarlarDosyasıYolu = Kendi.DosyaYolu + ".Ayarlar";    
             else _AyarlarDosyasıYolu = AyarlarDosyası;
 			
 			if (!File.Exists(AyarlarDosyasıYolu)) 
@@ -53,24 +53,40 @@ namespace ArgeMup.HazirKod
                 Depo.Yaz("Kendi", Sürüm);
                 Depo.Yaz("Kendi/Oluşturulma", DateTime.Now);
                 Depo.Yaz("Kendi/Konum", AyarlarDosyasıYolu);
-                Depo.Yaz("Kendi/BilgisayarVeKullanıcıAdı", Kendi.BilgisayarAdı() + "/" + Kendi.KullanıcıAdı());
+                Depo.Yaz("Kendi/Bilgisayar ve kullanıcı aAdı", Kendi.BilgisayarAdı + "/" + Kendi.KullanıcıAdı);
+                Depo.Yaz("Kendi/Bütünlük kontrolü", "ArGeMuP");
 
-                Depo.Yaz("Uygulama", Kendi.Sürümü_Dosya());
-                Depo.Yaz("Uygulama/Ad", Kendi.Adı());
+                Depo.Yaz("Uygulama", Kendi.Sürümü_Dosya);
+                Depo.Yaz("Uygulama/Ad", Kendi.Adı);
+                Depo.Yaz("Uygulama/Konum", Kendi.DosyaYolu);
+
+                Depo.Yaz("Ayarlar", "ArGeMuP");
             }
             else
             {
-                string tümü = File.ReadAllText(_AyarlarDosyasıYolu);
-                if (Parola != null) tümü = Karmaşıklaştırma.Düzelt(tümü, Parola);
-                Depo = new Depo_(tümü);
+                Depo = new Depo_(File.ReadAllText(_AyarlarDosyasıYolu));
+                
+                if (Parola != null)
+                {
+                    try
+                    {
+                        Depo_.IEleman ayrlr = Depo.Bul("Ayarlar");
+                        string ayrlr_içeriği = Karmaşıklaştırma.Düzelt(ayrlr[0], Parola);
+                        ayrlr.Ekle(null, ayrlr_içeriği);
+                        ayrlr[0] = null;
+                    }
+                    catch (Exception) { }
+                }
 
-                string okunan = Depo.Oku("Doğrulama/Bütünlük Kontrolü"), hesaplanan = "Hata";
-                Depo.Yaz("Doğrulama/Bütünlük Kontrolü", null);
-                try { hesaplanan = DoğrulamaKodu.Üret.Yazıdan(Depo.YazıyaDönüştür()); } catch (Exception) { }
-                if (okunan != hesaplanan) throw new Exception("Bütünlük Kontrolü Hatalı");
+                try 
+                {
+                    string okunan = Depo.Oku("Kendi/Bütünlük kontrolü");
+                    if (string.IsNullOrEmpty(okunan) || okunan != DoğrulamaKodu.Üret.Yazıdan(Depo.Bul("Ayarlar").YazıyaDönüştür(null, true))) throw new Exception(); 
+                }
+                catch (Exception) { throw new Exception("Bütünlük Kontrolü Hatalı - " + _AyarlarDosyasıYolu); }
             }
 
-            if (Zamanlayıcı == null && DeğişiklikleriKaydetmeAralığı_Sn > 0)
+            if (DeğişiklikleriKaydetmeAralığı_Sn > 0)
             {
                 Zamanlayıcı = new System.Timers.Timer();
                 Zamanlayıcı.Elapsed += new System.Timers.ElapsedEventHandler(ZamanlayıcıKesmesi);
@@ -85,21 +101,32 @@ namespace ArgeMup.HazirKod
         }
         public void DeğişiklikleriKaydet(bool VeDurdur = false)
         {
-            if (Depo.EnAzBirElemanAdıVeyaİçeriğiDeğişti)
+            if (Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti)
             {
                 if (File.Exists(_AyarlarDosyasıYolu) && !File.Exists(_AyarlarDosyasıYolu + ".yedek")) File.Copy(_AyarlarDosyasıYolu, _AyarlarDosyasıYolu + ".yedek", false);
 
                 Kilit.WaitOne();
 
-                Depo.Yaz("Doğrulama", DateTime.Now);
-                Depo.Yaz("Doğrulama/Bütünlük Kontrolü", null);
-                Depo.Yaz("Doğrulama/Bütünlük Kontrolü", DoğrulamaKodu.Üret.Yazıdan(Depo.YazıyaDönüştür()));
+                string çıktı, Ayarlar = Depo.Bul("Ayarlar").YazıyaDönüştür(null, true);
+                Depo.Yaz("Kendi/Bütünlük kontrolü", DoğrulamaKodu.Üret.Yazıdan(Ayarlar));
 
-                string tümü = Depo.YazıyaDönüştür();
-                if (Parola != null) tümü = Karmaşıklaştırma.Karıştır(tümü, Parola);
+                if (Parola == null) çıktı = Depo.YazıyaDönüştür();
+                else
+                {
+                    string Uygulama = Depo.Bul("Uygulama").YazıyaDönüştür(null);
+                    string Kendi = Depo.Bul("Kendi").YazıyaDönüştür(null);
 
-                File.WriteAllText(_AyarlarDosyasıYolu, tümü);
-                Depo.EnAzBirElemanAdıVeyaİçeriğiDeğişti = false;
+                    Depo_ gecici = new Depo_();
+                    gecici.Yaz("Ayarlar", Karmaşıklaştırma.Karıştır(Ayarlar, Parola));
+                    Ayarlar = gecici.YazıyaDönüştür(null);
+
+                    çıktı = Kendi + Uygulama + Ayarlar;
+                }
+
+                File.WriteAllText(_AyarlarDosyasıYolu, çıktı);
+
+                Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = false;
+
                 File.Delete(_AyarlarDosyasıYolu + ".yedek");
 
                 Kilit.ReleaseMutex();
@@ -131,63 +158,83 @@ namespace ArgeMup.HazirKod
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public string Oku(string ElemanAdıDizisi, string BulunamamasıDurumundakiİçeriği = "")
+        /// <param name="ElemanAdıDizisi">Ayraçlar.ElemanAdıDizisi karakteri / ile ayrılmış sıralı eleman göstergesi E1/E2/E3 ile E1 içindeki E2 içindeki E3 anlaşılır</param>
+        /// <param name="İçeriği">Elemanın içeriği (İçeriği ve Elemanları olmayan Elemanlar YazıyaDönüştürme aşamasında görmezden gelinip silinir)</param>
+        /// <param name="SıraNo">Aynı eleman adı ile birden fazla içerik tutmak için kullanılabilir</param>
+        public void Yaz(string ElemanAdıDizisi, string İçeriği, int SıraNo = 0)
         {
             Kilit.WaitOne();
 
-            string okunan = Depo.Oku("Ayarlar/" + ElemanAdıDizisi, BulunamamasıDurumundakiİçeriği);
+            Depo.Yaz("Ayarlar" + (string.IsNullOrEmpty(ElemanAdıDizisi) ? null : Depo.Ayraçlar.ElemanAdıDizisi.ToString() + ElemanAdıDizisi), İçeriği, SıraNo);
+
+            Kilit.ReleaseMutex();
+
+            if (Zamanlayıcı == null) DeğişiklikleriKaydet();
+        }
+        public string Oku(string ElemanAdıDizisi, string BulunamamasıDurumundakiİçeriği = "", int SıraNo = 0)
+        {
+            Kilit.WaitOne();
+
+            string okunan = Depo.Oku("Ayarlar" + (string.IsNullOrEmpty(ElemanAdıDizisi) ? null : Depo.Ayraçlar.ElemanAdıDizisi.ToString() + ElemanAdıDizisi), BulunamamasıDurumundakiİçeriği, SıraNo);
 
             Kilit.ReleaseMutex();
 
             return okunan;
         }
-        public void Yaz(string ElemanAdıDizisi, string İçeriği)
-        {
-            Kilit.WaitOne();
-
-            Depo.Yaz("Ayarlar/" + ElemanAdıDizisi, İçeriği);
-
-            Kilit.ReleaseMutex();
-        }
 
         #region Dönüştürme
-        public void Yaz(string ElemanAdıDizisi, double Sayı)
+        public void Yaz(string ElemanAdıDizisi, double Sayı, int SıraNo = 0)
         {
-            Yaz(ElemanAdıDizisi, D_Sayı.Yazıya(Sayı));
+            Yaz(ElemanAdıDizisi, D_Sayı.Yazıya(Sayı), SıraNo);
         }
-        public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
+        public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, int SıraNo = 0)
         {
-            Yaz(ElemanAdıDizisi, D_HexYazı.BaytDizisinden(BaytDizisi, Adet, BaşlangıçKonumu));
+            Yaz(ElemanAdıDizisi, D_HexYazı.BaytDizisinden(BaytDizisi, Adet, BaşlangıçKonumu), SıraNo);
         }
-        public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat)
+        public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo = 0)
         {
-            Yaz(ElemanAdıDizisi, D_TarihSaat.Yazıya(TarihSaat));
+            Yaz(ElemanAdıDizisi, D_TarihSaat.Yazıya(TarihSaat), SıraNo);
         }
-        public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default)
+        public void Yaz(string ElemanAdıDizisi, bool Bit, int SıraNo = 0)
+        {
+            Yaz(ElemanAdıDizisi, Bit.ToString(), SıraNo);
+        }
+
+        public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
         {
             try
             {
-                return D_Sayı.Yazıdan(Oku(ElemanAdıDizisi));
+                return D_Sayı.Yazıdan(Oku(ElemanAdıDizisi, null, SıraNo));
             }
             catch (Exception) { }
 
             return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
         }
-        public byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null)
+        public byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
         {
             try
             {
-                return D_HexYazı.BaytDizisine(Oku(ElemanAdıDizisi));
+                return D_HexYazı.BaytDizisine(Oku(ElemanAdıDizisi, null, SıraNo));
             }
             catch (Exception) { }
 
             return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
         }
-        public DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default)
+        public DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
         {
             try
             {
-                return D_TarihSaat.Tarihe(Oku(ElemanAdıDizisi));
+                return D_TarihSaat.Tarihe(Oku(ElemanAdıDizisi, null, SıraNo));
+            }
+            catch (Exception) { }
+
+            return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+        }
+        public bool Oku_Bit(string ElemanAdıDizisi, bool BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
+        {
+            try
+            {
+                return bool.Parse(Oku(ElemanAdıDizisi, null, SıraNo));
             }
             catch (Exception) { }
 
@@ -197,59 +244,46 @@ namespace ArgeMup.HazirKod
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public string[] Listele(string ElemanAdıDizisi, bool Adı = false, bool İçeriği = true, bool ElemanAdları = false)
+        public string[] Listele_Elemanları(string ElemanAdıDizisi)
         {
-            return Depo.Listele(ElemanAdıDizisi, Adı, İçeriği, ElemanAdları);
+            string[] çıktı = null;
+
+            Depo_.IEleman eleman = Bul(ElemanAdıDizisi);
+            if (eleman != null)
+            {
+                çıktı = new string[eleman.Elemanları.Length];
+                for (int i = 0; i < eleman.Elemanları.Length; i++)
+                {
+                    çıktı[i] = eleman.Elemanları[i].Adı;
+                }
+            }
+            else çıktı = new string[0];
+
+            return çıktı;
+        }
+        public string[] Listele_İçeriği(string ElemanAdıDizisi)
+        {
+            string[] çıktı = null; 
+
+            Depo_.IEleman eleman = Bul(ElemanAdıDizisi);
+            if (eleman != null) çıktı = eleman.İçeriği;
+            else çıktı = new string[0];
+
+            return çıktı;
         }
 
         /// <summary>
         /// Ayarlar içinde kullanılan kilit mekanizmasından bağımsız çalıştırılacağından, uygulama kapanmadan önce tüm yazma okuma işlemleri bitmiş olmalı
         /// </summary>
-        public Depo_.Depo_Elemanı_ Bul(string ElemanAdıDizisi)
+        public Depo_.IEleman Bul(string ElemanAdıDizisi)
         {
-            return Depo.Bul(ElemanAdıDizisi);
+            Kilit.WaitOne();
+
+            Depo_.IEleman Eleman = Depo.Bul("Ayarlar" + (string.IsNullOrEmpty(ElemanAdıDizisi) ? null : Depo.Ayraçlar.ElemanAdıDizisi.ToString() + ElemanAdıDizisi));
+
+            Kilit.ReleaseMutex();
+
+            return Eleman;
         }
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                DeğişiklikleriKaydet(true);
-
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects).
-
-                    Durdur();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                //disposedValue = true;
-            }
-        }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        ~Ayarlar_()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(false);
-        }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 }

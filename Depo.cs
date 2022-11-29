@@ -3,294 +3,83 @@
 using ArgeMup.HazirKod.Dönüştürme;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace ArgeMup.HazirKod
 {
     public class Depo_
     {
         public const string Sürüm = "V1.0";
-        public bool EnAzBirElemanAdıVeyaİçeriğiDeğişti = false;
-
-        public List<Depo_Elemanı_> Elemanları = null;
-        public class Depo_Elemanı_
+        public bool EnAzBir_ElemanAdıVeyaİçeriği_Değişti = false;
+        public IEleman[] Elemanları
         {
-            public bool Silmekİçinİşaretlendi
+            get
             {
-                get
-                {
-                    if (string.IsNullOrEmpty(Adı)) return true;
-                    if (!string.IsNullOrEmpty(İçeriği)) return false;
-                    if (Elemanları == null || Elemanları.Count == 0) return true;
-
-                    int MevcutElemanSayısı = 0;
-                    foreach (Depo_Elemanı_ Eleman in Elemanları)
-                    {
-                        if (Eleman.Silmekİçinİşaretlendi) continue;
-
-                        MevcutElemanSayısı++;
-                    }
-
-                    return MevcutElemanSayısı == 0;
-                }
+                if (_Elemanları == null) return new IEleman[0];
+                
+                return _Elemanları;
             }
-            public string Adı
-            {
-                get
-                {
-                    return _Depo.Ayraçlar.KullancıYazısı_İlkHalineGetir(_Adı);
-                }
-                set
-                {
-                    _Adı = _Depo.Ayraçlar.KullancıYazısı_Uygunlaştır(value);
-                    _Depo.EnAzBirElemanAdıVeyaİçeriğiDeğişti = true;
-                }
-            }
-            public string İçeriği
-            {
-                get
-                {
-                    return _Depo.Ayraçlar.KullancıYazısı_İlkHalineGetir(_İçeriği);
-                }
-                set
-                {
-                    _İçeriği = _Depo.Ayraçlar.KullancıYazısı_Uygunlaştır(value);
-                    _Depo.EnAzBirElemanAdıVeyaİçeriğiDeğişti = true;
-                }
-            }
-            public string Uzun_Adı
-            {
-                get
-                {
-                    return _Adı;
-                }
-            }
-            public string Uzun_İçeriği
-            {
-                get
-                {
-                    return _İçeriği;
-                }
-            }
-            public List<Depo_Elemanı_> Elemanları = null;
+        }
+        public Ayraçlar_ Ayraçlar = new Ayraçlar_();
 
-            readonly Depo_ _Depo = null;
-            string _Adı = null;
-            string _İçeriği = null;
+        public interface IEleman
+        {
+            string Adı { get; set; }
+            /// <summary>
+            /// İçeriği
+            /// </summary>
+            string this[int i] { get; set; } //İçeriği
+            string[] İçeriği { get; set; }
+            IEleman[] Elemanları { get; }
+            bool İçiBoşOlduğuİçinSilinecek { get; }
 
-            public Depo_Elemanı_(string Adı, string İçeriği, Depo_ Depo)
-            {
-                if (Depo == null) throw new Exception("Depo boş olamaz");
+            /// <param name="ElemanAdıDizisi">Ayraçlar.ElemanAdıDizisi karakteri / ile ayrılmış sıralı eleman göstergesi E1/E2/E3 ile E1 içindeki E2 içindeki E3 anlaşılır</param>
+            /// <param name="İçeriği">Elemanın içeriği (İçeriği ve Elemanları olmayan Elemanlar YazıyaDönüştürme aşamasında görmezden gelinip silinir)</param>
+            /// <param name="SıraNo">Aynı eleman adı ile birden fazla içerik tutmak için kullanılabilir</param>
+            void Yaz(string ElemanAdıDizisi, string İçeriği, int SıraNo = 0);
+            void Yaz(string ElemanAdıDizisi, double Sayı, int SıraNo = 0);
+            void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, int SıraNo = 0);
+            void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo = 0);
+            void Yaz(string ElemanAdıDizisi, bool Bit, int SıraNo = 0);
 
-                _Depo = Depo;
-                this.Adı = Adı;
-                this.İçeriği = İçeriği;
-            }
-            public Depo_Elemanı_(string Eleman_AdıİçeriğiElemaları, int Seviye, Depo_ Depo)
-            {
-                // Adı'İçeriği'Alt Elemanları
-                // baslık1''A%$?]1{#AAA%$?]1{#C%$?]2{#CCC%$?]2{#E%$?]3{#EEE?%#{3]$F%$?]3{#FFF?%#{2]$D%$?]2{#DDD?%#{1]$B%$?]1{#BBB
+            string Oku(string ElemanAdıDizisi, string BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null, int SıraNo = 0);
+            double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
+            byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null, int SıraNo = 0);
+            DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
+            bool Oku_Bit(string ElemanAdıDizisi, bool BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
 
-                if (Depo == null) throw new Exception("Depo boş olamaz");
-                _Depo = Depo;
-
-                if (!string.IsNullOrEmpty(Eleman_AdıİçeriğiElemaları))
-                {
-                    string[] dizi = Eleman_AdıİçeriğiElemaları.Split(_Depo.Ayraçlar.AdıVeİçeriğiVeElemanları);
-                    if (dizi != null && dizi.Length >= 2 && !string.IsNullOrEmpty(dizi[0]))
-                    {
-                        Adı = dizi[0];
-                        İçeriği = string.IsNullOrEmpty(dizi[1]) ? null : dizi[1];
-
-                        if (dizi.Length == 3 && !string.IsNullOrEmpty(dizi[2]))
-                        {
-                            // Alt Elemanları
-                            // A%$?]1{#AAA%$?]1{#C%$?]2{#CCC%$?]2{#E%$?]3{#EEE?%#{3]$F%$?]3{#FFF?%#{2]$D%$?]2{#DDD?%#{1]$B%$?]1{#BBB
-                            Seviye++;
-                            string ayr_Eleman = _Depo.Ayraçlar.Vekil_Eleman(Seviye); // ?%#{1]$
-
-                            dizi = dizi[2].Split(new string[] { ayr_Eleman }, StringSplitOptions.None);
-                            if (dizi != null && dizi.Length > 0)
-                            {
-                                Elemanları = new List<Depo_Elemanı_>();
-                                string ayr_AdıVeİçeriğiVeElemanları = _Depo.Ayraçlar.Vekil_AdıVeİçeriğiVeElemanları(Seviye); // %$?]1{#
-
-                                foreach (string elm in dizi)
-                                {
-                                    // A%$?]1{#AAA%$?]1{#C%$?]2{#CCC%$?]2{#E%$?]3{#EEE?%#{3]$F%$?]3{#FFF?%#{2]$D%$?]2{#DDD
-                                    string ayıklanmış_eleman = elm.Replace(ayr_AdıVeİçeriğiVeElemanları, _Depo.Ayraçlar.AdıVeİçeriğiVeElemanları.ToString());
-                                    // A'AAA'C%$?]2{#CCC%$?]2{#E%$?]3{#EEE?%#{3]$F%$?]3{#FFF?%#{2]$D%$?]2{#DDD
-
-                                    Depo_Elemanı_ yeni = new Depo_Elemanı_(ayıklanmış_eleman, Seviye, _Depo);
-                                    if (!yeni.Silmekİçinİşaretlendi) Elemanları.Add(yeni);
-                                }
-
-                                if (Elemanları.Count == 0) Elemanları = null;
-                            }
-                        }
-                    }
-                }
-            }
-
-            /// <param name="ElemanAdıDizisi">Dizi_Ayırma_Elemanı karakteri ile ayrılmış sıralı eleman göstergesi E1/E2/E3 ile E1 içindeki E2 içindeki E3 anlaşılır</param>
-            /// <param name="İçeriği">Elemanın içeriği</param>
-            public void Yaz(string ElemanAdıDizisi, string İçeriği)
-            {
-                if (string.IsNullOrEmpty(ElemanAdıDizisi)) this.İçeriği = İçeriği;
-                else
-                {
-                    ElemanAdıDizisi = ElemanAdıDizisi.Trim(_Depo.Ayraçlar.ElemanAdıDizisi);
-
-                    //alttaki elemanlardan bahsediyor
-                    string geriyekalan = _Depo.Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
-
-                    if (Elemanları == null) Elemanları = new List<Depo_Elemanı_>();
-
-                    Depo_Elemanı_ bulunan = Elemanları.Find(x => x.Adı == ElemanAdıDizisi);
-                    if (bulunan != null) bulunan.Yaz(geriyekalan, İçeriği);
-                    else
-                    {
-                        //bulunamadığından yeni bir eleman oluştur
-                        bulunan = new Depo_Elemanı_(ElemanAdıDizisi, null, _Depo);
-                        bulunan.Yaz(geriyekalan, İçeriği);
-                        Elemanları.Add(bulunan);
-                    }
-                }
-            }
-            /// <param name="ElemanAdıDizisi">Dizi_Ayırma_Elemanı karakteri ile ayrılmış sıralı eleman göstergesi E1/E2/E3 ile E1 içindeki E2 içindeki E3 anlaşılır</param>
-            public string Oku(string ElemanAdıDizisi, string BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null)
-            {
-                Depo_Elemanı_ bulunan = Bul(ElemanAdıDizisi);
-                if (bulunan == null) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-
-                string okunan = bulunan.İçeriği;
-                if (string.IsNullOrEmpty(okunan)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-
-                return okunan;
-            }
-            public Depo_Elemanı_ Bul(string ElemanAdıDizisi)
-            {
-                if (string.IsNullOrEmpty(ElemanAdıDizisi)) return this;
-                else
-                {
-                    ElemanAdıDizisi = ElemanAdıDizisi.Trim(_Depo.Ayraçlar.ElemanAdıDizisi);
-
-                    //alttaki elemanlardan bahsediyor
-                    if (Elemanları == null) return null;
-
-                    string geriyekalan = _Depo.Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
-
-                    Depo_Elemanı_ bulunan = Elemanları.Find(x => x.Adı == ElemanAdıDizisi);
-                    if (bulunan == null) return null;
-
-                    return bulunan.Bul(geriyekalan);
-                }
-            }
-            public string[] Listele(string ElemanAdıDizisi, bool Adı = false, bool İçeriği = true, bool ElemanAdları = false)
-            {
-                string[] dizi = new string[0];
-                if (!Adı && !İçeriği && !ElemanAdları) return dizi;
-
-                Depo_Elemanı_ bulunan = Bul(ElemanAdıDizisi);
-                if (bulunan == null || bulunan.Elemanları == null || bulunan.Elemanları.Count == 0) return dizi;
-
-                dizi = new string[(Adı ? bulunan.Elemanları.Count : 0) + (İçeriği ? bulunan.Elemanları.Count : 0) + (ElemanAdları ? bulunan.Elemanları.Count : 0)];
-                int syc = 0;
-                foreach (Depo_Elemanı_ de in bulunan.Elemanları)
-                {
-                    if (Adı) dizi[syc++] = de.Adı;
-                    if (İçeriği) dizi[syc++] = de.İçeriği;
-                    if (ElemanAdları)
-                    {
-                        if (de.Elemanları == null || de.Elemanları.Count == 0) syc++;
-                        else
-                        {
-                            string birarada = "";
-                            de.Elemanları.ForEach(x => birarada += x.Adı + _Depo.Ayraçlar.ElemanAdıDizisi);
-                            dizi[syc++] = birarada.TrimEnd(_Depo.Ayraçlar.ElemanAdıDizisi);
-                        }
-                    }
-                }
-
-                return dizi;
-            }
-
-            #region Dönüştürme
-            public void Yaz(string ElemanAdıDizisi, double Sayı)
-            {
-                Yaz(ElemanAdıDizisi, D_Sayı.Yazıya(Sayı));
-            }
-            public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
-            {
-                Yaz(ElemanAdıDizisi, D_HexYazı.BaytDizisinden(BaytDizisi, Adet, BaşlangıçKonumu));
-            }
-            public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat)
-            {
-                Yaz(ElemanAdıDizisi, D_TarihSaat.Yazıya(TarihSaat));
-            }
-            public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default)
-            {
-                try
-                {
-                    return D_Sayı.Yazıdan(Oku(ElemanAdıDizisi));
-                }
-                catch (Exception) { }
-
-                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-            }
-            public byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null)
-            {
-                try
-                {
-                    return D_HexYazı.BaytDizisine(Oku(ElemanAdıDizisi));
-                }
-                catch (Exception) { }
-
-                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-            }
-            public DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default)
-            {
-                try
-                {
-                    return D_TarihSaat.Tarihe(Oku(ElemanAdıDizisi));
-                }
-                catch (Exception) { }
-
-                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-            }
-            #endregion
-        };
-
+            IEleman Bul(string ElemanAdıDizisi);
+            string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları = false);
+            void Ekle(string ElemanAdıDizisi, string Eleman);
+            void Sil(string ElemanAdıDizisi);
+        }
         public class Ayraçlar_
         {
-            public char ElemanAdıDizisi = '/';
+            public readonly char ElemanAdıDizisi = '/';
 
-            public char Eleman = '"';
-            public char AdıVeİçeriğiVeElemanları = '\'';
-            public string Vekil_Eleman_Başla = "?%#{", Vekil_Eleman_Bitir = "]$";
-            public string Vekil_AdıVeİçeriğiVeElemanları_Başla = "%$?]", Vekil_AdıVeİçeriğiVeElemanları_Bitir = "{#";
+            public readonly char Eleman = '\n';
+            public readonly char Eleman2 = '\r';
+            public readonly char AdıVeİçerik = '>';
 
-            public string Vekil_Eleman(int Seviye)
-            {
-                return Vekil_Eleman_Başla + Seviye + Vekil_Eleman_Bitir;
-            }
-            public string Vekil_AdıVeİçeriğiVeElemanları(int Seviye)
-            {
-                return Vekil_AdıVeİçeriğiVeElemanları_Başla + Seviye + Vekil_AdıVeİçeriğiVeElemanları_Bitir;
-            }
+            string Vekil_Eleman = " ?'#{n]$ ";
+            string Vekil_Eleman2 = " ?'#{r]$ ";
+            string Vekil_AdıVeİçerik = " ?'#{b]$ ";
 
-            public string KullancıYazısı_Uygunlaştır(string KullanıcıYazısı)
+            public string KullancıYazısı_Depoya_Göre_Uygunlaştır(string KullanıcıYazısı)
             {
-                if (string.IsNullOrEmpty(KullanıcıYazısı)) return KullanıcıYazısı;
-                return KullanıcıYazısı.Replace(Eleman.ToString(), Vekil_Eleman(-1)).Replace(AdıVeİçeriğiVeElemanları.ToString(), Vekil_AdıVeİçeriğiVeElemanları(-1));
+                if (string.IsNullOrEmpty(KullanıcıYazısı)) return null;
+                return KullanıcıYazısı.Replace(Eleman.ToString(), Vekil_Eleman).Replace(Eleman2.ToString(), Vekil_Eleman2).Replace(AdıVeİçerik.ToString(), Vekil_AdıVeİçerik);
             }
             public string KullancıYazısı_İlkHalineGetir(string KullanıcıYazısı)
             {
-                if (string.IsNullOrEmpty(KullanıcıYazısı)) return KullanıcıYazısı;
-                return KullanıcıYazısı.Replace(Vekil_Eleman(-1), Eleman.ToString()).Replace(Vekil_AdıVeİçeriğiVeElemanları(-1), AdıVeİçeriğiVeElemanları.ToString());
+                if (string.IsNullOrEmpty(KullanıcıYazısı)) return null;
+                return KullanıcıYazısı.Replace(Vekil_Eleman, Eleman.ToString()).Replace(Vekil_Eleman2, Eleman2.ToString()).Replace(Vekil_AdıVeİçerik, AdıVeİçerik.ToString());
             }
 
             public string ElemanAdıDizisi_Ayıkla(ref string Girdi)
             {
+                Girdi = Girdi.Trim(ElemanAdıDizisi);
+
                 int ayırma_karakteri_konumu = Girdi.IndexOf(ElemanAdıDizisi);
                 string geriyekalan = "";
                 string asıl = Girdi;
@@ -306,226 +95,585 @@ namespace ArgeMup.HazirKod
                 return geriyekalan;
             }
         }
-        public Ayraçlar_ Ayraçlar = new Ayraçlar_();
+
+        Eleman_[] _Elemanları = null;
+        class Eleman_ : IEleman
+        {
+            readonly Depo_ _Depo = null;
+            public string _Adı = null;
+            public string[] _İçeriği = null;
+            public Eleman_[] _Elemanları = null;
+
+            public Eleman_(string Adı, Depo_ Depo)
+            {
+                _Adı = Adı;
+                _Depo = Depo;
+            }
+            public Eleman_(ref List<string> Eleman_AdıİçeriğiElemaları, int Seviye, Depo_ Depo)
+            {
+                // eleman1'içerik[0]'içerik[1]\n
+                // 'eleman1_alteleman1'içerik[0]\n
+
+                if (Depo == null) throw new Exception("Depo boş olamaz");
+                _Depo = Depo;
+                _Elemanları = new Eleman_[0];
+
+                int okunan_seviye = SıradakiniOku(ref Eleman_AdıİçeriğiElemaları, out string eleman);
+                if (okunan_seviye > Seviye + 1) throw new Exception("Seviye bilgisi uyumsuz - " + eleman);
+
+                string[] dizi = eleman.Split(Depo.Ayraçlar.AdıVeİçerik);
+                _Adı = Depo.Ayraçlar.KullancıYazısı_İlkHalineGetir(dizi[0]);
+                _İçeriği = new string[dizi.Length - 1];
+                for (int i = 0; i < _İçeriği.Length; i++)
+                {
+                    _İçeriği[i] = Depo.Ayraçlar.KullancıYazısı_İlkHalineGetir(dizi[i + 1]);
+                    if (string.IsNullOrEmpty(_İçeriği[i])) _İçeriği[i] = null;
+                }
+
+                Eleman_AdıİçeriğiElemaları.RemoveAt(0);
+            YenidenDene:
+                int sonrakinin_seviyesi = SıradakiniOku(ref Eleman_AdıİçeriğiElemaları, out _);
+                if (sonrakinin_seviyesi <= Seviye)
+                {
+                    Elemanları_BoşMu();
+                    return;
+                }
+
+                //sonraki eleman şimdiki elemanın alt elemanı olduğundan içerden devam edecek
+                Array.Resize(ref _Elemanları, _Elemanları.Length + 1);
+                _Elemanları[_Elemanları.Length - 1] = new Eleman_(ref Eleman_AdıİçeriğiElemaları, Seviye + 1, Depo);
+                goto YenidenDene;
+
+                int SıradakiniOku(ref List<string> Tümü, out string Cümle)
+                {
+                    while (Tümü.Count > 0 && string.IsNullOrEmpty(Tümü[0])) Tümü.RemoveAt(0);
+                    if (Tümü.Count <= 0)
+                    {
+                        Cümle = null;
+                        return -1;
+                    }
+
+                    string sıradaki = Tümü[0];
+                    
+                    int sıradaki_seviye = sıradaki.Length;
+                    sıradaki = sıradaki.TrimStart(Depo.Ayraçlar.AdıVeİçerik);
+                    sıradaki_seviye -= sıradaki.Length;
+
+                    Cümle = sıradaki;
+                    return sıradaki_seviye;
+                }
+            }
+            
+            public void Yaz(string ElemanAdıDizisi, string İçeriği, int SıraNo = 0)
+            {
+                if (string.IsNullOrEmpty(ElemanAdıDizisi)) this[SıraNo] = İçeriği;
+                else
+                {
+                    //alttaki elemanlardan bahsediyor
+                    string geriyekalan = _Depo.Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
+
+                    if (_Elemanları == null) _Elemanları = new Eleman_[0];
+
+                    Eleman_ bulunan = Array.Find(_Elemanları, x => x._Adı == ElemanAdıDizisi);
+                    if (bulunan != null) bulunan.Yaz(geriyekalan, İçeriği, SıraNo);
+                    else
+                    {
+                        //bulunamadığından yeni bir eleman oluştur
+                        if (!string.IsNullOrEmpty(İçeriği))
+                        {
+                            bulunan = new Eleman_(ElemanAdıDizisi, _Depo);
+                            bulunan.Yaz(geriyekalan, İçeriği, SıraNo);
+                            
+                            Array.Resize(ref _Elemanları, _Elemanları.Length + 1);
+                            _Elemanları[_Elemanları.Length - 1] = bulunan;
+                        }
+                    }
+                }
+            }
+            public string Oku(string ElemanAdıDizisi, string BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null, int SıraNo = 0)
+            {
+                Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
+                if (bulunan == null) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+
+                string okunan = bulunan[SıraNo];
+                if (string.IsNullOrEmpty(okunan)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+
+                return okunan;
+            }
+            public Eleman_ Bul_Getir(string ElemanAdıDizisi)
+            {
+                if (string.IsNullOrEmpty(ElemanAdıDizisi)) return this;
+                else
+                {
+                    //alttaki elemanlardan bahsediyor
+                    if (_Elemanları == null) return null;
+
+                    string geriyekalan = _Depo.Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
+
+                    Eleman_ bulunan = Array.Find(_Elemanları, x => x._Adı == ElemanAdıDizisi);
+                    if (bulunan == null) return null;
+
+                    return bulunan.Bul_Getir(geriyekalan);
+                }
+            }
+            public string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları)
+            {
+                Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
+                if (bulunan == null) return "";
+
+                string eleman_adı_ve_içeriği = "";
+
+                if (SadeceElemanları)
+                {
+                    _YazıyaDönüştür_(bulunan, -1);
+
+                    int konum_n = eleman_adı_ve_içeriği.IndexOf(_Depo.Ayraçlar.Eleman);
+                    eleman_adı_ve_içeriği = eleman_adı_ve_içeriği.Substring(konum_n + 1);
+                }
+                else
+                {
+                    _YazıyaDönüştür_(bulunan, 0);
+                }
+
+                return eleman_adı_ve_içeriği;
+
+                void _YazıyaDönüştür_(Eleman_ Eleman, int Seviye)
+                {
+                    if (Eleman == null || Eleman.İçiBoşOlduğuİçinSilinecek) return;
+
+                    //Seviye belirteci
+                    for (int i = 0; i < Seviye; i++) eleman_adı_ve_içeriği += _Depo.Ayraçlar.AdıVeİçerik;
+
+                    //Adı
+                    eleman_adı_ve_içeriği += _Depo.Ayraçlar.KullancıYazısı_Depoya_Göre_Uygunlaştır(Eleman.Adı);
+
+                    //İçeriği
+                    foreach (string içerik in Eleman.İçeriği)
+                    {
+                        eleman_adı_ve_içeriği += _Depo.Ayraçlar.AdıVeİçerik + _Depo.Ayraçlar.KullancıYazısı_Depoya_Göre_Uygunlaştır(içerik);
+                    }
+
+                    //bitiş karakteri
+                    eleman_adı_ve_içeriği += _Depo.Ayraçlar.Eleman;
+
+                    //Alt elemanları
+                    if (Eleman._Elemanları != null)
+                    {
+                        foreach (Eleman_ AltEleman in Eleman._Elemanları)
+                        {
+                            _YazıyaDönüştür_(AltEleman, Seviye + 1);
+                        }
+                    }
+                }
+            }
+            public void Ekle(string ElemanAdıDizisi, string YazıOlarakElemanlar)
+            {
+                if (!string.IsNullOrEmpty(YazıOlarakElemanlar))
+                {
+                    string[] dizi = YazıOlarakElemanlar.Split(_Depo.Ayraçlar.Eleman);
+                    if (dizi != null && dizi.Length > 0)
+                    {
+                        List<string> Elemanlar = dizi.ToList();
+                        List<Eleman_> gecici = new List<Eleman_>();
+
+                        while (Elemanlar.Count > 0)
+                        {
+                            Eleman_ yeni = new Eleman_(ref Elemanlar, 0, _Depo);
+                            if (!yeni.İçiBoşOlduğuİçinSilinecek) gecici.Add(yeni);
+                        }
+
+                        if (gecici.Count > 0)
+                        {
+                            bool Çıkışta_içeriği_temizle = true;
+                            Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
+
+                            if (bulunan == null)
+                            {
+                                Yaz(ElemanAdıDizisi, "ArGeMuP");
+                                bulunan = Bul_Getir(ElemanAdıDizisi);
+                            }
+                            else Çıkışta_içeriği_temizle = false;
+
+                            if (bulunan._Elemanları == null) bulunan._Elemanları = new Eleman_[gecici.Count];
+                            else Array.Resize(ref bulunan._Elemanları, bulunan._Elemanları.Length + gecici.Count);
+
+                            Array.Copy(gecici.ToArray(), 0, bulunan.Elemanları, bulunan._Elemanları.Length - gecici.Count, gecici.Count);
+
+                            if (Çıkışta_içeriği_temizle) bulunan[0] = null;
+
+                            _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+                        }
+                    }
+                }
+            }
+            public void Sil(string ElemanAdıDizisi)
+            {
+                Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
+                if (bulunan != null) bulunan.Adı = null;
+            }
+
+            #region İç Kullanım
+            bool Elemanları_BoşMu()
+            {
+                if (_Elemanları == null) return true;
+
+                List<Eleman_> DoluOlanlar = new List<Eleman_>();
+                if (_Elemanları.Length > 0)
+                {
+                    foreach (Eleman_ Eleman in _Elemanları)
+                    {
+                        if (Eleman.İçiBoşOlduğuİçinSilinecek) continue;
+                        DoluOlanlar.Add(Eleman);    
+                    }
+                }
+
+                if (DoluOlanlar.Count == 0)
+                {
+                    _Elemanları = null;
+                    _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+
+                    return true;
+                }
+                else if (_Elemanları.Length != DoluOlanlar.Count)
+                {
+                    _Elemanları = DoluOlanlar.ToArray();
+                    _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+                }
+                return false;
+            }
+            bool İçeriği_BoşMu()
+            {
+                if (_İçeriği == null) return true;
+                if (_İçeriği.Length > 0)
+                {
+                    foreach (string biri in _İçeriği)
+                    {
+                        if (string.IsNullOrEmpty(biri)) continue;
+
+                        //boş değil, en sondan itibaren boş girdileri sil
+                        int sayac_boşluk = 0;
+                        for (int i = _İçeriği.Length - 1; i >= 0; i--)
+                        {
+                            if (string.IsNullOrEmpty(_İçeriği[i])) sayac_boşluk++;
+                            else break;
+                        }
+
+                        if (sayac_boşluk > 0)
+                        {
+                            Array.Resize(ref _İçeriği, _İçeriği.Length - sayac_boşluk);
+                            _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+                        }
+                        return false;
+                    }
+                }
+                
+                _İçeriği = null;
+                _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+                return true;
+            }
+            #endregion
+
+            #region IEleman
+            public string Adı 
+            { 
+                get 
+                { 
+                    return _Adı; 
+                }
+                set 
+                { 
+                    if (_Adı != value)
+                    {
+                        _Adı = value;
+                        _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+                    }
+                }
+            }
+            public string this[int i] //içeriği
+            {
+                get
+                {
+                    if (_İçeriği == null || i >= _İçeriği.Length) return null;
+                    else return _İçeriği[i];
+                }
+                set
+                {
+                    if (_İçeriği == null) _İçeriği = new string[i + 1];
+                    else if (i >= _İçeriği.Length) Array.Resize(ref _İçeriği, i + 1);
+
+                    if (_İçeriği[i] != value)
+                    {
+                        _İçeriği[i] = value;
+                        _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+                    }  
+                }
+            }
+            public string[] İçeriği
+            {
+                get
+                {
+                    if (_İçeriği == null) return new string[0];
+                    else return _İçeriği;
+                }
+                set
+                {
+                    _İçeriği = value;
+                    _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+                }
+            }
+            public IEleman[] Elemanları
+            {
+                get
+                {
+                    if (_Elemanları == null) return new IEleman[0];
+                    else return _Elemanları;
+                }
+            }
+            public bool İçiBoşOlduğuİçinSilinecek
+            {
+                get
+                {
+                    if (string.IsNullOrEmpty(_Adı)) return true;
+                    if (!İçeriği_BoşMu()) return false;
+                    return Elemanları_BoşMu();
+                }
+            }
+
+            public void Yaz(string ElemanAdıDizisi, double Sayı, int SıraNo)
+            {
+                Yaz(ElemanAdıDizisi, D_Sayı.Yazıya(Sayı), SıraNo);
+            }
+            public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet, int BaşlangıçKonumu, int SıraNo)
+            {
+                Yaz(ElemanAdıDizisi, D_HexYazı.BaytDizisinden(BaytDizisi, Adet, BaşlangıçKonumu), SıraNo);
+            }
+            public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo)
+            {
+                Yaz(ElemanAdıDizisi, D_TarihSaat.Yazıya(TarihSaat), SıraNo);
+            }
+            public void Yaz(string ElemanAdıDizisi, bool Bit, int SıraNo)
+            {
+                Yaz(ElemanAdıDizisi, Bit.ToString(), SıraNo);
+            }
+
+            public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
+            {
+                try
+                {
+                    return D_Sayı.Yazıdan(Oku(ElemanAdıDizisi, null, SıraNo));
+                }
+                catch (Exception) { }
+
+                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+            }
+            public byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
+            {
+                try
+                {
+                    return D_HexYazı.BaytDizisine(Oku(ElemanAdıDizisi, null, SıraNo));
+                }
+                catch (Exception) { }
+
+                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+            }
+            public DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
+            {
+                try
+                {
+                    return D_TarihSaat.Tarihe(Oku(ElemanAdıDizisi, null, SıraNo));
+                }
+                catch (Exception) { }
+
+                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+            }
+            public bool Oku_Bit(string ElemanAdıDizisi, bool BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
+            {
+                try
+                {
+                    return bool.Parse(Oku(ElemanAdıDizisi, null, SıraNo));
+                }
+                catch (Exception) { }
+
+                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+            }
+
+            public IEleman Bul(string ElemanAdıDizisi)
+            {
+                return Bul_Getir(ElemanAdıDizisi);
+            }
+            #endregion
+        }
 
         public Depo_(string YazıOlarakElemanlar = null)
         {
-            // Eleman                   " -> ?%#{seviye]$
-            // AdıVeİçeriğiVeElemanları ' -> %$?]seviye{#
-            //
-            // Elemanın Adı ' Elamanın İçeriği '(istege bagli) Elemanın Alt Elemanları
-            //
-            // baslık1''alteleman1"baslık2'bilgi2'hata	0-> baslık1''A%$?]1{#AAA%$?]1{#C%$?]2{#CCC%$?]2{#E%$?]3{#EEE?%#{3]$F%$?]3{#FFF?%#{2]$D%$?]2{#DDD?%#{1]$B%$?]1{#BBB"baslık2'bilgi2'hata
-            //
-            // alteleman1
-            // A'AAA'alteleman2"B'BBB				    1-> A%$?]1{#AAA%$?]1{#C%$?]2{#CCC%$?]2{#E%$?]3{#EEE?%#{3]$F%$?]3{#FFF?%#{2]$D%$?]2{#DDD?%#{1]$B%$?]1{#BBB
-            //
-            // alteleman2
-            // C'CCC'alteleman3"D'DDD				    2-> C%$?]2{#CCC%$?]2{#E%$?]3{#EEE?%#{3]$F%$?]3{#FFF?%#{2]$D%$?]2{#DDD
-            //
-            // alteleman3
-            // E'EEE"F'FFF                              3-> E%$?]3{#EEE?%#{3]$F%$?]3{#FFF
+            Ekle(YazıOlarakElemanlar);
+            
+            EnAzBir_ElemanAdıVeyaİçeriği_Değişti = false;
+        }
+
+        /// <param name="ElemanAdıDizisi">Ayraçlar.ElemanAdıDizisi karakteri / ile ayrılmış sıralı eleman göstergesi E1/E2/E3 ile E1 içindeki E2 içindeki E3 anlaşılır</param>
+        /// <param name="İçeriği">Elemanın içeriği (İçeriği ve Elemanları olmayan Elemanlar YazıyaDönüştürme aşamasında görmezden gelinip silinir)</param>
+        /// <param name="SıraNo">Aynı eleman adı ile birden fazla içerik tutmak için kullanılabilir</param>
+        public void Yaz(string ElemanAdıDizisi, string İçeriği, int SıraNo = 0)
+        {
+            if (string.IsNullOrEmpty(ElemanAdıDizisi)) throw new Exception("ElemanAdıDizisi boş olamaz");
+
+            //alttaki elemanlardan bahsediyor
+            string geriyekalan = Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
+
+            if (_Elemanları == null) _Elemanları = new Eleman_[0];
+
+            Eleman_ bulunan = Array.Find(_Elemanları, x => x.Adı == ElemanAdıDizisi);
+            if (bulunan != null) bulunan.Yaz(geriyekalan, İçeriği, SıraNo);
+            else
+            {
+                //bulunamadığından yeni bir eleman oluştur
+                if (!string.IsNullOrEmpty(İçeriği))
+                {
+                    bulunan = new Eleman_(ElemanAdıDizisi, this);
+                    bulunan.Yaz(geriyekalan, İçeriği, SıraNo);
+
+                    Array.Resize(ref _Elemanları, _Elemanları.Length + 1);
+                    _Elemanları[_Elemanları.Length - 1] = bulunan;
+                }
+            }
+        }
+        public string Oku(string ElemanAdıDizisi, string BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null, int SıraNo = 0)
+        {
+            if (string.IsNullOrEmpty(ElemanAdıDizisi)) throw new Exception("ElemanAdıDizisi boş olamaz");
+
+            IEleman bulunan = Bul(ElemanAdıDizisi);
+            if (bulunan == null) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+
+            string okunan = bulunan[SıraNo];
+            if (string.IsNullOrEmpty(okunan)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+
+            return okunan;
+        }
+        public IEleman Bul(string ElemanAdıDizisi)
+        {
+            if (string.IsNullOrEmpty(ElemanAdıDizisi)) throw new Exception("ElemanDizisi boş olamaz");
+
+            //alttaki elemanlardan bahsediyor
+            if (_Elemanları == null) return null;
+
+            string geriyekalan = Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
+
+            Eleman_ bulunan = Array.Find(_Elemanları, x => x.Adı == ElemanAdıDizisi);
+            if (bulunan == null) return null;
+
+            return bulunan.Bul(geriyekalan);
+        }
+        
+        #region Dönüştürme
+        public void Yaz(string ElemanAdıDizisi, double Sayı, int SıraNo = 0)
+        {
+            Yaz(ElemanAdıDizisi, D_Sayı.Yazıya(Sayı), SıraNo);
+        }
+        public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, int SıraNo = 0)
+        {
+            Yaz(ElemanAdıDizisi, D_HexYazı.BaytDizisinden(BaytDizisi, Adet, BaşlangıçKonumu), SıraNo);
+        }
+        public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo = 0)
+        {
+            Yaz(ElemanAdıDizisi, D_TarihSaat.Yazıya(TarihSaat), SıraNo);
+        }
+        public void Yaz(string ElemanAdıDizisi, bool Bit, int SıraNo = 0)
+        {
+            Yaz(ElemanAdıDizisi, Bit.ToString(), SıraNo);
+        }
+
+        public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
+        {
+            IEleman bulunan = Bul(ElemanAdıDizisi);
+            if (bulunan == null) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+
+            return bulunan.Oku_Sayı(null, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+        }
+        public byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null, int SıraNo = 0)
+        {
+            IEleman bulunan = Bul(ElemanAdıDizisi);
+            if (bulunan == null) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+
+            return bulunan.Oku_BaytDizisi(null, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+        }
+        public DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
+        {
+            IEleman bulunan = Bul(ElemanAdıDizisi);
+            if (bulunan == null) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+
+            return bulunan.Oku_TarihSaat(null, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+        }
+        public bool Oku_Bit(string ElemanAdıDizisi, bool BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
+        {
+            IEleman bulunan = Bul(ElemanAdıDizisi);
+            if (bulunan == null) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+
+            return bulunan.Oku_Bit(null, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+        }
+
+        public string YazıyaDönüştür(string ElemanAdıDizisi = null, bool SadeceElemanları = false)
+        {
+            if (string.IsNullOrEmpty(ElemanAdıDizisi))
+            {
+                if (_Elemanları == null || _Elemanları.Length == 0) return "";
+
+                string çıktı = "";
+                foreach (Eleman_ Eleman in _Elemanları)
+                {
+                    string oluşturulan = Eleman.YazıyaDönüştür(null, false);
+                    if (!string.IsNullOrEmpty(oluşturulan)) çıktı += oluşturulan;
+                }
+
+                return çıktı;
+            }
+            else
+            {
+                IEleman bulunan = Bul(ElemanAdıDizisi);
+                if (bulunan == null) return "";
+
+                return bulunan.YazıyaDönüştür(null, SadeceElemanları);
+            }
+        }
+        public void Ekle(string YazıOlarakElemanlar)
+        {
+            // eleman1'içerik[0]'içerik[1]\n                    0
+            // 'eleman1_alteleman1'içerik[0]\n                  1
+            // 'eleman1_alteleman2'içerik[0]\n                  1
+            // ''eleman1_alteleman2_alteleman1'içerik[0]\n      2
+            // eleman2'içerik[0]'içerik[1]\n                    0
 
             if (!string.IsNullOrEmpty(YazıOlarakElemanlar))
             {
                 string[] dizi = YazıOlarakElemanlar.Split(Ayraçlar.Eleman);
                 if (dizi != null && dizi.Length > 0)
                 {
-                    Elemanları = new List<Depo_Elemanı_>();
+                    List<string> Elemanlar = dizi.ToList();
+                    List<Eleman_> gecici = new List<Eleman_>();
 
-                    foreach (string Eleman in dizi)
+                    while (Elemanlar.Count > 0)
                     {
-                        Depo_Elemanı_ yeni = new Depo_Elemanı_(Eleman, 0, this);
-                        if (!yeni.Silmekİçinİşaretlendi) Elemanları.Add(yeni);
+                        Eleman_ yeni = new Eleman_(ref Elemanlar, 0, this);
+                        if (!yeni.İçiBoşOlduğuİçinSilinecek) gecici.Add(yeni);
                     }
 
-                    if (Elemanları.Count == 0) Elemanları = null;
-                }
-            }
-
-            EnAzBirElemanAdıVeyaİçeriğiDeğişti = false;
-        }
-
-        /// <param name="ElemanAdıDizisi">Dizi_Ayırma_Elemanı karakteri ile ayrılmış sıralı eleman göstergesi E1/E2/E3 ile E1 içindeki E2 içindeki E3 anlaşılır</param>
-        /// <param name="İçeriği">Elemanın içeriği</param>
-        public void Yaz(string ElemanAdıDizisi, string İçeriği)
-        {
-            if (string.IsNullOrEmpty(ElemanAdıDizisi)) throw new Exception("ElemanDizisi boş olamaz");
-            else ElemanAdıDizisi = ElemanAdıDizisi.Trim(Ayraçlar.ElemanAdıDizisi);
-
-            //alttaki elemanlardan bahsediyor
-            string geriyekalan = Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
-
-            if (Elemanları == null) Elemanları = new List<Depo_Elemanı_>();
-
-            Depo_Elemanı_ bulunan = Elemanları.Find(x => x.Adı == ElemanAdıDizisi);
-            if (bulunan != null) bulunan.Yaz(geriyekalan, İçeriği);
-            else
-            {
-                //bulunamadığından yeni bir eleman oluştur
-                bulunan = new Depo_Elemanı_(ElemanAdıDizisi, null, this);
-                bulunan.Yaz(geriyekalan, İçeriği);
-                Elemanları.Add(bulunan);
-            }
-        }
-        /// <param name="ElemanAdıDizisi">Dizi_Ayırma_Elemanı karakteri ile ayrılmış sıralı eleman göstergesi E1/E2/E3 ile E1 içindeki E2 içindeki E3 anlaşılır</param>
-        public string Oku(string ElemanAdıDizisi, string BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null)
-        {
-            Depo_Elemanı_ bulunan = Bul(ElemanAdıDizisi);
-            if (bulunan == null) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-
-            string okunan = bulunan.İçeriği;
-            if (string.IsNullOrEmpty(okunan)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-
-            return okunan;
-        }
-        public Depo_Elemanı_ Bul(string ElemanAdıDizisi)
-        {
-            if (string.IsNullOrEmpty(ElemanAdıDizisi)) throw new Exception("ElemanDizisi boş olamaz");
-            else ElemanAdıDizisi = ElemanAdıDizisi.Trim(Ayraçlar.ElemanAdıDizisi);
-
-            //alttaki elemanlardan bahsediyor
-            if (Elemanları == null) return null;
-
-            string geriyekalan = Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
-
-            Depo_Elemanı_ bulunan = Elemanları.Find(x => x.Adı == ElemanAdıDizisi);
-            if (bulunan == null) return null;
-
-            return bulunan.Bul(geriyekalan);
-        }
-        public string[] Listele(string ElemanAdıDizisi, bool Adı = false, bool İçeriği = true, bool ElemanAdları = false)
-        {
-            string[] dizi = new string[0];
-            if (!İçeriği && !Adı && !ElemanAdları) return dizi;
-
-            if (string.IsNullOrEmpty(ElemanAdıDizisi))
-            {
-                //en üst dal
-                if (Elemanları == null || Elemanları.Count == 0) return dizi;
-
-                dizi = new string[(Adı ? Elemanları.Count : 0) + (İçeriği ? Elemanları.Count : 0) + (ElemanAdları ? Elemanları.Count : 0)];
-                int syc = 0;
-                foreach (Depo_Elemanı_ de in Elemanları)
-                {
-                    if (Adı) dizi[syc++] = de.Adı;
-                    if (İçeriği) dizi[syc++] = de.İçeriği;
-                    if (ElemanAdları)
+                    if (gecici.Count > 0)
                     {
-                        if (de.Elemanları == null || de.Elemanları.Count == 0) syc++;
-                        else
-                        {
-                            string birarada = "";
-                            de.Elemanları.ForEach(x => birarada += x.Adı + Ayraçlar.ElemanAdıDizisi);
-                            dizi[syc++] = birarada.TrimEnd(Ayraçlar.ElemanAdıDizisi);
-                        }
+                        if (_Elemanları == null) _Elemanları = new Eleman_[gecici.Count];
+                        else Array.Resize(ref _Elemanları, _Elemanları.Length + gecici.Count);
+
+                        Array.Copy(gecici.ToArray(), 0, Elemanları, _Elemanları.Length - gecici.Count, gecici.Count);
+
+                        EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
                     }
                 }
-
-                return dizi;
-            }
-            else
-            {
-                //alt dallardan biri
-                Depo_Elemanı_ bulunan = Bul(ElemanAdıDizisi);
-                if (bulunan == null) return dizi;
-
-                return bulunan.Listele(null, Adı, İçeriği, ElemanAdları);
             }
         }
-
-        #region Dönüştürme
-        public void Yaz(string ElemanAdıDizisi, double Sayı)
+        public void Sil(string ElemanAdıDizisi)
         {
-            Yaz(ElemanAdıDizisi, D_Sayı.Yazıya(Sayı));
-        }
-        public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
-        {
-            Yaz(ElemanAdıDizisi, D_HexYazı.BaytDizisinden(BaytDizisi, Adet, BaşlangıçKonumu));
-        }
-        public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat)
-        {
-            Yaz(ElemanAdıDizisi, D_TarihSaat.Yazıya(TarihSaat));
-        }
-        public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default)
-        {
-            try
-            {
-                return D_Sayı.Yazıdan(Oku(ElemanAdıDizisi));
-            }
-            catch (Exception) { }
-
-            return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-        }
-        public byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null)
-        {
-            try
-            {
-                return D_HexYazı.BaytDizisine(Oku(ElemanAdıDizisi));
-            }
-            catch (Exception) { }
-
-            return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-        }
-        public DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default)
-        {
-            try
-            {
-                return D_TarihSaat.Tarihe(Oku(ElemanAdıDizisi));
-            }
-            catch (Exception) { }
-
-            return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+            IEleman bulunan = Bul(ElemanAdıDizisi);
+            if (bulunan != null) bulunan.Sil(null);
         }
         #endregion
-
-        public string YazıyaDönüştür()
-        {
-            if (Elemanları == null || Elemanları.Count == 0) return "";
-
-            string çıktı = "";
-
-            foreach (Depo_Elemanı_ Eleman in Elemanları)
-            {
-                string yeni = _YazıyaDönüştür_(Eleman, -1);
-                if (string.IsNullOrEmpty(yeni)) continue;
-
-                çıktı += yeni + Ayraçlar.Eleman;
-            }
-            çıktı = çıktı.TrimEnd(Ayraçlar.Eleman);
-
-            string ayr_Eleman = Ayraçlar.Vekil_Eleman(0); // ?%#{0]$
-            string ayr_AdıVeİçeriğiVeElemanları = Ayraçlar.Vekil_AdıVeİçeriğiVeElemanları(0); // %$?]0{#
-            çıktı = çıktı.Replace(ayr_Eleman, Ayraçlar.Eleman.ToString());
-            çıktı = çıktı.Replace(ayr_AdıVeİçeriğiVeElemanları, Ayraçlar.AdıVeİçeriğiVeElemanları.ToString());
-
-            return çıktı;
-        }
-        string _YazıyaDönüştür_(Depo_Elemanı_ Eleman, int Seviye)
-        {
-            if (Eleman == null || Eleman.Silmekİçinİşaretlendi) return "";
-
-            Seviye++;
-            string çıktı = "";
-            if (Eleman.Elemanları != null)
-            {
-                string ayr_Eleman = Ayraçlar.Vekil_Eleman(Seviye + 1); // ?%#{1]$
-
-                foreach (Depo_Elemanı_ AltEleman in Eleman.Elemanları)
-                {
-                    if (AltEleman.Silmekİçinİşaretlendi) continue;
-
-                    string yeni = _YazıyaDönüştür_(AltEleman, Seviye);
-                    if (string.IsNullOrEmpty(yeni)) continue;
-
-                    çıktı += ayr_Eleman + yeni;
-                }
-
-                if (!string.IsNullOrEmpty(çıktı)) çıktı = çıktı.Substring(ayr_Eleman.Length);
-            }
-
-            string ayr_AdıVeİçeriğiVeElemanları = Ayraçlar.Vekil_AdıVeİçeriğiVeElemanları(Seviye); // %$?]1{#
-            return Eleman.Uzun_Adı + ayr_AdıVeİçeriğiVeElemanları + Eleman.Uzun_İçeriği + (string.IsNullOrEmpty(çıktı) ? null : ayr_AdıVeİçeriğiVeElemanları + çıktı);
-        }
     }
 }

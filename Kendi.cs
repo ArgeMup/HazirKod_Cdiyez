@@ -9,7 +9,7 @@ namespace ArgeMup.HazirKod
 {
     public class Kendi
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
         static string KendiKonumu = null; 
         static FileVersionInfo fvi = null; 
         //static FileInfo fi = null;
@@ -17,77 +17,101 @@ namespace ArgeMup.HazirKod
         /// <summary>
         /// Çıktısı : Argemup_HazirKod_C_diyez
         /// </summary>
-        public static string Adı()
+        public static string Adı
         {
-            Başlat();
+            get
+            {
+                Başlat();
 
-            return Path.GetFileNameWithoutExtension(KendiKonumu);
+                return Path.GetFileNameWithoutExtension(KendiKonumu);
+            }
         }
 
         /// <summary>
         /// Çıktısı : Argemup_HazirKod_C_diyez.exe
         /// </summary>
-        public static string DosyaAdı()
+        public static string DosyaAdı
         {
-            Başlat();
+            get
+            {
+                Başlat();
 
-            return Path.GetFileName(KendiKonumu);
+                return Path.GetFileName(KendiKonumu);
+            }
+        }    
+
+        /// <summary>
+        /// Çıktısı : Argemup
+        /// </summary>
+        public static string KullanıcıAdı
+        {
+            get
+            {
+                return System.Environment.UserName;
+            }
         }
 
         /// <summary>
         /// Çıktısı : Argemup
         /// </summary>
-        public static string KullanıcıAdı()
+        public static string BilgisayarAdı
         {
-            return System.Environment.UserName;
-        }
-
-        /// <summary>
-        /// Çıktısı : Argemup
-        /// </summary>
-        public static string BilgisayarAdı()
-        {
-            return System.Environment.MachineName;
+            get
+            {
+                return System.Environment.MachineName;
+            }
         }
 
         /// <summary>
         /// Çıktısı : C:\\Klasör\\Argemup_HazirKod_C_diyez.exe
         /// </summary>
-        public static string DosyaYolu()
+        public static string DosyaYolu
         {
-            Başlat();
+            get
+            {
+                Başlat();
 
-            return KendiKonumu;
-        }
-
+                return KendiKonumu;
+            }
+        }     
+            
         /// <summary>
         /// Çıktısı : C:\\Klasör
         /// </summary>
-        public static string Klasörü()
+        public static string Klasörü
         {
-            Başlat();
+            get
+            {
+                Başlat();
 
-            return Path.GetDirectoryName(KendiKonumu);
+                return Path.GetDirectoryName(KendiKonumu);
+            }
         }
 
         /// <summary>
         /// Çıktısı : 1.2.3.4
         /// </summary>
-        public static string Sürümü_Dosya()
+        public static string Sürümü_Dosya
         {
-            Başlat();
+            get
+            {
+                Başlat();
 
-            return fvi.FileVersion;
+                return fvi.FileVersion;
+            }
         }
 
         /// <summary>
         /// Çıktısı : 1.2.3.4
         /// </summary>
-        public static string Sürümü_Ürün()
+        public static string Sürümü_Ürün
         {
-            Başlat();
+            get
+            {
+                Başlat();
 
-            return fvi.ProductVersion;
+                return fvi.ProductVersion;
+            }
         }
 
         static void Başlat()

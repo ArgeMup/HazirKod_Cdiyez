@@ -275,9 +275,9 @@ namespace ArgeMup.HazirKod
                 Dispose();
                 disposedValue = false;
 
-                if (AyarlarDosyası == "") AyarlarDosyasıYolu = Kendi.DosyaYolu() + ".Ayarlar";    
+                if (AyarlarDosyası == "") AyarlarDosyasıYolu = Kendi.DosyaYolu + ".Ayarlar";    
                 else if (AyarlarDosyası.Contains("\\")) AyarlarDosyasıYolu = AyarlarDosyası;               
-                else AyarlarDosyasıYolu = Kendi.Klasörü() + "\\" + AyarlarDosyası + ".Ayarlar";
+                else AyarlarDosyasıYolu = Kendi.Klasörü + "\\" + AyarlarDosyası + ".Ayarlar";
 			
 				if (!File.Exists(AyarlarDosyasıYolu)) 
                 {
@@ -328,9 +328,9 @@ namespace ArgeMup.HazirKod
 
                     XmlElement Uygulama = Döküman.CreateElement("Uygulama");
                     XmlElement Uygulama_1 = Döküman.CreateElement("Ad");
-					Uygulama_1.InnerText = HazirKod.Kendi.Adı();
+					Uygulama_1.InnerText = HazirKod.Kendi.Adı;
                     XmlElement Uygulama_2 = Döküman.CreateElement("Surum");
-					Uygulama_2.InnerText = "V" + HazirKod.Kendi.Sürümü_Dosya();
+					Uygulama_2.InnerText = "V" + HazirKod.Kendi.Sürümü_Dosya;
                     Uygulama.AppendChild(Uygulama_1);
                     Uygulama.AppendChild(Uygulama_2);
 

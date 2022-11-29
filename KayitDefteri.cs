@@ -11,7 +11,7 @@ namespace ArgeMup.HazirKod
         
         public KayitDefteri_(string ÜstDal = "")
         {
-            if (string.IsNullOrEmpty(ÜstDal)) AnaDal = "HKEY_CURRENT_USER\\Software\\ArgeMup\\" + Kendi.Adı();
+            if (string.IsNullOrEmpty(ÜstDal)) AnaDal = "HKEY_CURRENT_USER\\Software\\ArgeMup\\" + Kendi.Adı;
             else AnaDal = ÜstDal;
 
             if (!AnaDal.EndsWith("\\")) AnaDal += "\\";

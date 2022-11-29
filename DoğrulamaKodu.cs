@@ -83,7 +83,7 @@ namespace ArgeMup.HazirKod
                 _Ekle_("- ArGeMup Klasör Dosya Doğrulama Aracı", ref kod, ref GörselÇıktı);
                 _Ekle_("- Dosya Sayısı : " + liste_d.Length, ref kod, ref GörselÇıktı);
                 _Ekle_("- Klasör Sayısı : " + liste_k.Length, ref kod, ref GörselÇıktı);
-                _Ekle_("- " + Kendi.Adı() + " / V" + Kendi.Sürümü_Dosya(), ref kod, ref GörselÇıktı);
+                _Ekle_("- " + Kendi.Adı + " / V" + Kendi.Sürümü_Dosya, ref kod, ref GörselÇıktı);
                 _Ekle_("- " + D_TarihSaat.Yazıya(DateTime.Now), ref kod, ref GörselÇıktı);
                 _Ekle_("- https://github.com/ArgeMup/HazirKod_Cdiyez", ref kod, ref GörselÇıktı);
 

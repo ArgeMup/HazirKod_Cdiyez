@@ -179,12 +179,11 @@ namespace ArgeMup.HazirKod.ArkaPlan
             {
                 get
                 {
-                    return _TakmaAdı;
+                    return Ayarlar.Adı;
                 }
                 set
                 {
-                    _TakmaAdı = value;
-                    Ayarlar.Yaz(null, value, 0);
+                    Ayarlar.Adı = value;
                 }
             }
             public DateTime HesaplananTetiklemeAnı
@@ -196,24 +195,21 @@ namespace ArgeMup.HazirKod.ArkaPlan
                 set
                 {
                     _HesaplananTetiklemeAnı = value;
-                    Ayarlar.Yaz(null, value, 1);
+                    Ayarlar.Yaz(null, value, 0);
                 }
             }
             public string TekrarlayıcıKomutCümlesi
             {
                 get
                 {
-                    return _TekrarlayıcıKomutCümlesi;
+                    return Ayarlar[1];
                 }
                 set
                 {
-                    _TekrarlayıcıKomutCümlesi = value;
-                    Ayarlar.Yaz(null, value, 2);
+                    Ayarlar.Yaz(null, value, 1);
                 }
             }
-            string _TakmaAdı;
             DateTime _HesaplananTetiklemeAnı;
-            string _TekrarlayıcıKomutCümlesi = null;
 
             public bool GeriBildirim_Islemini_çalıştır = true;
             public Func<string, object, int> GeriBildirim_Islemi = null;
@@ -221,14 +217,15 @@ namespace ArgeMup.HazirKod.ArkaPlan
 
             public IDepo_Eleman Ayarlar = null;
 
-            public Biri_(string TakmaAdı, DateTime HesaplananTetiklemeAnı, string TekrarlayıcıKomutCümlesi, Func<string, object, int> GeriBildirim_Islemi, object Hatırlatıcı)
+            public Biri_(IDepo_Eleman Ayarlar, DateTime HesaplananTetiklemeAnı, string TekrarlayıcıKomutCümlesi, Func<string, object, int> GeriBildirim_Islemi, object Hatırlatıcı)
             {
-                this._TakmaAdı = TakmaAdı;
-                this._HesaplananTetiklemeAnı = HesaplananTetiklemeAnı;
-                this._TekrarlayıcıKomutCümlesi = TekrarlayıcıKomutCümlesi;
+                this.Ayarlar = Ayarlar;
+                this.HesaplananTetiklemeAnı = HesaplananTetiklemeAnı;
+                this.TekrarlayıcıKomutCümlesi = TekrarlayıcıKomutCümlesi;
 
                 this.GeriBildirim_Islemini_çalıştır = this._HesaplananTetiklemeAnı >= DateTime.Now;
                 this.GeriBildirim_Islemi = GeriBildirim_Islemi;
+
                 this.Hatırlatıcı = Hatırlatıcı;
             }
 
@@ -274,9 +271,9 @@ namespace ArgeMup.HazirKod.ArkaPlan
             {
                 foreach (IDepo_Eleman biri in te.Elemanları)
                 {
-                    string TakmaAdı = biri.Oku(null, null, 0);
-                    DateTime İlkTetikleyeceğiZaman = biri.Oku_TarihSaat(null, default, 1);
-                    string TekrarlayıcıKomutCümlesi = biri.Oku(null, null, 2);
+                    string TakmaAdı = biri.Adı;
+                    DateTime İlkTetikleyeceğiZaman = biri.Oku_TarihSaat(null, default, 0);
+                    string TekrarlayıcıKomutCümlesi = biri.Oku(null, null, 1);
 
                     if (string.IsNullOrEmpty(TakmaAdı) || İlkTetikleyeceğiZaman == default(DateTime)) continue;
 
@@ -307,14 +304,8 @@ namespace ArgeMup.HazirKod.ArkaPlan
             {
                 if (SonrakiTetikleme_Hesapla(İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi) == default) throw new Exception("TekrarlayıcıKomutCümlesi uygun değil");
             }
-            
-            Biri_ yeni = new Biri_(TakmaAdı, İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi, GeriBildirim_Islemi, Hatırlatıcı);
-            Liste.Add(yeni);
 
-            Ayarlar.Yaz("Tetikleyiciler/" + Liste.Count, yeni.TakmaAdı, 0);
-            Ayarlar.Yaz("Tetikleyiciler/" + Liste.Count, yeni.HesaplananTetiklemeAnı, 1);
-            Ayarlar.Yaz("Tetikleyiciler/" + Liste.Count, yeni.TekrarlayıcıKomutCümlesi, 2);
-            yeni.Ayarlar = Ayarlar.Bul("Tetikleyiciler/" + Liste.Count);
+            Liste.Add(new Biri_(Ayarlar.Bul("Tetikleyiciler/" + TakmaAdı, true), İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi, GeriBildirim_Islemi, Hatırlatıcı));
 
             if (GeriBildirim_Islemi != null) ArkaPlanGörevi_Başlat();
         }
@@ -421,6 +412,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
             EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
             foreach (Biri_ b in bulunanlar)
             {
+                b.Ayarlar.Sil(null);
                 Liste.Remove(b);
             }
 

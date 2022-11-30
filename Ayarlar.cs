@@ -207,9 +207,9 @@ namespace ArgeMup.HazirKod
         {
             return Bul(ElemanAdıDizisi).İçeriği;
         }
-        public IDepo_Eleman Bul(string ElemanAdıDizisi)
+        public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false)
         {
-            return Depo_Ayarlar.Bul(ElemanAdıDizisi);
+            return Depo_Ayarlar.Bul(ElemanAdıDizisi, YoksaOluştur);
         }
         public void Sil(string ElemanAdıDizisi)
         {

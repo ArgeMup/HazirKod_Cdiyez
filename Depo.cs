@@ -34,7 +34,7 @@ namespace ArgeMup.HazirKod
         DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
         bool Oku_Bit(string ElemanAdıDizisi, bool BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
 
-        IDepo_Eleman Bul(string ElemanAdıDizisi);
+        IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false);
         string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları = false);
         void Ekle(string ElemanAdıDizisi, string Eleman);
         void Sil(string ElemanAdıDizisi);
@@ -219,20 +219,30 @@ namespace ArgeMup.HazirKod
 
                 return okunan;
             }
-            public Eleman_ Bul_Getir(string ElemanAdıDizisi)
+            public Eleman_ Bul_Getir(string ElemanAdıDizisi, bool YoksaOluştur = false)
             {
                 if (string.IsNullOrEmpty(ElemanAdıDizisi)) return this;
                 else
                 {
                     //alttaki elemanlardan bahsediyor
-                    if (_Elemanları == null) return null;
+                    Eleman_ bulunan = null;
+                    if (_Elemanları == null) goto OluşturmayıKontrolEt;
 
                     string geriyekalan = Depo_Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
 
-                    Eleman_ bulunan = Array.Find(_Elemanları, x => x._Adı == ElemanAdıDizisi);
-                    if (bulunan == null) return null;
+                    bulunan = Array.Find(_Elemanları, x => x._Adı == ElemanAdıDizisi);
+                    if (bulunan == null) goto OluşturmayıKontrolEt;
 
-                    return bulunan.Bul_Getir(geriyekalan);
+                    return bulunan.Bul_Getir(geriyekalan, YoksaOluştur);
+
+                    OluşturmayıKontrolEt:
+                    if (YoksaOluştur)
+                    {
+                        Yaz(ElemanAdıDizisi, "ArGeMuP");
+                        bulunan = Bul_Getir(ElemanAdıDizisi, false);
+                    }
+
+                    return bulunan;
                 }
             }
             public string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları)
@@ -516,9 +526,9 @@ namespace ArgeMup.HazirKod
                 return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
             }
 
-            public IDepo_Eleman Bul(string ElemanAdıDizisi)
+            public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur)
             {
-                return Bul_Getir(ElemanAdıDizisi);
+                return Bul_Getir(ElemanAdıDizisi, YoksaOluştur);
             }
             #endregion
         }
@@ -570,19 +580,30 @@ namespace ArgeMup.HazirKod
 
             return okunan;
         }
-        public IDepo_Eleman Bul(string ElemanAdıDizisi)
+        public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false)
         {
             if (string.IsNullOrEmpty(ElemanAdıDizisi)) throw new Exception("ElemanDizisi boş olamaz");
 
             //alttaki elemanlardan bahsediyor
-            if (_Elemanları == null) return null;
+            IDepo_Eleman bulunan = null;
+            if (_Elemanları == null) goto OluşturmayıKontrolEt;
 
             string geriyekalan = Depo_Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
 
-            Eleman_ bulunan = Array.Find(_Elemanları, x => x.Adı == ElemanAdıDizisi);
-            if (bulunan == null) return null;
+            bulunan = Array.Find(_Elemanları, x => x.Adı == ElemanAdıDizisi);
+            if (bulunan == null) goto OluşturmayıKontrolEt;
 
-            return bulunan.Bul(geriyekalan);
+            bulunan = bulunan.Bul(geriyekalan, YoksaOluştur);
+            return bulunan; 
+
+            OluşturmayıKontrolEt:
+            if (YoksaOluştur)
+            {
+                Yaz(ElemanAdıDizisi, "ArGeMuP");
+                bulunan = Bul(ElemanAdıDizisi, false);
+            }
+
+            return bulunan;
         }
 
         #region Dönüştürme
@@ -990,16 +1011,12 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                 return okunan;
             }
 
-            public IDepo_Eleman Bul(string ElemanAdıDizisi)
+            public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur)
             {
                 if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
-                IDepo_Eleman okunan = AsılEleman.Bul(ElemanAdıDizisi);
-                if (okunan != null)
-                {
-                    Depo_Kilitli_Eleman_ yeni = new Depo_Kilitli_Eleman_(okunan, Depo);
-                    okunan = yeni;
-                }
+                IDepo_Eleman okunan = AsılEleman.Bul(ElemanAdıDizisi, YoksaOluştur);
+                if (okunan != null) okunan = new Depo_Kilitli_Eleman_(okunan, Depo);
 
                 Depo.Kilit.ReleaseMutex();
 
@@ -1039,16 +1056,12 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
             
             return okunan;
         }
-        public IDepo_Eleman Bul(string ElemanAdıDizisi)
+        public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false)
         {
             if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
-            IDepo_Eleman okunan = Depo.Bul(ElemanAdıDizisi);
-            if (okunan != null)
-            {
-                Depo_Kilitli_Eleman_ yeni = new Depo_Kilitli_Eleman_(okunan, this);
-                okunan = yeni;
-            }
+            IDepo_Eleman okunan = Depo.Bul(ElemanAdıDizisi, YoksaOluştur);
+            if (okunan != null) okunan = new Depo_Kilitli_Eleman_(okunan, this);
 
             Kilit.ReleaseMutex();
 

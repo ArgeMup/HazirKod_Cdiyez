@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using ArgeMup.HazirKod.Dönüştürme;
 using ArgeMup.HazirKod.ArkaPlan;
-using ArgeMup.HazirKod.EşZamanlı;
 using System.Threading;
 
 namespace ArgeMup.HazirKod
@@ -379,7 +378,7 @@ namespace ArgeMup.HazirKod
             }
             FizikselOlarakMevcut = true;
 
-            Liste_<İçerik_Dosya_> dsy_l = new Liste_<İçerik_Dosya_>();
+            EşZamanlıÇokluErişim.Liste_<İçerik_Dosya_> dsy_l = new EşZamanlıÇokluErişim.Liste_<İçerik_Dosya_>();
             Action<object> TümüÖğütülünceÇağırılacakİşlem = null;
             if (!BitmesiniBekle) TümüÖğütülünceÇağırılacakİşlem = İşl_bitti;
             
@@ -533,8 +532,8 @@ namespace ArgeMup.HazirKod
             Farklılık_ Güncel = Karşılaştır(Sağdaki);
             Farklılık_ Sonuç = new Farklılık_();
 
-            Liste_<Fark_Klasör_> kls_l = new Liste_<Fark_Klasör_>();
-            Liste_<Fark_Dosya_> dsy_l = new Liste_<Fark_Dosya_>();
+            EşZamanlıÇokluErişim.Liste_<Fark_Klasör_> kls_l = new EşZamanlıÇokluErişim.Liste_<Fark_Klasör_>();
+            EşZamanlıÇokluErişim.Liste_<Fark_Dosya_> dsy_l = new EşZamanlıÇokluErişim.Liste_<Fark_Dosya_>();
             Öğütücü_<Fark_Klasör_> kls_ö = new Öğütücü_<Fark_Klasör_>(İşl_Kls, null, EşZamanlıİşlemSayısı);
             Öğütücü_<Fark_Dosya_> dsy_ö = new Öğütücü_<Fark_Dosya_>(İşl_Dsy, null, EşZamanlıİşlemSayısı);
 
@@ -588,8 +587,8 @@ namespace ArgeMup.HazirKod
             Farklılık_ Güncel = Karşılaştır(AsılKlasör);
             Farklılık_ Sonuç = new Farklılık_();
 
-            Liste_<Fark_Klasör_> kls_l = new Liste_<Fark_Klasör_>();
-            Liste_<Fark_Dosya_> dsy_l = new Liste_<Fark_Dosya_>();
+            EşZamanlıÇokluErişim.Liste_<Fark_Klasör_> kls_l = new EşZamanlıÇokluErişim.Liste_<Fark_Klasör_>();
+            EşZamanlıÇokluErişim.Liste_<Fark_Dosya_> dsy_l = new EşZamanlıÇokluErişim.Liste_<Fark_Dosya_>();
             Öğütücü_<Fark_Klasör_> kls_ö = new Öğütücü_<Fark_Klasör_>(İşl_Kls, null, EşZamanlıİşlemSayısı);
             Öğütücü_<Fark_Dosya_> dsy_ö = new Öğütücü_<Fark_Dosya_>(İşl_Dsy, null, EşZamanlıİşlemSayısı);
 

@@ -3,7 +3,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ArgeMup.HazirKod.EşZamanlı;
 using ArgeMup.HazirKod.Dönüştürme;
 
 namespace ArgeMup.HazirKod.ArkaPlan
@@ -21,7 +20,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
         /// Görev içinde bekleme yapılacak ise Thread.Sleep(1000); kullanılmalı
         /// </summary>
         public int Kilit_Devralma_ZamanAşımı_msn = 5000;
-        public Liste_<T> Liste = new Liste_<T>();
+        public EşZamanlıÇokluErişim.Liste_<T> Liste = new EşZamanlıÇokluErişim.Liste_<T>();
 
         Action<T, object> Çağırılacakİşlem = null;
         Action<object> TümüÖğütülünceÇağırılacakİşlem = null;
@@ -107,6 +106,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
     public class Hatırlatıcı_
     {
         public const string Sürüm = "V1.1";
+        public int TekrarHatırlatmaGecikmesi_msn = 0;
         public class Durum_
         {
             public string TakmaAdı;
@@ -175,14 +175,62 @@ namespace ArgeMup.HazirKod.ArkaPlan
 
         class Biri_
         {
-            public string TakmaAdı;
-            public DateTime HesaplananTetiklemeAnı;
-            public bool GeriBildirim_Islemini_çalıştır = true;
+            public string TakmaAdı
+            {
+                get
+                {
+                    return _TakmaAdı;
+                }
+                set
+                {
+                    _TakmaAdı = value;
+                    Ayarlar.Yaz(null, value, 0);
+                }
+            }
+            public DateTime HesaplananTetiklemeAnı
+            {
+                get
+                {
+                    return _HesaplananTetiklemeAnı;
+                }
+                set
+                {
+                    _HesaplananTetiklemeAnı = value;
+                    Ayarlar.Yaz(null, value, 1);
+                }
+            }
+            public string TekrarlayıcıKomutCümlesi
+            {
+                get
+                {
+                    return _TekrarlayıcıKomutCümlesi;
+                }
+                set
+                {
+                    _TekrarlayıcıKomutCümlesi = value;
+                    Ayarlar.Yaz(null, value, 2);
+                }
+            }
+            string _TakmaAdı;
+            DateTime _HesaplananTetiklemeAnı;
+            string _TekrarlayıcıKomutCümlesi = null;
 
+            public bool GeriBildirim_Islemini_çalıştır = true;
             public Func<string, object, int> GeriBildirim_Islemi = null;
             public object Hatırlatıcı = null;
 
-            public string TekrarlayıcıKomutCümlesi = null;
+            public IDepo_Eleman Ayarlar = null;
+
+            public Biri_(string TakmaAdı, DateTime HesaplananTetiklemeAnı, string TekrarlayıcıKomutCümlesi, Func<string, object, int> GeriBildirim_Islemi, object Hatırlatıcı)
+            {
+                this._TakmaAdı = TakmaAdı;
+                this._HesaplananTetiklemeAnı = HesaplananTetiklemeAnı;
+                this._TekrarlayıcıKomutCümlesi = TekrarlayıcıKomutCümlesi;
+
+                this.GeriBildirim_Islemini_çalıştır = this._HesaplananTetiklemeAnı >= DateTime.Now;
+                this.GeriBildirim_Islemi = GeriBildirim_Islemi;
+                this.Hatırlatıcı = Hatırlatıcı;
+            }
 
             public void Ertele(int MiliSaniye)
             {
@@ -193,38 +241,55 @@ namespace ArgeMup.HazirKod.ArkaPlan
 
         bool Çalışsın = true;
         CancellationTokenSource İptalEtmeAnahtarıKaynağı = null;
-        Liste_<Biri_> Liste = new Liste_<Biri_>();
-        int TekrarHatırlatmaGecikmesi_msn = 0;
+        EşZamanlıÇokluErişim.Liste_<Biri_> Liste = new EşZamanlıÇokluErişim.Liste_<Biri_>();
+        IDepo_Eleman Ayarlar = null;
         long UcuzKilit = 0;
 
-        public Hatırlatıcı_(string Ayarlar = null, int TekrarHatırlatmaGecikmesi_msn = int.MinValue)
+        public Hatırlatıcı_(string Ayarlar = null)
         {
-            this.TekrarHatırlatmaGecikmesi_msn = TekrarHatırlatmaGecikmesi_msn;
-            
-            if (!string.IsNullOrEmpty(Ayarlar))
+            // Hatırlatıcı_\n
+            // >Tetikleyiciler\n
+            // >>1> ...\n
+            // >>2> ...\n
+
+            ArgeMup.HazirKod.EşZamanlıÇokluErişim.Depo_ depo = new ArgeMup.HazirKod.EşZamanlıÇokluErişim.Depo_(Ayarlar);
+            depo.Yaz("Hatırlatıcı_", "ArGeMuP");
+            this.Ayarlar = depo.Bul("Hatırlatıcı_");
+
+            Başlat();
+        }
+        public Hatırlatıcı_(IDepo_Eleman Ayarlar)
+        {
+            if (Ayarlar == null) throw new Exception("Ayarlar boş olamaz");
+            this.Ayarlar = Ayarlar;
+
+            Başlat();
+        }
+        void Başlat()
+        {
+            // Hatırlatıcı_ dalı
+
+            IDepo_Eleman te = Ayarlar.Bul("Tetikleyiciler");
+            if (te != null)
             {
-                Depo_ depo = new Depo_(Ayarlar);
-                Depo_.IEleman te = depo.Bul("Tetikleyiciler");
-                if (te != null)
+                foreach (IDepo_Eleman biri in te.Elemanları)
                 {
-                    foreach (Depo_.IEleman biri in te.Elemanları)
-                    {
-                        string TakmaAdı = biri.Oku(null, null, 0);
-                        DateTime İlkTetikleyeceğiZaman = biri.Oku_TarihSaat(null, default, 1);
-                        string TekrarlayıcıKomutCümlesi = biri.Oku(null, null, 2);
+                    string TakmaAdı = biri.Oku(null, null, 0);
+                    DateTime İlkTetikleyeceğiZaman = biri.Oku_TarihSaat(null, default, 1);
+                    string TekrarlayıcıKomutCümlesi = biri.Oku(null, null, 2);
 
-                        if (string.IsNullOrEmpty(TakmaAdı) || İlkTetikleyeceğiZaman == default(DateTime)) continue;
+                    if (string.IsNullOrEmpty(TakmaAdı) || İlkTetikleyeceğiZaman == default(DateTime)) continue;
 
-                        Kur(TakmaAdı, İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi);
-                    }
+                    Kur(TakmaAdı, İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi);
                 }
             }
         }
+
         public void Kur(string TakmaAdı, Func<string, object, int> GeriBildirim_Islemi, object Hatırlatıcı = null)
         {
             if (GeriBildirim_Islemi == null) throw new Exception("GeriBildirim_Islemi boş olmamalı");
 
-            Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
+            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
             if (bulunanlar.Count > 0)
             {
                 foreach (Biri_ b in bulunanlar)
@@ -240,37 +305,37 @@ namespace ArgeMup.HazirKod.ArkaPlan
         {
             if (!string.IsNullOrEmpty(TekrarlayıcıKomutCümlesi))
             {
-                DateTime gecici = İlkTetikleyeceğiZaman;
-                if (!SonrakiTetikleme_Hesapla(ref gecici, TekrarlayıcıKomutCümlesi)) throw new Exception("TekrarlayıcıKomutCümlesi uygun değil");
+                if (SonrakiTetikleme_Hesapla(İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi) == default) throw new Exception("TekrarlayıcıKomutCümlesi uygun değil");
             }
             
-            Biri_ yeni = new Biri_();
-            yeni.TakmaAdı = TakmaAdı;
-            yeni.HesaplananTetiklemeAnı = İlkTetikleyeceğiZaman;
-            yeni.TekrarlayıcıKomutCümlesi = TekrarlayıcıKomutCümlesi;
-            yeni.GeriBildirim_Islemi = GeriBildirim_Islemi;
-            yeni.Hatırlatıcı = Hatırlatıcı;
-            yeni.GeriBildirim_Islemini_çalıştır = İlkTetikleyeceğiZaman >= DateTime.Now;
+            Biri_ yeni = new Biri_(TakmaAdı, İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi, GeriBildirim_Islemi, Hatırlatıcı);
             Liste.Add(yeni);
+
+            Ayarlar.Yaz("Tetikleyiciler/" + Liste.Count, yeni.TakmaAdı, 0);
+            Ayarlar.Yaz("Tetikleyiciler/" + Liste.Count, yeni.HesaplananTetiklemeAnı, 1);
+            Ayarlar.Yaz("Tetikleyiciler/" + Liste.Count, yeni.TekrarlayıcıKomutCümlesi, 2);
+            yeni.Ayarlar = Ayarlar.Bul("Tetikleyiciler/" + Liste.Count);
 
             if (GeriBildirim_Islemi != null) ArkaPlanGörevi_Başlat();
         }
 
         public DateTime SonrakiTetikleme_Kur(string TakmaAdı, bool GelecektekiBirZamanaKur = true)
         {
-            Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
+            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
             if (bulunanlar == null || bulunanlar.Count == 0) return default;
             
             if (GelecektekiBirZamanaKur)
             {
                 while (Çalışsın && Ortak.Çalışsın && bulunanlar[0].HesaplananTetiklemeAnı < DateTime.Now)
                 {
-                    if (!SonrakiTetikleme_Hesapla(ref bulunanlar[0].HesaplananTetiklemeAnı, bulunanlar[0].TekrarlayıcıKomutCümlesi)) return default;
+                    bulunanlar[0].HesaplananTetiklemeAnı = SonrakiTetikleme_Hesapla(bulunanlar[0].HesaplananTetiklemeAnı, bulunanlar[0].TekrarlayıcıKomutCümlesi);
+                    if (bulunanlar[0].HesaplananTetiklemeAnı == default) return default;
                 }
             }
             else
             {
-                if (!SonrakiTetikleme_Hesapla(ref bulunanlar[0].HesaplananTetiklemeAnı, bulunanlar[0].TekrarlayıcıKomutCümlesi)) return default;
+                bulunanlar[0].HesaplananTetiklemeAnı = SonrakiTetikleme_Hesapla(bulunanlar[0].HesaplananTetiklemeAnı, bulunanlar[0].TekrarlayıcıKomutCümlesi);
+                if (bulunanlar[0].HesaplananTetiklemeAnı == default) return default;
             }
 
             bulunanlar[0].GeriBildirim_Islemini_çalıştır = true;
@@ -278,9 +343,9 @@ namespace ArgeMup.HazirKod.ArkaPlan
 
             return bulunanlar[0].HesaplananTetiklemeAnı;
         }
-        public bool SonrakiTetikleme_Hesapla(ref DateTime BaşlangıçNoktası, string KomutCümlesi)
+        public DateTime SonrakiTetikleme_Hesapla(DateTime BaşlangıçNoktası, string KomutCümlesi)
         {
-            if (string.IsNullOrEmpty(KomutCümlesi)) return false;
+            if (string.IsNullOrEmpty(KomutCümlesi)) return default;
 
             try
             {
@@ -344,16 +409,16 @@ namespace ArgeMup.HazirKod.ArkaPlan
                     }
                 }
 
-                return sonuç;
+                if (sonuç) return BaşlangıçNoktası;
             }
             catch (Exception) { }
 
-            return false;
+            return default;
         }
         
         public void Sil(string TakmaAdı)
         {
-            Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
+            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
             foreach (Biri_ b in bulunanlar)
             {
                 Liste.Remove(b);
@@ -363,7 +428,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
         }
         public Durum_ Bul(string TakmaAdı)
         {
-            Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
+            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
             Durum_ Durum = null;
 
             if (bulunanlar != null && bulunanlar.Count > 0)
@@ -383,7 +448,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
         public Durum_[] Bul(bool SadeceSüresiDolanları = true)
         {
             DateTime şimdi = DateTime.Now;
-            Liste_<Biri_> bulunanlar = null;
+            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = null;
             if (SadeceSüresiDolanları) bulunanlar = Liste.FindAll(x => x.HesaplananTetiklemeAnı <= şimdi);
             else bulunanlar = Liste.Copy();
 
@@ -410,18 +475,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
                 ArkaPlanGörevi_Başlat();
             }
 
-            Depo_ depo = new Depo_();
-            depo.Yaz("sürüm", Sürüm);
-            int syc = 0;
-            foreach (Biri_ b in Liste)
-            {
-                syc++;
-                depo.Yaz("Tetikleyiciler/" + syc, b.TakmaAdı, 0);
-                depo.Yaz("Tetikleyiciler/" + syc, b.HesaplananTetiklemeAnı, 1);
-                depo.Yaz("Tetikleyiciler/" + syc, b.TekrarlayıcıKomutCümlesi, 2);
-            }
-
-            return depo.YazıyaDönüştür();
+            return Ayarlar.YazıyaDönüştür(null);
         }
 
         void ArkaPlanGörevi_Başlat()

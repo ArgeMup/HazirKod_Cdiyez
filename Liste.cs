@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace ArgeMup.HazirKod.EşZamanlı
+namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
 {
     public class Liste_<T> : IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable, ICollection
     {

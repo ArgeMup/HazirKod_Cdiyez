@@ -136,7 +136,7 @@ namespace ArgeMup.HazirKod
 
             Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = false;
 
-            File.Delete(_AyarlarDosyasıYolu + ".yedek");
+            if (File.Exists(_AyarlarDosyasıYolu + ".yedek")) File.Delete(_AyarlarDosyasıYolu + ".yedek");
         }
 
         private void ZamanlayıcıKesmesi(object source, System.Timers.ElapsedEventArgs e)

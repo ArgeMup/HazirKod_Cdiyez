@@ -358,9 +358,8 @@ namespace ArgeMup.HazirKod
 
                 if (DoluOlanlar.Count == 0)
                 {
+                    if (_Elemanları.Length > 0) _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
                     _Elemanları = null;
-                    _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
-
                     return true;
                 }
                 else if (_Elemanları.Length != DoluOlanlar.Count)
@@ -387,17 +386,12 @@ namespace ArgeMup.HazirKod
                             else break;
                         }
 
-                        if (sayac_boşluk > 0)
-                        {
-                            Array.Resize(ref _İçeriği, _İçeriği.Length - sayac_boşluk);
-                            _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
-                        }
+                        if (sayac_boşluk > 0) Array.Resize(ref _İçeriği, _İçeriği.Length - sayac_boşluk);
                         return false;
                     }
                 }
 
                 _İçeriği = null;
-                _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
                 return true;
             }
             #endregion
@@ -411,6 +405,8 @@ namespace ArgeMup.HazirKod
                 }
                 set
                 {
+                    if (string.IsNullOrEmpty(value)) value = null;
+
                     if (_Adı != value)
                     {
                         _Adı = value;
@@ -427,8 +423,20 @@ namespace ArgeMup.HazirKod
                 }
                 set
                 {
-                    if (_İçeriği == null) _İçeriği = new string[i + 1];
-                    else if (i >= _İçeriği.Length) Array.Resize(ref _İçeriği, i + 1);
+                    if (string.IsNullOrEmpty(value)) value = null;
+
+                    if (_İçeriği == null)
+                    {
+                        if (value == null) return;
+
+                        _İçeriği = new string[i + 1];
+                    }
+                    else if (i >= _İçeriği.Length)
+                    {
+                        if (value == null) return;
+
+                        Array.Resize(ref _İçeriği, i + 1);
+                    }
 
                     if (_İçeriği[i] != value)
                     {

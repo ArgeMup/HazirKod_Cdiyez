@@ -106,7 +106,15 @@ namespace ArgeMup.HazirKod
         {
             if (Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti) DeğişiklikleriKaydet_Hemen(null);
             
-            if (VeDurdur) Durdur();
+            if (VeDurdur)
+            {
+                try
+                {
+                    if (Zamanlayıcı != null) { Zamanlayıcı.Dispose(); Zamanlayıcı = null; }
+                    if (Karmaşıklaştırma != null) { Karmaşıklaştırma.Dispose(); Karmaşıklaştırma = null; }
+                }
+                catch (Exception) { }
+            }
         }
         void DeğişiklikleriKaydet_Hemen(EşZamanlıÇokluErişim.Depo_ _)
         {
@@ -131,15 +139,6 @@ namespace ArgeMup.HazirKod
             File.Delete(_AyarlarDosyasıYolu + ".yedek");
         }
 
-        private void Durdur()
-        {
-            try
-            {
-                if (Zamanlayıcı != null) { Zamanlayıcı.Dispose(); Zamanlayıcı = null; }
-                if (Karmaşıklaştırma != null) { Karmaşıklaştırma.Dispose(); Karmaşıklaştırma = null; }
-            }
-            catch (Exception) { }
-        }
         private void ZamanlayıcıKesmesi(object source, System.Timers.ElapsedEventArgs e)
         {
             DeğişiklikleriKaydet();

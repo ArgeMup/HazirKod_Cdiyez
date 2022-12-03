@@ -223,75 +223,22 @@ namespace ArgeMup.HazirKod
         public static bool Sil_TarihineGöre(string Klasörü, double Gün, string Filtre, int EşZamanlıİşlemSayısı = 5)
         {
             Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true, EşZamanlıİşlemSayısı);
-            int HataOldu = 0;
-            Öğütücü_<Klasör_.İçerik_Dosya_> ö = new Öğütücü_<Klasör_.İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
-
-            if (kls.FizikselOlarakMevcut)
-            {
-                foreach (var dsy in kls.Dosyalar)
-                {
-                    ö.Ekle(dsy);
-                }
-            }
-
-            while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
-            return HataOldu == 0;
-
-            void İşl(Klasör_.İçerik_Dosya_ dsy, object o)
-            {
-                if (dsy.DeğiştirilmeTarihi.AddDays(Gün) < DateTime.Now)
-                {
-                    if (!Dosya.Sil(kls.Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
-                }
-            }
+            return kls.Dosya_Sil_TarihineGöre(Gün, EşZamanlıİşlemSayısı);
         }
         public static bool Sil_BoyutunaGöre(string Klasörü, long TümDosyaların_KapladığıAlan_bayt, string Filtre, int EşZamanlıİşlemSayısı = 5)
         {
             Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true, EşZamanlıİşlemSayısı);
-            bool EnAz1HataOldu = false;
-
-            if (kls.FizikselOlarakMevcut)
-            {
-                kls.Sırala_EskidenYeniye();
-
-                foreach (var dsy in kls.Dosyalar)
-                {
-                    if (kls.KapladığıAlan_bayt <= TümDosyaların_KapladığıAlan_bayt) break;
-                    
-                    if (!Dosya.Sil(kls.Kök + @"\" + dsy.Yolu)) EnAz1HataOldu = true;
-                    
-                    kls.KapladığıAlan_bayt -= dsy.KapladığıAlan_bayt;
-                }
-            }
-
-            return !EnAz1HataOldu;
+            return kls.Dosya_Sil_BoyutunaGöre(TümDosyaların_KapladığıAlan_bayt, EşZamanlıİşlemSayısı);
         }
         public static bool Sil_SayısınaGöre(string Klasörü, int AzamiToplamDosyaSayısı, string Filtre, int EşZamanlıİşlemSayısı = 5)
         {
             Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true, EşZamanlıİşlemSayısı);
-            int HataOldu = 0;
-            Öğütücü_<Klasör_.İçerik_Dosya_> ö = new Öğütücü_<Klasör_.İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
-
-            if (kls.FizikselOlarakMevcut)
+            return kls.Dosya_Sil_SayısınaGöre(AzamiToplamDosyaSayısı, EşZamanlıİşlemSayısı);
+		}
+        public static bool Sil_SayısınaVeBoyutunaGöre(string Klasörü, int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt, string Filtre, int EşZamanlıİşlemSayısı = 5)
             {
-                kls.Sırala_EskidenYeniye();
-
-                AzamiToplamDosyaSayısı = kls.Dosyalar.Count - AzamiToplamDosyaSayısı;
-                foreach (var dsy in kls.Dosyalar)
-                {
-                    if (AzamiToplamDosyaSayısı-- <= 0) break;
-
-                    ö.Ekle(dsy);
-                }
-            }
-
-            while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
-            return HataOldu == 0;
-
-            void İşl(Klasör_.İçerik_Dosya_ dsy, object o)
-            {
-                if (!Dosya.Sil(kls.Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
-            }
+            Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true, EşZamanlıİşlemSayısı);
+            return kls.Dosya_Sil_SayısınaVeBoyutunaGöre(AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt, EşZamanlıİşlemSayısı);
         }
     }
 
@@ -432,7 +379,7 @@ namespace ArgeMup.HazirKod
             while (soldaki.Klasörler.Count > 0)
             {
                 Fark_Klasör_ f_kls = new Fark_Klasör_();
-                if (sağdaki.MevcutMu_Klasör(soldaki.Klasörler[0]))
+                if (sağdaki.Klasörler.Contains(soldaki.Klasörler[0]))
                 {
                     f_kls.Farklılık = Farklılık_Klasör.Aynı;
                     sağdaki.Klasörler.Remove(soldaki.Klasörler[0]);
@@ -452,7 +399,7 @@ namespace ArgeMup.HazirKod
             while (sağdaki.Klasörler.Count > 0)
             {
                 Fark_Klasör_ f_kls = new Fark_Klasör_();
-                if (soldaki.MevcutMu_Klasör(sağdaki.Klasörler[0]))
+                if (soldaki.Klasörler.Contains(sağdaki.Klasörler[0]))
                 {
                     f_kls.Farklılık = Farklılık_Klasör.Aynı;
                     soldaki.Klasörler.Remove(sağdaki.Klasörler[0]);
@@ -472,7 +419,7 @@ namespace ArgeMup.HazirKod
             while (soldaki.Dosyalar.Count > 0)
             {
                 Fark_Dosya_ f_dsy = new Fark_Dosya_();
-                İçerik_Dosya_ dsy = sağdaki.MevcutMu_Dosya(soldaki.Dosyalar[0].Yolu);
+                İçerik_Dosya_ dsy = sağdaki.Dosyalar.Find(x => x.Yolu == soldaki.Dosyalar[0].Yolu);
                 if (dsy != null && dsy.Yolu == soldaki.Dosyalar[0].Yolu)
                 {
                     if (soldaki.Dosyalar[0].DeğiştirilmeTarihi < dsy.DeğiştirilmeTarihi) f_dsy.Farklılık = Farklılık_Dosya.SağdakiDahaYeni;
@@ -500,7 +447,7 @@ namespace ArgeMup.HazirKod
             while (sağdaki.Dosyalar.Count > 0)
             {
                 Fark_Dosya_ f_dsy = new Fark_Dosya_();
-                İçerik_Dosya_ dsy = soldaki.MevcutMu_Dosya(sağdaki.Dosyalar[0].Yolu);
+                İçerik_Dosya_ dsy = soldaki.Dosyalar.Find(x => x.Yolu == sağdaki.Dosyalar[0].Yolu);
                 if (dsy != null && dsy.Yolu == sağdaki.Dosyalar[0].Yolu)
                 {
                     if (sağdaki.Dosyalar[0].DeğiştirilmeTarihi < dsy.DeğiştirilmeTarihi) f_dsy.Farklılık = Farklılık_Dosya.SoldakiDahaYeni;
@@ -650,6 +597,126 @@ namespace ArgeMup.HazirKod
                 }
             }
         }
+
+        public bool Dosya_Sil_TarihineGöre(double Gün, int EşZamanlıİşlemSayısı = 5)
+        {
+            int HataOldu = 0;
+            Öğütücü_<İçerik_Dosya_> ö = new Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
+
+            if (FizikselOlarakMevcut)
+            {
+                Sırala_EskidenYeniye();
+                DateTime SıfırNoktası = DateTime.Now.AddDays(Gün * -1);
+
+                foreach (var dsy in Dosyalar)
+                {
+                    if (dsy.DeğiştirilmeTarihi >= SıfırNoktası) break;
+
+                    ö.Ekle(dsy);
+                }
+
+                while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+            }
+
+            return HataOldu == 0;
+
+            void İşl(İçerik_Dosya_ dsy, object o)
+            {
+                if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
+            }
+        }
+        public bool Dosya_Sil_BoyutunaGöre(long TümDosyaların_KapladığıAlan_bayt, int EşZamanlıİşlemSayısı = 5)
+        {
+            int HataOldu = 0;
+            Öğütücü_<İçerik_Dosya_> ö = new Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
+
+            if (FizikselOlarakMevcut)
+            {
+                Sırala_EskidenYeniye();
+
+                foreach (var dsy in Dosyalar)
+                {
+                    if (KapladığıAlan_bayt <= TümDosyaların_KapladığıAlan_bayt) break;
+
+                    ö.Ekle(dsy);
+                    KapladığıAlan_bayt -= dsy.KapladığıAlan_bayt;
+                }
+
+                while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+            }
+
+            return HataOldu == 0;
+
+            void İşl(İçerik_Dosya_ dsy, object o)
+            {
+                if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
+            }
+        }
+        public bool Dosya_Sil_SayısınaGöre(int AzamiToplamDosyaSayısı, int EşZamanlıİşlemSayısı = 5)
+        {
+            int HataOldu = 0;
+            Öğütücü_<İçerik_Dosya_> ö = new Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
+
+            if (FizikselOlarakMevcut)
+            {
+                Sırala_EskidenYeniye();
+
+                AzamiToplamDosyaSayısı = Dosyalar.Count - AzamiToplamDosyaSayısı;
+                foreach (var dsy in Dosyalar)
+                {
+                    if (AzamiToplamDosyaSayısı-- <= 0) break;
+
+                    ö.Ekle(dsy);
+                }
+
+                while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+            }
+
+            return HataOldu == 0;
+
+            void İşl(İçerik_Dosya_ dsy, object o)
+            {
+                if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
+            }
+        }
+        public bool Dosya_Sil_SayısınaVeBoyutunaGöre(int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt, int EşZamanlıİşlemSayısı = 5)
+        {
+            // En yeni AzamiToplamDosyaSayısı kadar dosya tutulur
+            // Haricindekiler TümDosyaların_KapladığıAlan_bayt aşıyorsa eskiden yeniye doğru silinir
+
+            if (!FizikselOlarakMevcut ||
+                Dosyalar.Count <= AzamiToplamDosyaSayısı) return true;
+
+            Sırala_EskidenYeniye();
+
+            //AzamiToplamDosyaSayısı kadar yeni dosyayı görünmez yap, sildirtme
+            for (int i = 0; i < AzamiToplamDosyaSayısı; i++)
+            {
+                KapladığıAlan_bayt -= Dosyalar.Last().KapladığıAlan_bayt;
+                Dosyalar.Remove(Dosyalar.Last());
+            }
+
+            int HataOldu = 0;
+            Öğütücü_<İçerik_Dosya_> ö = new Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
+
+            foreach (var dsy in Dosyalar)
+            {
+                if (KapladığıAlan_bayt <= TümDosyaların_KapladığıAlan_bayt) break;
+
+                ö.Ekle(dsy);
+
+                KapladığıAlan_bayt -= dsy.KapladığıAlan_bayt;
+            }
+
+            while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+            
+            return HataOldu == 0;
+
+            void İşl(İçerik_Dosya_ dsy, object o)
+            {
+                if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
+            }
+        }
         #endregion
 
         #region Sıralama
@@ -681,17 +748,6 @@ namespace ArgeMup.HazirKod
         {
             _Sıralayıcı_DosyaBoyutuKüçüktenBüyüğe srl = new _Sıralayıcı_DosyaBoyutuKüçüktenBüyüğe();
             Dosyalar.Sort(srl);
-        }
-        #endregion
-
-        #region İçKullanım
-        bool MevcutMu_Klasör(string Yolu)
-        {
-            return Klasörler.Contains(Yolu);
-        }
-        İçerik_Dosya_ MevcutMu_Dosya(string KısaYolu)
-        {
-            return Dosyalar.Find(x => x.Yolu == KısaYolu);
         }
         #endregion
     }

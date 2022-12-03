@@ -33,7 +33,7 @@ namespace ArgeMup.HazirKod
         /// </param>
         /// <param name="UdpSunucusuErişimNoktası">1 den küçük değerlerde bu özellik kapalıdır</param>
         /// <exception cref="Exception">Klasör oluşturulamadı</exception>
-        public static void Başlat(string Klasörü = "", int UdpSunucusununErişimNoktası = 0)
+        public static void Başlat(string Klasörü = "", int UdpSunucusununErişimNoktası = 0, int AzamiToplamDosyaSayısı = 50, int TümDosyaların_KapladığıAlan_bayt = 50 * 1024 * 1024 /*50 MiB*/)
         {
             if (Klasörü != null)
             {
@@ -42,9 +42,7 @@ namespace ArgeMup.HazirKod
 
                 Yolu = Klasörü + @"\" + D_TarihSaat.Yazıya(DateTime.Now, D_TarihSaat.Şablon_DosyaAdı) + ".Gunluk";
 
-                Dosya.Sil_TarihineGöre(Klasörü, 30, "*.Gunluk");
-                Dosya.Sil_BoyutunaGöre(Klasörü, 50 * 1024 * 1024 /*50 MiB*/, "*.Gunluk");
-                Dosya.Sil_SayısınaGöre(Klasörü, 500, "*.Gunluk");
+                Dosya.Sil_SayısınaVeBoyutunaGöre(Klasörü, AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt, "*.Gunluk");
 
                 Dosyalama = new Öğütücü_<string>(İşlem_Dosyalama, AzamiElemanSayısı:5555);
             }

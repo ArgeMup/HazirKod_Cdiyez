@@ -75,46 +75,49 @@ namespace ArgeMup.HazirKod.Dönüştürme
         public static readonly char ayraç_tamsayı = Convert.ToChar(CultureInfo.InvariantCulture.NumberFormat.NumberGroupSeparator);
         public static double Yazıdan(string Girdi, bool TamKontrol = true, bool GeçersizKarakterleriSil = true)
         {
-            if (TamKontrol)
+            if (!string.IsNullOrEmpty(Girdi))
             {
-                //tamsayı   .
-                //kesir     ,
-                if (Girdi.LastIndexOf(ayraç_tamsayı) > Girdi.LastIndexOf(ayraç_kesir))
+                if (TamKontrol)
                 {
-                    //100,000,000.2
-                    Girdi = Girdi.Replace(ayraç_kesir.ToString(), "");
-                    //100000000.2
-                    Girdi = Girdi.Replace(ayraç_tamsayı, ayraç_kesir);
-                    //100000000,2
-                }
-            }
-
-            if (double.TryParse(Girdi, NumberStyles.AllowThousands | NumberStyles.Float, CultureInfo.InvariantCulture, out double Çıktı))
-            {
-                return Çıktı;
-            }
-            
-            if (GeçersizKarakterleriSil)
-            {
-                string yeni = "";
-                bool Enazbirkarakterbulundu = false;
-                foreach (char krt in Girdi)
-                {
-                    if (krt == ayraç_kesir || krt == '+' || krt == '-' || (krt >= '0' && krt <= '9'))
+                    //tamsayı   .
+                    //kesir     ,
+                    if (Girdi.LastIndexOf(ayraç_tamsayı) > Girdi.LastIndexOf(ayraç_kesir))
                     {
-                        yeni += krt;
-                        Enazbirkarakterbulundu = true;
+                        //100,000,000.2
+                        Girdi = Girdi.Replace(ayraç_kesir.ToString(), "");
+                        //100000000.2
+                        Girdi = Girdi.Replace(ayraç_tamsayı, ayraç_kesir);
+                        //100000000,2
                     }
-                    else if (Enazbirkarakterbulundu) break;
                 }
 
-                //tekrar dene
-                if (double.TryParse(yeni, NumberStyles.Float, CultureInfo.InvariantCulture, out Çıktı))
+                if (double.TryParse(Girdi, NumberStyles.AllowThousands | NumberStyles.Float, CultureInfo.InvariantCulture, out double Çıktı))
                 {
                     return Çıktı;
                 }
+
+                if (GeçersizKarakterleriSil)
+                {
+                    string yeni = "";
+                    bool Enazbirkarakterbulundu = false;
+                    foreach (char krt in Girdi)
+                    {
+                        if (krt == ayraç_kesir || krt == '+' || krt == '-' || (krt >= '0' && krt <= '9'))
+                        {
+                            yeni += krt;
+                            Enazbirkarakterbulundu = true;
+                        }
+                        else if (Enazbirkarakterbulundu) break;
+                    }
+
+                    //tekrar dene
+                    if (double.TryParse(yeni, NumberStyles.Float, CultureInfo.InvariantCulture, out Çıktı))
+                    {
+                        return Çıktı;
+                    }
+                }
             }
-            
+
             throw new Exception(Girdi + " sayıya dönüştürülemiyor");
         }
         public static string Yazıya(double Girdi)

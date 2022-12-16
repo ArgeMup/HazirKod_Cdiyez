@@ -250,8 +250,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
             // >>2> ...\n
 
             ArgeMup.HazirKod.EşZamanlıÇokluErişim.Depo_ depo = new ArgeMup.HazirKod.EşZamanlıÇokluErişim.Depo_(Ayarlar);
-            depo.Yaz("Hatırlatıcı_", "ArGeMuP");
-            this.Ayarlar = depo.Bul("Hatırlatıcı_");
+            this.Ayarlar = depo.Bul("Hatırlatıcı_", true);
 
             Başlat();
         }

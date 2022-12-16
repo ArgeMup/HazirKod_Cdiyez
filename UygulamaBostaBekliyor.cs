@@ -46,9 +46,9 @@
                 }
                 else if(Directory.Exists(AğdakiReklamVideolarınınYolu)) UzaktakiOynatılacakVideolarListesi = Directory.GetFiles(AğdakiReklamVideolarınınYolu).ToList();
 
-                if (YerelDepolamaKonumu == "") YerelKlasör = Kendi.Klasörü() + "\\UygulamaBoştaBekliyor\\";
+                if (YerelDepolamaKonumu == "") YerelKlasör = Kendi.Klasörü + "\\UygulamaBoştaBekliyor\\";
                 else if (YerelDepolamaKonumu.Contains("\\")) YerelKlasör = YerelDepolamaKonumu;
-                else YerelKlasör = Kendi.Klasörü() + "\\" + YerelDepolamaKonumu + "\\UygulamaBoştaBekliyor\\";
+                else YerelKlasör = Kendi.Klasörü + "\\" + YerelDepolamaKonumu + "\\UygulamaBoştaBekliyor\\";
 
                 bool var;
                 Ayarlar = new Ayarlar_Xml_(out var, "", YerelKlasör + "UygulamaBostaBekliyor.Ayarlar");

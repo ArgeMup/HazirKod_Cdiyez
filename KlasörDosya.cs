@@ -14,13 +14,13 @@ namespace ArgeMup.HazirKod
     {
         public const string Sürüm = "V1.1";
 
-        public static bool Oluştur(string Yolu)
+        public static bool Oluştur(string Yolu, bool Düzelt = true)
         {
             try
             {
                 if (Directory.Exists(Yolu)) return true;
 
-                Yolu = D_DosyaKlasörAdı.Düzelt(Yolu, false);
+                if (Düzelt) Yolu = D_DosyaKlasörAdı.Düzelt(Yolu, false);
                 Directory.CreateDirectory(Yolu);
 
                 if (Directory.Exists(Yolu)) return true;

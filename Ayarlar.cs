@@ -177,7 +177,7 @@ namespace ArgeMup.HazirKod
 
         public string Oku(string ElemanAdıDizisi, string BulunamamasıDurumundakiİçeriği = "", int SıraNo = 0)
         {
-            return Depo_Ayarlar.Oku(ElemanAdıDizisi);
+            return Depo_Ayarlar.Oku(ElemanAdıDizisi, BulunamamasıDurumundakiİçeriği, SıraNo);
         }
         public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
         {

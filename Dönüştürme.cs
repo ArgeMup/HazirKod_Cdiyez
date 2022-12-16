@@ -210,6 +210,8 @@ namespace ArgeMup.HazirKod.Dönüştürme
         }
         public static double Sayıya(string Girdi)
         {
+            if (!string.IsNullOrEmpty(Girdi))
+            {
             if (Girdi.Length >= Şablon_Tarih_Saat_MiliSaniye.Length)
             {
                 if (DateTime.TryParseExact(Girdi.Substring(0, Şablon_Tarih_Saat_MiliSaniye.Length), Şablon_Tarih_Saat_MiliSaniye, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime yeni))
@@ -235,6 +237,9 @@ namespace ArgeMup.HazirKod.Dönüştürme
             }
 
             return D_Sayı.Yazıdan(Girdi);
+            }
+
+            throw new Exception(Girdi + " tarihe dönüştürülemiyor");
         }
     }
 

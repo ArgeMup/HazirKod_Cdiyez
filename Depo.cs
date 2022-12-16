@@ -199,8 +199,6 @@ namespace ArgeMup.HazirKod
                     else
                     {
                         //bulunamadığından yeni bir eleman oluştur
-                        if (!string.IsNullOrEmpty(İçeriği))
-                        {
                             bulunan = new Eleman_(ElemanAdıDizisi, _Depo);
                             Array.Resize(ref _Elemanları, _Elemanları.Length + 1);
                             _Elemanları[_Elemanları.Length - 1] = bulunan;
@@ -208,7 +206,6 @@ namespace ArgeMup.HazirKod
                         }
                     }
                 }
-            }
             public string Oku(string ElemanAdıDizisi, string BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null, int SıraNo = 0)
             {
                 Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
@@ -228,9 +225,10 @@ namespace ArgeMup.HazirKod
                     Eleman_ bulunan = null;
                     if (_Elemanları == null) goto OluşturmayıKontrolEt;
 
-                    string geriyekalan = Depo_Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
+                    string elm_adı = ElemanAdıDizisi;
+                    string geriyekalan = Depo_Ayraçlar.ElemanAdıDizisi_Ayıkla(ref elm_adı);
 
-                    bulunan = Array.Find(_Elemanları, x => x._Adı == ElemanAdıDizisi);
+                    bulunan = Array.Find(_Elemanları, x => x._Adı == elm_adı);
                     if (bulunan == null) goto OluşturmayıKontrolEt;
 
                     return bulunan.Bul_Getir(geriyekalan, YoksaOluştur);
@@ -238,7 +236,7 @@ namespace ArgeMup.HazirKod
                     OluşturmayıKontrolEt:
                     if (YoksaOluştur)
                     {
-                        Yaz(ElemanAdıDizisi, "ArGeMuP");
+                        Yaz(ElemanAdıDizisi, null);
                         bulunan = Bul_Getir(ElemanAdıDizisi, false);
                     }
 
@@ -313,22 +311,18 @@ namespace ArgeMup.HazirKod
 
                         if (gecici.Count > 0)
                         {
-                            bool Çıkışta_içeriği_temizle = true;
                             Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
 
                             if (bulunan == null)
                             {
-                                Yaz(ElemanAdıDizisi, "ArGeMuP");
+                                Yaz(ElemanAdıDizisi, null);
                                 bulunan = Bul_Getir(ElemanAdıDizisi);
                             }
-                            else Çıkışta_içeriği_temizle = false;
 
                             if (bulunan._Elemanları == null) bulunan._Elemanları = new Eleman_[gecici.Count];
                             else Array.Resize(ref bulunan._Elemanları, bulunan._Elemanları.Length + gecici.Count);
 
                             Array.Copy(gecici.ToArray(), 0, bulunan.Elemanları, bulunan._Elemanları.Length - gecici.Count, gecici.Count);
-
-                            if (Çıkışta_içeriği_temizle) bulunan[0] = null;
 
                             _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
                         }
@@ -470,9 +464,12 @@ namespace ArgeMup.HazirKod
             {
                 get
                 {
+                    bool durum_içerik = İçeriği_BoşMu();
+                    bool durum_elemanları = Elemanları_BoşMu();
+
                     if (string.IsNullOrEmpty(_Adı)) return true;
-                    if (!İçeriği_BoşMu()) return false;
-                    return Elemanları_BoşMu();
+                    if (!durum_içerik) return false;
+                    return durum_elemanları;
                 }
             }
 
@@ -567,15 +564,12 @@ namespace ArgeMup.HazirKod
             else
             {
                 //bulunamadığından yeni bir eleman oluştur
-                if (!string.IsNullOrEmpty(İçeriği))
-                {
                     bulunan = new Eleman_(ElemanAdıDizisi, this);
                     Array.Resize(ref _Elemanları, _Elemanları.Length + 1);
                     _Elemanları[_Elemanları.Length - 1] = bulunan;
                     bulunan.Yaz(geriyekalan, İçeriği, SıraNo);
                 }
             }
-        }
         public string Oku(string ElemanAdıDizisi, string BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null, int SıraNo = 0)
         {
             if (string.IsNullOrEmpty(ElemanAdıDizisi)) throw new Exception("ElemanAdıDizisi boş olamaz");
@@ -596,9 +590,10 @@ namespace ArgeMup.HazirKod
             IDepo_Eleman bulunan = null;
             if (_Elemanları == null) goto OluşturmayıKontrolEt;
 
-            string geriyekalan = Depo_Ayraçlar.ElemanAdıDizisi_Ayıkla(ref ElemanAdıDizisi);
+            string elm_adı = ElemanAdıDizisi;
+            string geriyekalan = Depo_Ayraçlar.ElemanAdıDizisi_Ayıkla(ref elm_adı);
 
-            bulunan = Array.Find(_Elemanları, x => x.Adı == ElemanAdıDizisi);
+            bulunan = Array.Find(_Elemanları, x => x.Adı == elm_adı);
             if (bulunan == null) goto OluşturmayıKontrolEt;
 
             bulunan = bulunan.Bul(geriyekalan, YoksaOluştur);
@@ -607,7 +602,7 @@ namespace ArgeMup.HazirKod
             OluşturmayıKontrolEt:
             if (YoksaOluştur)
             {
-                Yaz(ElemanAdıDizisi, "ArGeMuP");
+                Yaz(ElemanAdıDizisi, (string)null);
                 bulunan = Bul(ElemanAdıDizisi, false);
             }
 

@@ -7,7 +7,7 @@ namespace ArgeMup.HazirKod
 {
     public class Ayarlar_ 
     {
-        public const string Sürüm = "V5.0";
+        public const string Sürüm = "V5.1";
         public string AyarlarDosyasıYolu
         {
             get
@@ -162,6 +162,10 @@ namespace ArgeMup.HazirKod
         {
             Depo_Ayarlar.Yaz(ElemanAdıDizisi, Sayı, SıraNo);
         }
+        public void Yaz(string ElemanAdıDizisi, int TamSayı, int SıraNo = 0)
+        {
+            Depo_Ayarlar.Yaz(ElemanAdıDizisi, TamSayı, SıraNo);
+        }
         public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, int SıraNo = 0)
         {
             Depo_Ayarlar.Yaz(ElemanAdıDizisi, BaytDizisi, Adet, BaşlangıçKonumu, SıraNo);
@@ -183,6 +187,10 @@ namespace ArgeMup.HazirKod
         {
             return Depo_Ayarlar.Oku_Sayı(ElemanAdıDizisi, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
         }
+        public int Oku_TamSayı(string ElemanAdıDizisi, int BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
+        {
+            return Depo_Ayarlar.Oku_TamSayı(ElemanAdıDizisi, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+        }
         public byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
         {
             return Depo_Ayarlar.Oku_BaytDizisi(ElemanAdıDizisi, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
@@ -200,19 +208,27 @@ namespace ArgeMup.HazirKod
 
         public IDepo_Eleman[] Elemanları(string ElemanAdıDizisi)
         {
-            return Bul(ElemanAdıDizisi).Elemanları;
+            IDepo_Eleman bulunan = Bul(ElemanAdıDizisi);
+
+            return bulunan == null ? new IDepo_Eleman[0] : bulunan.Elemanları;
         }
         public string[] İçeriği(string ElemanAdıDizisi)
         {
-            return Bul(ElemanAdıDizisi).İçeriği;
+            IDepo_Eleman bulunan = Bul(ElemanAdıDizisi);
+
+            return bulunan == null ? new string[0] : bulunan.İçeriği;
         }
-        public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false)
+        public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false, bool BağımsızKopyaOluştur = false)
         {
-            return Depo_Ayarlar.Bul(ElemanAdıDizisi, YoksaOluştur);
+            return Depo_Ayarlar.Bul(ElemanAdıDizisi, YoksaOluştur, BağımsızKopyaOluştur);
         }
-        public void Sil(string ElemanAdıDizisi)
+        public void Sil(string ElemanAdıDizisi, bool Sadeceİçeriğini, bool SadeceElemanlarını)
         {
-            Depo_Ayarlar.Sil(ElemanAdıDizisi);
+            Depo_Ayarlar.Sil(ElemanAdıDizisi, Sadeceİçeriğini, SadeceElemanlarını);
+        }
+        public override string ToString()
+        {
+            return Depo_Ayarlar.ToString();
         }
     }
 }

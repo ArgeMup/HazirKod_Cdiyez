@@ -12,7 +12,7 @@ namespace ArgeMup.HazirKod
 {
     public class DoğrulamaKodu 
     {
-        public const string Sürüm = "V1.2";
+        public const string Sürüm = "V1.3";
         public const string DoğrulamaKodu_DosyaAdı = "ArgeMup.HazirKod_Cdiyez.DogrulamaKodu";
 
         public class Üret
@@ -72,36 +72,43 @@ namespace ArgeMup.HazirKod
 
                 return D_HexYazı.BaytDizisinden(çıktı);
             }
-            static public string Klasörden(string KlasörYolu, bool VeYaz)
+            static public string Klasörden(string KlasörYolu, bool VeYaz, SearchOption Kapsamı = SearchOption.AllDirectories, string SihirliKelime = "ArGeMuP")
             {
+                Salkım_ Salkım = new Salkım_
+                {
+                    GörselÇıktı = "",
+                    Kod = "",
+                    SihirliKelime = SihirliKelime
+                };
+
                 KlasörYolu = D_DosyaKlasörAdı.Düzelt(KlasörYolu, false);
 
-                string[] liste_d = Directory.GetFiles(KlasörYolu, "*.*", SearchOption.AllDirectories).Where((biri, içerik) => !biri.EndsWith(DoğrulamaKodu_DosyaAdı)).ToArray();
-                string[] liste_k = Directory.GetDirectories(KlasörYolu, "*", SearchOption.AllDirectories);
+                string[] liste_d = Directory.GetFiles(KlasörYolu, "*.*", Kapsamı).Where((biri, içerik) => !biri.EndsWith(DoğrulamaKodu_DosyaAdı)).ToArray();
+                string[] liste_k = Directory.GetDirectories(KlasörYolu, "*", Kapsamı);
 
-                string GörselÇıktı = "", kod = "";
-                _Ekle_("- ArGeMup Klasör Dosya Doğrulama Aracı", ref kod, ref GörselÇıktı);
-                _Ekle_("- Dosya Sayısı : " + liste_d.Length, ref kod, ref GörselÇıktı);
-                _Ekle_("- Klasör Sayısı : " + liste_k.Length, ref kod, ref GörselÇıktı);
-                _Ekle_("- " + Kendi.Adı + " / V" + Kendi.Sürümü_Dosya, ref kod, ref GörselÇıktı);
-                _Ekle_("- " + D_TarihSaat.Yazıya(DateTime.Now), ref kod, ref GörselÇıktı);
-                _Ekle_("- https://github.com/ArgeMup/HazirKod_Cdiyez", ref kod, ref GörselÇıktı);
+                Salkım.Ekle("- ArGeMup Klasör Dosya Doğrulama Aracı");
+                Salkım.Ekle("- " + (Kapsamı == SearchOption.AllDirectories ? "Tüm alt klasörleriyle birlikte" : "Sadece üst klasör"));
+                Salkım.Ekle("- Dosya Sayısı : " + liste_d.Length);
+                Salkım.Ekle("- Klasör Sayısı : " + liste_k.Length);
+                Salkım.Ekle("- https://github.com/ArgeMup/HazirKod_Cdiyez");
+                Salkım.Ekle("A " + Kendi.Adı + " / V" + Kendi.Sürümü_Dosya);
+                Salkım.Ekle("A " + D_TarihSaat.Yazıya(DateTime.Now));
 
                 foreach (string b in liste_d)
                 {
-                    _Ekle_("D |" + Dosyadan(b) + "|" + b.Substring(KlasörYolu.Length + 1), ref kod, ref GörselÇıktı);
+                    Salkım.Ekle("D |" + Dosyadan(b) + "|" + b.Substring(KlasörYolu.Length + 1));
                 }
 
                 foreach (string b in liste_k)
                 {
-                    _Ekle_("K |" + b.Substring(KlasörYolu.Length + 1), ref kod, ref GörselÇıktı);
+                    Salkım.Ekle("K |" + b.Substring(KlasörYolu.Length + 1));
                 }
 
-                _Ekle_("- " + Yazıdan(kod), ref kod, ref GörselÇıktı);
+                Salkım.Ekle("- " + Yazıdan(Salkım.Kod));
 
-                if (VeYaz) File.WriteAllText(KlasörYolu + "\\" + DoğrulamaKodu_DosyaAdı, GörselÇıktı);
+                if (VeYaz) File.WriteAllText(KlasörYolu + "\\" + DoğrulamaKodu_DosyaAdı, Salkım.GörselÇıktı);
 
-                return GörselÇıktı;
+                return Salkım.Kod;
             }
         }
 
@@ -109,9 +116,16 @@ namespace ArgeMup.HazirKod
         {
             public enum Durum_ { DoğrulamaDosyasıYok = -3, DoğrulamaDosyasıİçeriğiHatalı, Farklı, Aynı = 1, FazlaKlasörVeyaDosyaVar };
 
-            static public Durum_ Klasör(string KlasörYolu, int EşZamanlıİşlemSayısı = 5)
+            static public Durum_ Klasör(string KlasörYolu, SearchOption Kapsamı = SearchOption.AllDirectories, string SihirliKelime = "ArGeMuP", int EşZamanlıİşlemSayısı = 5)
             {
-                KlasörYolu = KlasörYolu.TrimEnd('\\') + "\\";
+                Salkım_ Salkım = new Salkım_
+                {
+                    GörselÇıktı = "",
+                    Kod = "",
+                    SihirliKelime = SihirliKelime
+                };
+
+                KlasörYolu = D_DosyaKlasörAdı.Düzelt(KlasörYolu, false) + "\\";
 
                 if (!File.Exists(KlasörYolu + DoğrulamaKodu_DosyaAdı)) return Durum_.DoğrulamaDosyasıYok;
                 string[] dosya_içeriği = File.ReadAllLines(KlasörYolu + DoğrulamaKodu_DosyaAdı);
@@ -120,10 +134,9 @@ namespace ArgeMup.HazirKod
 
                 try
                 {
-                    string GörselÇıktı = "", kod = "";
                     for (int i = 0; i < dosya_içeriği.Length - 1; i++)
                     {
-                        _Ekle_(dosya_içeriği[i], ref kod, ref GörselÇıktı);
+                        Salkım.Ekle(dosya_içeriği[i]);
                         
                         if (dosya_içeriği[i].StartsWith("D |"))
                         {
@@ -144,7 +157,7 @@ namespace ArgeMup.HazirKod
                         }
                     }
 
-                    if (Üret.Yazıdan(kod) != dosya_içeriği[dosya_içeriği.Length - 1].Remove(0, 2)) return Durum_.DoğrulamaDosyasıİçeriğiHatalı;
+                    if (Üret.Yazıdan(Salkım.Kod) != dosya_içeriği[dosya_içeriği.Length - 1].Remove(0, 2)) return Durum_.DoğrulamaDosyasıİçeriğiHatalı;
                 }
                 catch (Exception) { return Durum_.DoğrulamaDosyasıİçeriğiHatalı; }
 
@@ -162,8 +175,8 @@ namespace ArgeMup.HazirKod
                     if (!Directory.Exists(şimdiki)) return Durum_.Farklı;
                 }
 
-                string[] dsy_l = Directory.GetFiles(KlasörYolu, "*.*", SearchOption.AllDirectories);
-                string[] kls_l = Directory.GetDirectories(KlasörYolu, "*", SearchOption.AllDirectories);
+                string[] dsy_l = Directory.GetFiles(KlasörYolu, "*.*", Kapsamı);
+                string[] kls_l = Directory.GetDirectories(KlasörYolu, "*", Kapsamı);
                 
                 while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
                 if (dsy_sayac_hata != 0) return Durum_.Farklı;
@@ -183,11 +196,18 @@ namespace ArgeMup.HazirKod
             }
         }
 
-        static void _Ekle_(string Girdi, ref string Kod, ref string GörselÇıktı)
+        class Salkım_
         {
-            Kod = Üret.Yazıdan(Kod + Üret.Yazıdan(Girdi));
+            public string Kod;
+            public string GörselÇıktı;
+            public string SihirliKelime;
 
-            GörselÇıktı += Girdi + Environment.NewLine; 
+            public void Ekle(string Girdi)
+            {
+                if (Girdi[0] != 'A') Kod = Üret.Yazıdan(SihirliKelime + Kod + Girdi);
+
+                GörselÇıktı += Girdi + Environment.NewLine;
+            }
         }
     }
 }

@@ -236,7 +236,7 @@ namespace ArgeMup.HazirKod
             return kls.Dosya_Sil_SayısınaGöre(AzamiToplamDosyaSayısı, EşZamanlıİşlemSayısı);
 		}
         public static bool Sil_SayısınaVeBoyutunaGöre(string Klasörü, int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt, string Filtre, int EşZamanlıİşlemSayısı = 5)
-            {
+        {
             Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true, EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_SayısınaVeBoyutunaGöre(AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt, EşZamanlıİşlemSayısı);
         }

@@ -69,7 +69,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
     public static class D_Sayı
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         public static readonly char ayraç_kesir = Convert.ToChar(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
         public static readonly char ayraç_tamsayı = Convert.ToChar(CultureInfo.InvariantCulture.NumberFormat.NumberGroupSeparator);
@@ -79,19 +79,76 @@ namespace ArgeMup.HazirKod.Dönüştürme
             {
                 if (TamKontrol)
                 {
-                    //tamsayı   .
-                    //kesir     ,
-                    if (Girdi.LastIndexOf(ayraç_tamsayı) > Girdi.LastIndexOf(ayraç_kesir))
+                    //tamsayı   ,
+                    //kesir     .
+                    int adet_kesir = Girdi.Count(x => x == ayraç_kesir);
+                    int adet_tamsayı = Girdi.Count(x => x == ayraç_tamsayı);
+
+                    if (adet_tamsayı == 0)
                     {
-                        //100,000,000.2
-                        Girdi = Girdi.Replace(ayraç_kesir.ToString(), "");
-                        //100000000.2
-                        Girdi = Girdi.Replace(ayraç_tamsayı, ayraç_kesir);
-                        //100000000,2
+                        if (adet_kesir > 1)
+                        {
+                            //100.200.300.400
+                            Girdi = Girdi.Replace(ayraç_kesir.ToString(), "");
+                            //100200300400
+                        }
+                        else if (adet_kesir == 1)
+                        {
+                            if (Girdi.IndexOf(ayraç_kesir) == 0)
+                            {
+                                //.100
+                                Girdi = "0" + Girdi;
+                                //0.100
+                            }
+                            //else
+                            //{
+                            //    //100.200
+                            //}
+                        }
+                    }
+                    else if (adet_kesir == 0)
+                    {
+                        if (adet_tamsayı > 1)
+                        {
+                            //100,200,300,400
+                            Girdi = Girdi.Replace(ayraç_tamsayı.ToString(), "");
+                            //100200300400
+                        }
+                        else if (adet_tamsayı == 1)
+                        {
+                            if (Girdi.IndexOf(ayraç_tamsayı) == 0)
+                            {
+                                //,100
+                                Girdi = "0" + Girdi;
+                                //0,100
+                            }
+                            
+                            //100,200
+                            Girdi = Girdi.Replace(ayraç_tamsayı, ayraç_kesir);
+                            //100.200
+                        }
+                    }
+                    else 
+                    {
+                        if (adet_tamsayı == 1 && Girdi.LastIndexOf(ayraç_tamsayı) > Girdi.LastIndexOf(ayraç_kesir))
+	                    {
+                            //100.200.300,400
+                            Girdi = Girdi.Replace(ayraç_kesir.ToString(), "");
+                            //100200300,400
+                            Girdi = Girdi.Replace(ayraç_tamsayı, ayraç_kesir);
+                            //100200300.400
+                        }
+                        else if (adet_kesir == 1 && Girdi.LastIndexOf(ayraç_kesir) > Girdi.LastIndexOf(ayraç_tamsayı))
+                        {
+                            //100,200,300.400
+                            Girdi = Girdi.Replace(ayraç_tamsayı.ToString(), "");
+                            //100200300.400
+                        }
+                        else Girdi = Girdi.Replace(ayraç_tamsayı.ToString(), "+" + ayraç_tamsayı + "+").Replace(ayraç_kesir.ToString(), "-" + ayraç_kesir + "-");
                     }
                 }
 
-                if (double.TryParse(Girdi, NumberStyles.AllowThousands | NumberStyles.Float, CultureInfo.InvariantCulture, out double Çıktı))
+                if (double.TryParse(Girdi, NumberStyles.Float, CultureInfo.InvariantCulture, out double Çıktı))
                 {
                     return Çıktı;
                 }
@@ -102,7 +159,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
                     bool Enazbirkarakterbulundu = false;
                     foreach (char krt in Girdi)
                     {
-                        if (krt == ayraç_kesir || krt == '+' || krt == '-' || (krt >= '0' && krt <= '9'))
+                        if (krt == ayraç_tamsayı || krt == ayraç_kesir || krt == '+' || krt == '-' || (krt >= '0' && krt <= '9'))
                         {
                             yeni += krt;
                             Enazbirkarakterbulundu = true;
@@ -187,6 +244,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
         public const string Şablon_Tarih_Saat_MiliSaniye = "dd.MM.yyyy HH:mm:ss.fff";
         public const string Şablon_Tarih_Saat = "dd.MM.yyyy HH:mm:ss";
         public const string Şablon_DosyaAdı = "dd_MM_yyyy_HH_mm_ss";
+        public const string Şablon_DosyaAdı2 = "yyyy_MM_dd_HH_mm_ss_fff";
         
         public static string Yazıya(DateTime Girdi, string Şablon = Şablon_Tarih_Saat_MiliSaniye, CultureInfo Kültür = null)
         {

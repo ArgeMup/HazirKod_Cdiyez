@@ -80,11 +80,11 @@ namespace ArgeMup.HazirKod
 
             Ekle_(içerik, Seviyesi);
         }
-        public static void Ekle(byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, Seviye Seviyesi = Seviye.Geveze, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static void Ekle(byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, Seviye Seviyesi = Seviye.Geveze, string ÖnYazı = null, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
         {
             if (Seviyesi > GenelSeviye) return;
 
-            string başlık = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " ";
+            string başlık = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " " + ÖnYazı;
 
             if (BaytDizisi == null) Ekle_(başlık + "null", Seviyesi);
             else

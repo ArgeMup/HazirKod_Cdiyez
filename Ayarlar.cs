@@ -206,18 +206,69 @@ namespace ArgeMup.HazirKod
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public IDepo_Eleman[] Elemanları(string ElemanAdıDizisi)
-        {
-            IDepo_Eleman bulunan = Bul(ElemanAdıDizisi);
-
-            return bulunan == null ? new IDepo_Eleman[0] : bulunan.Elemanları;
+        /// <summary>
+        /// İçeriği
+        /// </summary>
+        public string this[int SıraNo]
+        { 
+            get
+            {
+                return Depo_Ayarlar[SıraNo];
+            }
+            set
+            {
+                Depo_Ayarlar[SıraNo] = value;
+            }
         }
-        public string[] İçeriği(string ElemanAdıDizisi)
-        {
-            IDepo_Eleman bulunan = Bul(ElemanAdıDizisi);
-
-            return bulunan == null ? new string[0] : bulunan.İçeriği;
+        /// <summary>
+        /// Tüm İçeriği
+        /// </summary>
+        public string[] İçeriği
+        { 
+            get
+            {
+                return Depo_Ayarlar.İçeriği;
+            }
+            set
+            {
+                Depo_Ayarlar.İçeriği = value;
+            }
         }
+        /// <summary>
+        /// Elemanı
+        /// </summary>
+        public IDepo_Eleman this[string ElemanAdıDizisi]
+        { 
+            get
+            {
+                return Depo_Ayarlar[ElemanAdıDizisi];
+            }
+        }
+        /// <summary>
+        /// Tüm Elemanları
+        /// </summary>
+        public IDepo_Eleman[] Elemanları
+        { 
+            get
+            {
+                return Depo_Ayarlar.Elemanları;
+            }
+        }
+        /// <summary>
+        /// Elemanın İçeriği 
+        /// </summary>
+        public string this[string ElemanAdıDizisi, int SıraNo]
+        {
+            get 
+            {
+                return Depo_Ayarlar[ElemanAdıDizisi, SıraNo];
+            }
+            set
+            {
+                Depo_Ayarlar[ElemanAdıDizisi, SıraNo] = value;
+            }
+        }
+
         public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false, bool BağımsızKopyaOluştur = false)
         {
             return Depo_Ayarlar.Bul(ElemanAdıDizisi, YoksaOluştur, BağımsızKopyaOluştur);

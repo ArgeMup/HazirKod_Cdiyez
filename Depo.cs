@@ -14,9 +14,26 @@ namespace ArgeMup.HazirKod
         /// <summary>
         /// İçeriği
         /// </summary>
-        string this[int i] { get; set; } //İçeriği
+        string this[int SıraNo] { get; set; }
+        /// <summary>
+        /// Tüm İçeriği
+        /// </summary>
         string[] İçeriği { get; set; }
+        /// <summary>
+        /// Elemanı
+        /// </summary>
+        IDepo_Eleman this[string ElemanAdıDizisi] { get; }
+        /// <summary>
+        /// Tüm Elemanları
+        /// </summary>
         IDepo_Eleman[] Elemanları { get; }
+        /// <summary>
+        /// Elemanın İçeriği 
+        /// </summary>
+        string this[string ElemanAdıDizisi, int SıraNo] { get; set; }
+        /// <summary>
+        /// YazıyaDönüştür aşamasında eleneceğini belirtir
+        /// </summary>
         bool İçiBoşOlduğuİçinSilinecek { get; }
 
         /// <param name="ElemanAdıDizisi">Ayraçlar.ElemanAdıDizisi karakteri / ile ayrılmış sıralı eleman göstergesi E1/E2/E3 ile E1 içindeki E2 içindeki E3 anlaşılır</param>
@@ -105,6 +122,19 @@ namespace ArgeMup.HazirKod
                 else _EnAzBir_ElemanAdıVeyaİçeriği_Değişti = false;
             }
         }
+        /// <summary>
+        /// Elemanı
+        /// </summary>
+        public IDepo_Eleman this[string ElemanAdıDizisi]
+        {
+            get
+            {
+                return Bul(ElemanAdıDizisi, true, false);
+            }
+        }
+        /// <summary>
+        /// Tüm Elemanları
+        /// </summary>
         public IDepo_Eleman[] Elemanları
         {
             get
@@ -112,6 +142,20 @@ namespace ArgeMup.HazirKod
                 if (_Elemanları == null) return new IDepo_Eleman[0];
 
                 return _Elemanları;
+            }
+        }
+        /// <summary>
+        /// Elemanın İçeriği 
+        /// </summary>
+        public string this[string ElemanAdıDizisi, int SıraNo]
+        {
+            get
+            {
+                return Bul(ElemanAdıDizisi, true, false)[SıraNo];
+            }
+            set
+            {
+                Bul(ElemanAdıDizisi, true, false)[SıraNo] = value;
             }
         }
 
@@ -438,12 +482,12 @@ namespace ArgeMup.HazirKod
                     }
                 }
             }
-            public string this[int i] //içeriği
+            public string this[int SıraNo] //içeriği
             {
                 get
                 {
-                    if (_İçeriği == null || i >= _İçeriği.Length) return null;
-                    else return _İçeriği[i];
+                    if (_İçeriği == null || SıraNo >= _İçeriği.Length) return null;
+                    else return _İçeriği[SıraNo];
                 }
                 set
                 {
@@ -453,23 +497,23 @@ namespace ArgeMup.HazirKod
                     {
                         if (value == null) return;
 
-                        _İçeriği = new string[i + 1];
+                        _İçeriği = new string[SıraNo + 1];
                     }
-                    else if (i >= _İçeriği.Length)
+                    else if (SıraNo >= _İçeriği.Length)
                     {
                         if (value == null) return;
 
-                        Array.Resize(ref _İçeriği, i + 1);
+                        Array.Resize(ref _İçeriği, SıraNo + 1);
                     }
 
-                    if (_İçeriği[i] != value)
+                    if (_İçeriği[SıraNo] != value)
                     {
-                        _İçeriği[i] = value;
+                        _İçeriği[SıraNo] = value;
                         _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
                     }
                 }
             }
-            public string[] İçeriği
+            public string[] İçeriği //Tüm İçeriği
             {
                 get
                 {
@@ -482,12 +526,30 @@ namespace ArgeMup.HazirKod
                     _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
                 }
             }
-            public IDepo_Eleman[] Elemanları
+            public IDepo_Eleman this[string ElemanAdıDizisi] //Elemanı
+            {
+                get
+                {
+                    return Bul(ElemanAdıDizisi, true, false); 
+                }
+            }
+            public IDepo_Eleman[] Elemanları //Tüm Elemanları
             {
                 get
                 {
                     if (_Elemanları == null) return new IDepo_Eleman[0];
                     else return _Elemanları;
+                }
+            }
+            public string this[string ElemanAdıDizisi, int SıraNo] //Elemanın İçeriği 
+            {
+                get
+                {
+                    return Bul(ElemanAdıDizisi, true, false)[SıraNo];
+                }
+                set
+                {
+                    Bul(ElemanAdıDizisi, true, false)[SıraNo] = value;
                 }
             }
             public bool İçiBoşOlduğuİçinSilinecek
@@ -829,6 +891,19 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                 else Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = false;
             }
         }
+        /// <summary>
+        /// Elemanı
+        /// </summary>
+        public IDepo_Eleman this[string ElemanAdıDizisi]
+        {
+            get
+            {
+                return Bul(ElemanAdıDizisi, true, false);
+            }
+        }
+        /// <summary>
+        /// Tüm Elemanları
+        /// </summary>
         public IDepo_Eleman[] Elemanları
         {
             get
@@ -849,6 +924,20 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                 Kilit.ReleaseMutex();
 
                 return elemanlar;
+            }
+        }
+        /// <summary>
+        /// Elemanın İçeriği 
+        /// </summary>
+        public string this[string ElemanAdıDizisi, int SıraNo]
+        {
+            get
+            {
+                return Bul(ElemanAdıDizisi, true, false)[SıraNo];
+            }
+            set
+            {
+                Bul(ElemanAdıDizisi, true, false)[SıraNo] = value;
             }
         }
 
@@ -943,13 +1032,13 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                     Depo.Kilit.ReleaseMutex();
                 }
             }
-            public string this[int i] //içeriği
+            public string this[int SıraNo] //içeriği
             {
                 get
                 {
                     if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
-                    string okunan = AsılEleman[i];
+                    string okunan = AsılEleman[SıraNo];
 
                     Depo.Kilit.ReleaseMutex();
 
@@ -959,13 +1048,13 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                 {
                     if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
-                    AsılEleman[i] = value;
+                    AsılEleman[SıraNo] = value;
                     Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
 
                     Depo.Kilit.ReleaseMutex();
                 }
             }
-            public string[] İçeriği
+            public string[] İçeriği //Tüm İçeriği
             {
                 get
                 {
@@ -987,7 +1076,14 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                     Depo.Kilit.ReleaseMutex();
                 }
             }
-            public IDepo_Eleman[] Elemanları
+            public IDepo_Eleman this[string ElemanAdıDizisi] //Elemanı
+            {
+                get
+                {
+                    return Bul(ElemanAdıDizisi, true, false);
+                }
+            }
+            public IDepo_Eleman[] Elemanları //Tüm Elemanları
             {
                 get
                 {
@@ -1007,6 +1103,17 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                     Depo.Kilit.ReleaseMutex();
 
                     return elemanlar;
+                }
+            }
+            public string this[string ElemanAdıDizisi, int SıraNo] //Elemanın İçeriği 
+            {
+                get
+                {
+                    return Bul(ElemanAdıDizisi, true, false)[SıraNo];
+                }
+                set
+                {
+                    Bul(ElemanAdıDizisi, true, false)[SıraNo] = value;
                 }
             }
             public bool İçiBoşOlduğuİçinSilinecek

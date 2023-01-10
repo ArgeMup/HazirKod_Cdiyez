@@ -45,9 +45,9 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return DaÇoKa.Düzelt(Girdi, Şifre);
         }
 
-        public static string Günlük(this string Girdi, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static string Günlük(this string Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
         {
-            ArgeMup.HazirKod.Günlük.Ekle(Girdi, Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
+            ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + Girdi, Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
             return Girdi;
         }
     }
@@ -61,9 +61,9 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return Girdi.ToString(Şablon);
         }
 
-        public static int Günlük(this int Girdi, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static int Günlük(this int Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
         {
-            ArgeMup.HazirKod.Günlük.Ekle(Girdi.ToString(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
+            ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + Girdi.Yazıya(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
             return Girdi;
         }
     }
@@ -77,9 +77,9 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return Girdi.ToString(Şablon);
         }
 
-        public static uint Günlük(this uint Girdi, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static uint Günlük(this uint Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
         {
-            ArgeMup.HazirKod.Günlük.Ekle(Girdi.ToString(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
+            ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + Girdi.Yazıya(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
             return Girdi;
         }
     }
@@ -93,9 +93,9 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return ArgeMup.HazirKod.Dönüştürme.D_Sayı.Yazıya(Girdi);
         }
 
-        public static double Günlük(this double Girdi, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static double Günlük(this double Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
         {
-            ArgeMup.HazirKod.Günlük.Ekle(Girdi.ToString(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
+            ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + Girdi.Yazıya(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
             return Girdi;
         }
     }
@@ -113,9 +113,9 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return ArgeMup.HazirKod.Dönüştürme.D_HexYazı.BaytDizisinden(Girdi, Adet, BaşlangıçKonumu);
         }
 
-        public static byte[] Günlük(this byte[] Girdi, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static byte[] Günlük(this byte[] Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
         {
-            ArgeMup.HazirKod.Günlük.Ekle(Girdi, int.MinValue, 0, Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
+            ArgeMup.HazirKod.Günlük.Ekle(Girdi, int.MinValue, 0, Seviyesi, ÖnYazı, ÇağıranDosya, ÇağıranSatırNo);
             return Girdi;
         }
     }
@@ -129,9 +129,9 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return ArgeMup.HazirKod.Dönüştürme.D_TarihSaat.Yazıya(Girdi, Şablon, Kültür);
         }
 
-        public static System.DateTime Günlük(this System.DateTime Girdi, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static System.DateTime Günlük(this System.DateTime Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
         {
-            ArgeMup.HazirKod.Günlük.Ekle(Girdi.Yazıya(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
+            ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + Girdi.Yazıya(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
             return Girdi;
         }
     }
@@ -140,9 +140,9 @@ namespace ArgeMup.HazirKod.Ekİşlemler
     {
         public const string Sürüm = "V1.0";
 
-        public static object Günlük(this object Girdi, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static object Günlük(this object Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
         {
-            ArgeMup.HazirKod.Günlük.Ekle(Girdi == null ? "null" : Girdi.GetType().FullName + " " + Girdi.ToString(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
+            ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + (Girdi == null ? "null" : Girdi.GetType().FullName + " " + Girdi.ToString()), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
             return Girdi;
         }
     }
@@ -151,7 +151,7 @@ namespace ArgeMup.HazirKod.Ekİşlemler
     {
         public const string Sürüm = "V1.0";
 
-        public static System.Exception Günlük(this System.Exception Girdi, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.BeklenmeyenDurum, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static System.Exception Günlük(this System.Exception Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.BeklenmeyenDurum, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
         {
             string çıktı = "";
             System.Exception ist = Girdi;
@@ -164,7 +164,7 @@ namespace ArgeMup.HazirKod.Ekİşlemler
                     ist = ist.InnerException;
                 }
 
-                ArgeMup.HazirKod.Günlük.Ekle(çıktı.TrimEnd('|'), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
+                ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + çıktı.TrimEnd('|'), Seviyesi, ÇağıranDosya, ÇağıranSatırNo);
             }
             catch (System.Exception) { }
 

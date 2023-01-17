@@ -12,7 +12,7 @@ namespace ArgeMup.HazirKod
 {
     public class Klasör
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
 
         public static bool Oluştur(string Yolu, bool Düzelt = true)
         {
@@ -45,6 +45,8 @@ namespace ArgeMup.HazirKod
         }
         public static void Sil_İçiBoşOlanları(string Yolu)
         {
+            if (!Directory.Exists(Yolu)) return;
+
             string[] klsler = Directory.GetDirectories(Yolu, "*", SearchOption.AllDirectories);
             for (int i = klsler.Length - 1; i >= 0; i--)
             {

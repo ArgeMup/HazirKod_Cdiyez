@@ -233,7 +233,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
     public static class D_TarihSaat
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         public const string Şablon_UtcZamanFarkı = "zzz";
         public const string Şablon_HaftanınGünü = "ddd";
@@ -270,31 +270,55 @@ namespace ArgeMup.HazirKod.Dönüştürme
         {
             if (!string.IsNullOrEmpty(Girdi))
             {
-            if (Girdi.Length >= Şablon_Tarih_Saat_MiliSaniye.Length)
-            {
-                if (DateTime.TryParseExact(Girdi.Substring(0, Şablon_Tarih_Saat_MiliSaniye.Length), Şablon_Tarih_Saat_MiliSaniye, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime yeni))
+                if (Girdi.Length >= Şablon_Tarih_Saat_MiliSaniye.Length)
                 {
-                    return yeni.ToOADate();
+                    if (DateTime.TryParseExact(Girdi.Substring(0, Şablon_Tarih_Saat_MiliSaniye.Length), Şablon_Tarih_Saat_MiliSaniye, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime yeni))
+                    {
+                        return yeni.ToOADate();
+                    }
                 }
-            }
 
-            if (Girdi.Length >= Şablon_Tarih_Saat.Length)
-            {
-                if (DateTime.TryParseExact(Girdi.Substring(0, Şablon_Tarih_Saat.Length), Şablon_Tarih_Saat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime yeni))
+                if (Girdi.Length >= Şablon_Tarih_Saat.Length)
                 {
-                    return yeni.ToOADate();
+                    if (DateTime.TryParseExact(Girdi.Substring(0, Şablon_Tarih_Saat.Length), Şablon_Tarih_Saat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime yeni))
+                    {
+                        return yeni.ToOADate();
+                    }
                 }
-            }
 
-            if (Girdi.Length >= Şablon_DosyaAdı.Length)
-            {
-                if (DateTime.TryParseExact(Girdi.Substring(0, Şablon_DosyaAdı.Length), Şablon_DosyaAdı, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime yeni))
+                if (Girdi.Length >= Şablon_DosyaAdı.Length)
                 {
-                    return yeni.ToOADate();
+                    if (DateTime.TryParseExact(Girdi.Substring(0, Şablon_DosyaAdı.Length), Şablon_DosyaAdı, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime yeni))
+                    {
+                        return yeni.ToOADate();
+                    }
                 }
-            }
 
-            return D_Sayı.Yazıdan(Girdi);
+                if (Girdi.Length >= Şablon_DosyaAdı2.Length)
+                {
+                    if (DateTime.TryParseExact(Girdi.Substring(0, Şablon_DosyaAdı2.Length), Şablon_DosyaAdı2, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime yeni))
+                    {
+                        return yeni.ToOADate();
+                    }
+                }
+
+                if (Girdi.Length >= Şablon_Tarih.Length)
+                {
+                    if (DateTime.TryParseExact(Girdi.Substring(0, Şablon_Tarih.Length), Şablon_Tarih, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime yeni))
+                    {
+                        return yeni.ToOADate();
+                    }
+                }
+
+                if (Girdi.Length >= Şablon_Saat.Length)
+                {
+                    if (DateTime.TryParseExact(Girdi.Substring(0, Şablon_Saat.Length), Şablon_Saat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime yeni))
+                    {
+                        return yeni.ToOADate();
+                    }
+                }
+
+                return D_Sayı.Yazıdan(Girdi);
             }
 
             throw new Exception(Girdi + " tarihe dönüştürülemiyor");

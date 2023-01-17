@@ -45,6 +45,16 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return DaÇoKa.Düzelt(Girdi, Şifre);
         }
 
+        public static bool BoşMu(this string Girdi, bool BoşluğuGörmezdenGel = false)
+        {
+            if (BoşluğuGörmezdenGel) return string.IsNullOrWhiteSpace(Girdi);
+            else return string.IsNullOrEmpty(Girdi);
+        }
+        public static bool DoluMu(this string Girdi, bool BoşluğuGörmezdenGel = false)
+        {
+            return !BoşMu(Girdi, BoşluğuGörmezdenGel);
+        }
+
         public static string Günlük(this string Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)
         {
             ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + Girdi, Seviyesi, ÇağıranDosya, ÇağıranSatırNo);

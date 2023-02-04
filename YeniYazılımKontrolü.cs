@@ -11,6 +11,7 @@ namespace ArgeMup.HazirKod
     public class YeniYazılımKontrolü_ : IDisposable
     {
     	public string Sürüm = "V1.2";
+        public bool KontrolTamamlandı = false;
         public delegate void YeniYazılımKontrolü_GeriBildirim_(bool Sonuç, string Açıklama);
 
         WebClient İstemci = null;
@@ -19,6 +20,9 @@ namespace ArgeMup.HazirKod
 
         public void Başlat(Uri DosyaKonumu, YeniYazılımKontrolü_GeriBildirim_ GeriBildirim = null)
         {
+            string[] ÖncekiDenemeler = Directory.GetFiles(Directory.GetCurrentDirectory(), "ArgeMuP.HazirKod.YeniYazılımKontrolü.*", SearchOption.TopDirectoryOnly);
+            if (ÖncekiDenemeler != null) foreach (string dsy in ÖncekiDenemeler) Dosya.Sil(dsy);
+
             İstemci = new WebClient();
 
             GeriBildirim_İşlemi = GeriBildirim;
@@ -28,6 +32,7 @@ namespace ArgeMup.HazirKod
         }
         public void Durdur()
         {
+            KontrolTamamlandı = true;
             if (İstemci == null) return;
 
             if (İstemci.IsBusy) İstemci.CancelAsync();

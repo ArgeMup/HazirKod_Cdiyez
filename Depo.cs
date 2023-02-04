@@ -104,7 +104,7 @@ namespace ArgeMup.HazirKod
 
     public class Depo_
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
         public bool EnAzBir_ElemanAdıVeyaİçeriği_Değişti
         {
             get
@@ -588,53 +588,33 @@ namespace ArgeMup.HazirKod
 
             public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
-                try
-                {
-                    return D_Sayı.Yazıdan(Oku(ElemanAdıDizisi, null, SıraNo));
-                }
-                catch (Exception) { }
-
-                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+                string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
+                if (string.IsNullOrEmpty(içerik)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+                else return D_Sayı.Yazıdan(içerik);
             }
             public int Oku_TamSayı(string ElemanAdıDizisi, int BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
-                try
-                {
-                    return int.Parse(Oku(ElemanAdıDizisi, null, SıraNo));
-                }
-                catch (Exception) { }
-
-                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+                string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
+                if (string.IsNullOrEmpty(içerik)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+                else return int.Parse(içerik);
             }
             public byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
-                try
-                {
-                    return D_HexYazı.BaytDizisine(Oku(ElemanAdıDizisi, null, SıraNo));
-                }
-                catch (Exception) { }
-
-                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+                string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
+                if (string.IsNullOrEmpty(içerik)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+                else return D_HexYazı.BaytDizisine(içerik);
             }
             public DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
-                try
-                {
-                    return D_TarihSaat.Tarihe(Oku(ElemanAdıDizisi, null, SıraNo));
-                }
-                catch (Exception) { }
-
-                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+                string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
+                if (string.IsNullOrEmpty(içerik)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+                else return D_TarihSaat.Tarihe(içerik);
             }
             public bool Oku_Bit(string ElemanAdıDizisi, bool BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
-                try
-                {
-                    return bool.Parse(Oku(ElemanAdıDizisi, null, SıraNo));
-                }
-                catch (Exception) { }
-
-                return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+                string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
+                if (string.IsNullOrEmpty(içerik)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+                else return bool.Parse(içerik);
             }
 
             public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur, bool BağımsızKopyaOluştur)

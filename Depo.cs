@@ -1,10 +1,8 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
-using ArgeMup.HazirKod.Dönüştürme;
-using System.Collections.Generic;
 using System;
 using System.Linq;
-using System.Threading;
+using System.Collections.Generic;
 
 namespace ArgeMup.HazirKod
 {
@@ -567,7 +565,7 @@ namespace ArgeMup.HazirKod
 
             public void Yaz(string ElemanAdıDizisi, double Sayı, int SıraNo)
             {
-                Yaz(ElemanAdıDizisi, D_Sayı.Yazıya(Sayı), SıraNo);
+                Yaz(ElemanAdıDizisi, Sayı.ToString(System.Globalization.CultureInfo.InvariantCulture), SıraNo);
             }
             public void Yaz(string ElemanAdıDizisi, int TamSayı, int SıraNo)
             {
@@ -575,11 +573,11 @@ namespace ArgeMup.HazirKod
             }
             public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet, int BaşlangıçKonumu, int SıraNo)
             {
-                Yaz(ElemanAdıDizisi, D_HexYazı.BaytDizisinden(BaytDizisi, Adet, BaşlangıçKonumu), SıraNo);
+                Yaz(ElemanAdıDizisi, Dönüştürme.D_HexYazı.BaytDizisinden(BaytDizisi, Adet, BaşlangıçKonumu), SıraNo);
             }
             public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo)
             {
-                Yaz(ElemanAdıDizisi, D_TarihSaat.Yazıya(TarihSaat), SıraNo);
+                Yaz(ElemanAdıDizisi, TarihSaat.ToString(Dönüştürme.D_TarihSaat.Şablon_Tarih_Saat_MiliSaniye, System.Globalization.CultureInfo.InvariantCulture), SıraNo);
             }
             public void Yaz(string ElemanAdıDizisi, bool Bit, int SıraNo)
             {
@@ -589,32 +587,33 @@ namespace ArgeMup.HazirKod
             public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
                 string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
-                if (string.IsNullOrEmpty(içerik)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-                else return D_Sayı.Yazıdan(içerik);
+                if (double.TryParse(içerik, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double dönüştürülen)) return dönüştürülen;
+                else return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
             }
             public int Oku_TamSayı(string ElemanAdıDizisi, int BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
                 string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
-                if (string.IsNullOrEmpty(içerik)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-                else return int.Parse(içerik);
+                if (int.TryParse(içerik, out int dönüştürülen)) return dönüştürülen;
+                else return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
             }
             public byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
                 string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
-                if (string.IsNullOrEmpty(içerik)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-                else return D_HexYazı.BaytDizisine(içerik);
+                
+                try { return Dönüştürme.D_HexYazı.BaytDizisine(içerik); }
+                catch (Exception) { return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği; }
             }
             public DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
                 string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
-                if (string.IsNullOrEmpty(içerik)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-                else return D_TarihSaat.Tarihe(içerik);
+                if (DateTime.TryParseExact(içerik, Dönüştürme.D_TarihSaat.Şablon_Tarih_Saat_MiliSaniye, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateTime dönüştürülen)) return dönüştürülen;
+                else return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
             }
             public bool Oku_Bit(string ElemanAdıDizisi, bool BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
                 string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
-                if (string.IsNullOrEmpty(içerik)) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
-                else return bool.Parse(içerik);
+                if (bool.TryParse(içerik, out bool dönüştürülen)) return dönüştürülen;
+                else return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
             }
 
             public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur, bool BağımsızKopyaOluştur)
@@ -726,23 +725,23 @@ namespace ArgeMup.HazirKod
         #region Dönüştürme
         public void Yaz(string ElemanAdıDizisi, double Sayı, int SıraNo = 0)
         {
-            Yaz(ElemanAdıDizisi, D_Sayı.Yazıya(Sayı), SıraNo);
+            Bul(ElemanAdıDizisi, true, false).Yaz(null, Sayı, SıraNo);
         }
         public void Yaz(string ElemanAdıDizisi, int TamSayı, int SıraNo = 0)
         {
-            Yaz(ElemanAdıDizisi, TamSayı.ToString(), SıraNo);
+            Bul(ElemanAdıDizisi, true, false).Yaz(null, TamSayı, SıraNo);
         }
         public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, int SıraNo = 0)
         {
-            Yaz(ElemanAdıDizisi, D_HexYazı.BaytDizisinden(BaytDizisi, Adet, BaşlangıçKonumu), SıraNo);
+            Bul(ElemanAdıDizisi, true, false).Yaz(null, BaytDizisi, Adet, BaşlangıçKonumu, SıraNo);
         }
         public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo = 0)
         {
-            Yaz(ElemanAdıDizisi, D_TarihSaat.Yazıya(TarihSaat), SıraNo);
+            Bul(ElemanAdıDizisi, true, false).Yaz(null, TarihSaat, SıraNo);
         }
         public void Yaz(string ElemanAdıDizisi, bool Bit, int SıraNo = 0)
         {
-            Yaz(ElemanAdıDizisi, Bit.ToString(), SıraNo);
+            Bul(ElemanAdıDizisi, true, false).Yaz(null, Bit, SıraNo);
         }
 
         public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
@@ -923,7 +922,7 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
 
         Action<Depo_> GeriBildirimİşlemi_EnAzBir_ElemanAdıVeyaİçeriği_Değişti = null;
         ArgeMup.HazirKod.Depo_ Depo;
-        Mutex Kilit;
+        System.Threading.Mutex Kilit;
         class Depo_Kilitli_Eleman_ : IDepo_Eleman
         {
             IDepo_Eleman AsılEleman;
@@ -1224,7 +1223,7 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
         public Depo_(string YazıOlarakElemanlar = null, Action<Depo_> GeriBildirimİşlemi_EnAzBir_ElemanAdıVeyaİçeriği_Değişti = null)
         {
             Depo = new ArgeMup.HazirKod.Depo_(YazıOlarakElemanlar);
-            Kilit = new Mutex();
+            Kilit = new System.Threading.Mutex();
 
             EnAzBir_ElemanAdıVeyaİçeriği_Değişti = false;
             this.GeriBildirimİşlemi_EnAzBir_ElemanAdıVeyaİçeriği_Değişti = GeriBildirimİşlemi_EnAzBir_ElemanAdıVeyaİçeriği_Değişti;

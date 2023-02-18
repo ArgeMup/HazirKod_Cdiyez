@@ -46,10 +46,11 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
         public static byte[] BaytDizisine(string Girdi)
         {
+            if (string.IsNullOrEmpty(Girdi)) return null;
+
             int BaşlangıçKonumu = 0;
             if (Girdi.StartsWith("0x")) BaşlangıçKonumu += 2;
 
-            if (string.IsNullOrEmpty(Girdi)) return null;
             return Enumerable.Range(BaşlangıçKonumu, Girdi.Length - BaşlangıçKonumu)
                      .Where(x => x % 2 == 0)
                      .Select(x => Convert.ToByte(Girdi.Substring(x, 2), 16))

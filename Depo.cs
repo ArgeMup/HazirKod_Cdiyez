@@ -30,6 +30,12 @@ namespace ArgeMup.HazirKod
         /// </summary>
         string this[string ElemanAdıDizisi, int SıraNo] { get; set; }
         /// <summary>
+        /// Elemanın İçeriğinin Türü ile Birlikte Değerlendirilmesi
+        /// Okuma : BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği türünde bilgi üretir
+        /// Yazma : Yeni değer türünden yazıya dönüştürerek ilerler
+        /// </summary>
+        object this[string ElemanAdıDizisi, int SıraNo, object BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği] { get; set; }
+        /// <summary>
         /// YazıyaDönüştür aşamasında eleneceğini belirtir
         /// </summary>
         bool İçiBoşOlduğuİçinSilinecek { get; }
@@ -149,11 +155,39 @@ namespace ArgeMup.HazirKod
         {
             get
             {
-                return Bul(ElemanAdıDizisi, true, false)[SıraNo];
+                return Oku(ElemanAdıDizisi, null, SıraNo);
             }
             set
             {
-                Bul(ElemanAdıDizisi, true, false)[SıraNo] = value;
+                Yaz(ElemanAdıDizisi, value, SıraNo);
+            }
+        }
+        /// <summary>
+        /// Elemanın İçeriğinin Türü ile Birlikte Değerlendirilmesi
+        /// Okuma : BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği türünde bilgi üretir
+        /// Yazma : Yeni değer türünden yazıya dönüştürerek ilerler
+        /// </summary>
+        public object this[string ElemanAdıDizisi, int SıraNo, object BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği]
+        {
+            get
+            {
+                if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) return Oku(ElemanAdıDizisi, (string)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) return Oku_Sayı(ElemanAdıDizisi, (double)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) return Oku_TamSayı(ElemanAdıDizisi, (int)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) return Oku_Bit(ElemanAdıDizisi, (bool)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) return Oku_TarihSaat(ElemanAdıDizisi, (DateTime)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is byte[]) return Oku_BaytDizisi(ElemanAdıDizisi, (byte[])BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else throw new Exception("Desteklenmeyen tür " + BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği.GetType().FullName);
+            }
+            set
+            {
+                if (value is string) Yaz(ElemanAdıDizisi, (string)value, SıraNo);
+                else if (value is double) Yaz(ElemanAdıDizisi, (double)value, SıraNo);
+                else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
+                else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
+                else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
+                else if (value is byte[]) Yaz(ElemanAdıDizisi, (byte[])value, SıraNo);
+                else throw new Exception("Desteklenmeyen tür " + value.GetType().FullName);
             }
         }
 
@@ -543,11 +577,34 @@ namespace ArgeMup.HazirKod
             {
                 get
                 {
-                    return Bul(ElemanAdıDizisi, true, false)[SıraNo];
+                    return Oku(ElemanAdıDizisi, null, SıraNo);
                 }
                 set
                 {
-                    Bul(ElemanAdıDizisi, true, false)[SıraNo] = value;
+                    Yaz(ElemanAdıDizisi, value, SıraNo);
+                }
+            }
+            public object this[string ElemanAdıDizisi, int SıraNo, object BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği] //Elemanın İçeriğinin Türü ile Birlikte Değerlendirilmesi
+            {
+                get
+                {
+                    if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) return Oku(ElemanAdıDizisi, (string)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) return Oku_Sayı(ElemanAdıDizisi, (double)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) return Oku_TamSayı(ElemanAdıDizisi, (int)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) return Oku_Bit(ElemanAdıDizisi, (bool)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) return Oku_TarihSaat(ElemanAdıDizisi, (DateTime)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is byte[]) return Oku_BaytDizisi(ElemanAdıDizisi, (byte[])BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else throw new Exception("Desteklenmeyen tür " + BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği.GetType().FullName);
+                }
+                set
+                {
+                    if (value is string) Yaz(ElemanAdıDizisi, (string)value, SıraNo);
+                    else if (value is double) Yaz(ElemanAdıDizisi, (double)value, SıraNo);
+                    else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
+                    else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
+                    else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
+                    else if (value is byte[]) Yaz(ElemanAdıDizisi, (byte[])value, int.MinValue, 0, SıraNo);
+                    else throw new Exception("Desteklenmeyen tür " + value.GetType().FullName);
                 }
             }
             public bool İçiBoşOlduğuİçinSilinecek
@@ -626,9 +683,15 @@ namespace ArgeMup.HazirKod
                     bulunan = Bul_Getir(ElemanAdıDizisi);
                 }
 
-                if (bulunan == null || !BağımsızKopyaOluştur) return bulunan;
+                if (!BağımsızKopyaOluştur || bulunan == null) return bulunan;
 
-                return new Depo_(bulunan.YazıyaDönüştür(null)).Elemanları[0];
+                Depo_ Bağımsız_yeni_depo = new Depo_(bulunan.YazıyaDönüştür(null));
+                if (Bağımsız_yeni_depo.Elemanları.Length == 0)
+                {
+                    //Sadece adı olan elemanlardan oluştuğundan (içerik veya elemanı yok) yeni bir nesne oluşturulacak
+                    Bağımsız_yeni_depo.Yaz(bulunan.Adı, "");
+                }
+                return Bağımsız_yeni_depo.Elemanları[0];
             }
             #endregion
         }
@@ -912,11 +975,39 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
         {
             get
             {
-                return Bul(ElemanAdıDizisi, true, false)[SıraNo];
+                return Oku(ElemanAdıDizisi, null, SıraNo);
             }
             set
             {
-                Bul(ElemanAdıDizisi, true, false)[SıraNo] = value;
+                Yaz(ElemanAdıDizisi, value, SıraNo);
+            }
+        }
+        /// <summary>
+        /// Elemanın İçeriğinin Türü ile Birlikte Değerlendirilmesi
+        /// Okuma : BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği türünde bilgi üretir
+        /// Yazma : Yeni değer türünden yazıya dönüştürerek ilerler
+        /// </summary>
+        public object this[string ElemanAdıDizisi, int SıraNo, object BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği]
+        {
+            get
+            {
+                if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) return Oku(ElemanAdıDizisi, (string)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) return Oku_Sayı(ElemanAdıDizisi, (double)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) return Oku_TamSayı(ElemanAdıDizisi, (int)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) return Oku_Bit(ElemanAdıDizisi, (bool)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) return Oku_TarihSaat(ElemanAdıDizisi, (DateTime)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is byte[]) return Oku_BaytDizisi(ElemanAdıDizisi, (byte[])BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else throw new Exception("Desteklenmeyen tür " + BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği.GetType().FullName);
+            }
+            set
+            {
+                if (value is string) Yaz(ElemanAdıDizisi, (string)value, SıraNo);
+                else if (value is double) Yaz(ElemanAdıDizisi, (double)value, SıraNo);
+                else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
+                else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
+                else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
+                else if (value is byte[]) Yaz(ElemanAdıDizisi, (byte[])value, SıraNo);
+                else throw new Exception("Desteklenmeyen tür " + value.GetType().FullName);
             }
         }
 
@@ -1088,11 +1179,34 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
             {
                 get
                 {
-                    return Bul(ElemanAdıDizisi, true, false)[SıraNo];
+                    return Oku(ElemanAdıDizisi, null, SıraNo);
                 }
                 set
                 {
-                    Bul(ElemanAdıDizisi, true, false)[SıraNo] = value;
+                    Yaz(ElemanAdıDizisi, value, SıraNo);
+                }
+            }
+            public object this[string ElemanAdıDizisi, int SıraNo, object BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği] //Elemanın İçeriğinin Türü ile Birlikte Değerlendirilmesi
+            {
+                get
+                {
+                    if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) return Oku(ElemanAdıDizisi, (string)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) return Oku_Sayı(ElemanAdıDizisi, (double)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) return Oku_TamSayı(ElemanAdıDizisi, (int)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) return Oku_Bit(ElemanAdıDizisi, (bool)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) return Oku_TarihSaat(ElemanAdıDizisi, (DateTime)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is byte[]) return Oku_BaytDizisi(ElemanAdıDizisi, (byte[])BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else throw new Exception("Desteklenmeyen tür " + BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği.GetType().FullName);
+                }
+                set
+                {
+                    if (value is string) Yaz(ElemanAdıDizisi, (string)value, SıraNo);
+                    else if (value is double) Yaz(ElemanAdıDizisi, (double)value, SıraNo);
+                    else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
+                    else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
+                    else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
+                    else if (value is byte[]) Yaz(ElemanAdıDizisi, (byte[])value, int.MinValue, 0, SıraNo);
+                    else throw new Exception("Desteklenmeyen tür " + value.GetType().FullName);
                 }
             }
             public bool İçiBoşOlduğuİçinSilinecek

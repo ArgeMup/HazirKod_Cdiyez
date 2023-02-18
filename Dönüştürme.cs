@@ -58,7 +58,8 @@ namespace ArgeMup.HazirKod.Dönüştürme
         }
         public static string BaytDizisinden(byte[] Girdi, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
         {
-            if (Girdi == null) return "";
+            if (Girdi == null || Girdi.Length == 0) return "";
+
             if (Adet == int.MinValue) Adet = Girdi.Length - BaşlangıçKonumu;
             if (Adet > Girdi.Length - BaşlangıçKonumu) Adet = Girdi.Length - BaşlangıçKonumu;
 

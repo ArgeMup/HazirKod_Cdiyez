@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         #endregion
 
         #region İç Kullanım
-        int ErişimNoktası = -1;
+        int ErişimNoktası = -1, Sessizlik_ZamanAşımı_Anı, Sessizlik_ZamanAşımı_msn = 0;
         string IpVeyaAdı = "";
         bool Çalışşsın = true;
 
@@ -33,7 +34,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         StreamWriter Verici = null;
         #endregion
         
-        public Tcpİstemci_(int ErişimNoktası, string IpVeyaAdı = "127.0.0.1", GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000)
+        public Tcpİstemci_(int ErişimNoktası, string IpVeyaAdı = "127.0.0.1", GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, int Sessizlik_ZamanAşımı_msn = 0)
         {
             if (ErişimNoktası < 0) throw new Exception("ErişimNoktası > 0 olmalı");
 
@@ -44,10 +45,11 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             this.SatırSatırGönderVeAl = SatırSatırGönderVeAl;
             this.TekrarDeneme_ZamanAşımı_msn = TekrarDeneme_ZamanAşımı_msn;
             this.BilgiGönderme_ZamanAşımı_msn = BilgiGönderme_ZamanAşımı_msn;
+            this.Sessizlik_ZamanAşımı_msn = Sessizlik_ZamanAşımı_msn;
 
             new Thread(() => Görev_İşlemi_Tcpİstemci()).Start();
         }
-        public Tcpİstemci_(TcpClient İstemci, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000)
+        public Tcpİstemci_(TcpClient İstemci, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, int Sessizlik_ZamanAşımı_msn = 0)
         {
             this.İstemci = İstemci;
             this.IpVeyaAdı = İstemci.Client.RemoteEndPoint.ToString();
@@ -56,6 +58,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             this.SatırSatırGönderVeAl = SatırSatırGönderVeAl;
             this.TekrarDeneme_ZamanAşımı_msn = TekrarDeneme_ZamanAşımı_msn;
             this.BilgiGönderme_ZamanAşımı_msn = BilgiGönderme_ZamanAşımı_msn;
+            this.Sessizlik_ZamanAşımı_msn = Sessizlik_ZamanAşımı_msn;
 
             new Thread(() => Görev_İşlemi_Tcpİstemci()).Start();
         }
@@ -82,6 +85,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                         }
 
                         GeriBildirim_Islemi?.Invoke(IpVeyaAdı, GeriBildirim_Türü_.BağlantıKuruldu, null, Hatırlatıcı);
+
+                        if (Sessizlik_ZamanAşımı_msn > 0) Sessizlik_ZamanAşımı_Anı = Environment.TickCount + Sessizlik_ZamanAşımı_msn;
                     }
 
                     int sayac = 0;
@@ -111,42 +116,48 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                             GeriBildirim_Islemi?.Invoke(IpVeyaAdı, GeriBildirim_Türü_.BilgiGeldi, çıktı, Hatırlatıcı);
 
                             if (sayac++ > 100) { sayac = 0; Thread.Sleep(1); } //cpu yüzdesini düşürmek için
+
+                            if (Sessizlik_ZamanAşımı_msn > 0) Sessizlik_ZamanAşımı_Anı = Environment.TickCount + Sessizlik_ZamanAşımı_msn;
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    int bekleme = TekrarDeneme_ZamanAşımı_msn;
-                    bool yeniden_başlat = true;
-
-                    if (ex.HResult == -2147467259) //bağlantı kurulamadı
+                    if (Sessizlik_ZamanAşımı_msn > 0 && Sessizlik_ZamanAşımı_Anı < Environment.TickCount) Çalışşsın = false;
+                    else
                     {
-                        if (ErişimNoktası < 0)
+                        int bekleme = TekrarDeneme_ZamanAşımı_msn;
+                        bool yeniden_başlat = true;
+
+                        if (ex.HResult == -2147467259) //bağlantı kurulamadı
                         {
-                            Çalışşsın = false;
+                            if (ErişimNoktası < 0)
+                            {
+                                Çalışşsın = false;
+                            }
+                            else
+                            {
+                                GeriBildirim_Islemi?.Invoke(IpVeyaAdı, GeriBildirim_Türü_.BağlantıKurulmasıTekrarDenecek, null, Hatırlatıcı);
+                            }
+                        }
+                        else if (ex.HResult == -2146232800) //cihaz bilgi göndermedi
+                        {
+                            yeniden_başlat = false;
+                            bekleme = 1; //cpu yüzdesini düşürmek için
                         }
                         else
                         {
-                            GeriBildirim_Islemi?.Invoke(IpVeyaAdı, GeriBildirim_Türü_.BağlantıKurulmasıTekrarDenecek, null, Hatırlatıcı);
-                        }
-                    }
-                    else if (ex.HResult == -2146232800) //cihaz bilgi göndermedi
-                    {
-                        yeniden_başlat = false;
-                        bekleme = 1; //cpu yüzdesini düşürmek için
-                    }
-                    else
-                    {
-                        if (ErişimNoktası < 0)
-                        {
-                            Çalışşsın = false;
+                            if (ErişimNoktası < 0)
+                            {
+                                Çalışşsın = false;
+                            }
+
+                            GeriBildirim_Islemi?.Invoke(IpVeyaAdı, GeriBildirim_Türü_.BağlantıKoptu, null, Hatırlatıcı);
                         }
 
-                        GeriBildirim_Islemi?.Invoke(IpVeyaAdı, GeriBildirim_Türü_.BağlantıKoptu, null, Hatırlatıcı);
+                        if (yeniden_başlat) Durdur();
+                        Thread.Sleep(bekleme);
                     }
-
-                    if (yeniden_başlat) Durdur();
-                    Thread.Sleep(bekleme);
                 }
             }
 
@@ -175,7 +186,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         #region IDonanımHaberlleşmesi
         bool IDonanımHaberlleşmesi.BağlantıKurulduMu()
         {
-            return (İstemci == null || Aracı == null) ? false : İstemci.Connected;
+            return İstemci == null ? false : İstemci.Connected;
         }
         void IDonanımHaberlleşmesi.Durdur()
         {
@@ -187,6 +198,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
             Aracı.Write(Bilgi, 0, Bilgi.Length);
             Aracı.Flush();
+
+            if (Sessizlik_ZamanAşımı_msn > 0) Sessizlik_ZamanAşımı_Anı = Environment.TickCount + Sessizlik_ZamanAşımı_msn;
         }
         void IDonanımHaberlleşmesi.Gönder(string Bilgi, string Alıcı)
         {
@@ -194,6 +207,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
             Verici.Write(Bilgi + SatırSonu.Karakteri);
             Verici.Flush();
+
+            if (Sessizlik_ZamanAşımı_msn > 0) Sessizlik_ZamanAşımı_Anı = Environment.TickCount + Sessizlik_ZamanAşımı_msn;
         }
         #endregion
 
@@ -248,7 +263,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         #endregion
 
         #region İç Kullanım
-        int ErişimNoktası;
+        int ErişimNoktası, Sessizlik_ZamanAşımı_msn;
         bool Çalışşsın = true;
         bool SadeceYerel = true;
 
@@ -258,7 +273,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         Dictionary<string, IDonanımHaberlleşmesi> İstemciler = new Dictionary<string, IDonanımHaberlleşmesi>();
         #endregion
 
-        public TcpSunucu_(int ErişimNoktası, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, bool SadeceYerel = true)
+        public TcpSunucu_(int ErişimNoktası, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, bool SadeceYerel = true, int Sessizlik_ZamanAşımı_msn = 0)
         {
             this.ErişimNoktası = ErişimNoktası;
             this.GeriBildirim_Islemi = GeriBildirim_Islemi;
@@ -267,9 +282,21 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             this.TekrarDeneme_ZamanAşımı_msn = TekrarDeneme_ZamanAşımı_msn;
             this.BilgiGönderme_ZamanAşımı_msn = BilgiGönderme_ZamanAşımı_msn;
             this.SadeceYerel = SadeceYerel;
+            this.Sessizlik_ZamanAşımı_msn = Sessizlik_ZamanAşımı_msn;
 
             new Thread(() => Görev_İşlemi_TcpSunucu()).Start();
         }
+        public int EtkinErişimNoktası()
+        {
+            if (Sunucu == null) return 0;
+
+            return ((IPEndPoint)Sunucu.LocalEndpoint).Port;
+        }
+        public void Durdur(string Alıcı)
+        {
+            if (İstemciler.ContainsKey(Alıcı)) İstemciler[Alıcı].Durdur();
+        }
+
         void Görev_İşlemi_TcpSunucu()
         {
             while (Çalışşsın)
@@ -282,36 +309,22 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                         Sunucu.Start();
                     }
 
-                    if (Sunucu.Pending())
+                    TcpClient gelen = Sunucu.AcceptTcpClient();
+                    Tcpİstemci_ Tcpİstemci = new Tcpİstemci_(gelen, GeriBildirim_Islemi, Hatırlatıcı, SatırSatırGönderVeAl, TekrarDeneme_ZamanAşımı_msn, BilgiGönderme_ZamanAşımı_msn, Sessizlik_ZamanAşımı_msn);
+                    İstemciler.Add(gelen.Client.RemoteEndPoint.ToString(), Tcpİstemci);
+
+                    KeyValuePair<string, IDonanımHaberlleşmesi>[] BağlantısıKopanlar = İstemciler.Where(x => !x.Value.BağlantıKurulduMu()).ToArray();
+                    foreach (var biri in BağlantısıKopanlar)
                     {
-                        TcpClient gelen = Sunucu.AcceptTcpClient();
-                        Tcpİstemci_ Tcpİstemci = new Tcpİstemci_(gelen, GeriBildirim_Islemi, Hatırlatıcı, SatırSatırGönderVeAl, TekrarDeneme_ZamanAşımı_msn, BilgiGönderme_ZamanAşımı_msn);
-
-                        İstemciler.Add(gelen.Client.RemoteEndPoint.ToString(), Tcpİstemci);
-                    }
-                    else
-                    {
-                        Thread.Sleep(TekrarDeneme_ZamanAşımı_msn);
-
-                        GeriBildirim_Islemi?.Invoke(ErişimNoktası.ToString(), GeriBildirim_Türü_.BağlantıKurulmasıTekrarDenecek, null, Hatırlatıcı);
-
-                        YenidenDene:
-                        foreach (var biri in İstemciler)
-                        {
-                            if (!biri.Value.BağlantıKurulduMu())
-                            {
-                                biri.Value.Durdur();
-                                İstemciler.Remove(biri.Key);
-                                goto YenidenDene;
-                            }
-                        }
+                        biri.Value.Durdur();
+                        İstemciler.Remove(biri.Key);
                     }
                 }
                 catch (Exception)
                 {
                     Durdur();
 
-                    Thread.Sleep(TekrarDeneme_ZamanAşımı_msn);
+                    if (Çalışşsın) Thread.Sleep(1000);
                 }
             }
 
@@ -323,7 +336,6 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         {
             if (TamamenDurdur)
             {
-                TekrarDeneme_ZamanAşımı_msn = 1;
                 Çalışşsın = false;
 
                 foreach (var biri in İstemciler.Values)
@@ -367,13 +379,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                 throw new Exception("Alıcı ile bağlantı koptuğu için gönderilemedi");
             }
         }
-        public int EtkinErişimNoktası()
-        {
-            if (Sunucu == null) return 0;
-
-            return ((IPEndPoint)Sunucu.LocalEndpoint).Port;
-        }
-
+        
         #region IDonanımHaberlleşmesi
         bool IDonanımHaberlleşmesi.BağlantıKurulduMu()
         {

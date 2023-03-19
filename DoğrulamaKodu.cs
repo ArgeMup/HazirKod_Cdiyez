@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using ArgeMup.HazirKod.ArkaPlan;
 using ArgeMup.HazirKod.Dönüştürme;
 
@@ -178,7 +177,7 @@ namespace ArgeMup.HazirKod
                 string[] dsy_l = Directory.GetFiles(KlasörYolu, "*.*", Kapsamı);
                 string[] kls_l = Directory.GetDirectories(KlasörYolu, "*", Kapsamı);
                 
-                while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+                while (!ö.TümüÖğütüldüMü()) System.Threading.Thread.Sleep(5);
                 if (dsy_sayac_hata != 0) return Durum_.Farklı;
 
                 if (Dosyalar.Count  != dsy_l.Length - 1 /*DoğrulamaKodu_DosyaAdı*/ ||
@@ -191,7 +190,7 @@ namespace ArgeMup.HazirKod
                     string şimdiki = KlasörYolu + dsy.Key;
 
                     if (!File.Exists(şimdiki) ||
-                        Üret.Dosyadan(şimdiki) != dsy.Value) Interlocked.Increment(ref dsy_sayac_hata);
+                        Üret.Dosyadan(şimdiki) != dsy.Value) System.Threading.Interlocked.Increment(ref dsy_sayac_hata);
                 }
             }
         }

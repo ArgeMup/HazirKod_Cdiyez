@@ -71,28 +71,28 @@ namespace ArgeMup.HazirKod
             }
         }
         
-        public static void Ekle(string Mesaj, Seviye Seviyesi = Seviye.Geveze, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static void Ekle(string Mesaj, Seviye Seviyesi = Seviye.Geveze, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0, bool Hemen = false)
         {
             if (Seviyesi > GenelSeviye) return;
             if (Mesaj == null) Mesaj = "";
 
             string içerik = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " " + Mesaj.Replace("\r\n", "|").Replace('\r', '|').Replace('\n', '|');
 
-            Ekle_(içerik, Seviyesi);
+            Ekle_(içerik, Seviyesi, Hemen);
         }
-        public static void Ekle(byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, Seviye Seviyesi = Seviye.Geveze, string ÖnYazı = null, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0)
+        public static void Ekle(byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, Seviye Seviyesi = Seviye.Geveze, string ÖnYazı = null, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0, bool Hemen = false)
         {
             if (Seviyesi > GenelSeviye) return;
 
             string başlık = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " " + ÖnYazı;
 
-            if (BaytDizisi == null) Ekle_(başlık + "null", Seviyesi);
+            if (BaytDizisi == null) Ekle_(başlık + "null", Seviyesi, Hemen);
             else
             {
                 if (Adet == int.MinValue) Adet = BaytDizisi.Length - BaşlangıçKonumu;
                 if (Adet > BaytDizisi.Length - BaşlangıçKonumu) Adet = BaytDizisi.Length - BaşlangıçKonumu;
                 
-                if (Adet < 0) Ekle_(başlık + "dizideki " + Adet + " kadar bilginin yazdırılması mümkün olmadığından atlandı", Seviyesi);
+                if (Adet < 0) Ekle_(başlık + "dizideki " + Adet + " kadar bilginin yazdırılması mümkün olmadığından atlandı", Seviyesi, Hemen);
                 else
                 {
                     string içerik = başlık + "[" + BaşlangıçKonumu + " - " + (BaşlangıçKonumu + Adet - 1) + "] : " + Adet + " Hex | Aralık | Ascii" + Environment.NewLine;
@@ -124,11 +124,11 @@ namespace ArgeMup.HazirKod
                         Adet -= şimdiki_adet;
                     }
 
-                    Ekle_(içerik.TrimEnd(Environment.NewLine.ToCharArray()), Seviyesi);
+                    Ekle_(içerik.TrimEnd(Environment.NewLine.ToCharArray()), Seviyesi, Hemen);
                 }
             }
         }
-        static void Ekle_(string Mesaj, Seviye Seviyesi)
+        static void Ekle_(string Mesaj, Seviye Seviyesi, bool Hemen)
         {
             switch (Seviyesi)
             {
@@ -141,9 +141,17 @@ namespace ArgeMup.HazirKod
 
             Console.WriteLine(Mesaj);
 
-            if (Dosyalama != null) Dosyalama.Ekle(Mesaj);
+            if (Dosyalama != null)
+            {
+                if (Hemen) İşlem_Dosyalama(Mesaj, null);
+                else Dosyalama.Ekle(Mesaj);
+            }
 
-            if (UdpSunucusu != null) UdpSunucusu.Ekle(Mesaj);
+            if (UdpSunucusu != null)
+            {
+                if (Hemen) İşlem_UdpSunucusu(Mesaj, null);  
+                else UdpSunucusu.Ekle(Mesaj);
+            }
         }
 
         #region Öğütücü

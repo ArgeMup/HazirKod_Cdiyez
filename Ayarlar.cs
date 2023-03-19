@@ -261,11 +261,11 @@ namespace ArgeMup.HazirKod
         {
             get
             {
-                return Oku(ElemanAdıDizisi, null, SıraNo);
+                return Depo_Ayarlar[ElemanAdıDizisi, SıraNo];
             }
             set
             {
-                Yaz(ElemanAdıDizisi, value, SıraNo);
+                Depo_Ayarlar[ElemanAdıDizisi, SıraNo] = value;
             }
         }
         /// <summary>
@@ -277,23 +277,11 @@ namespace ArgeMup.HazirKod
         {
             get
             {
-                if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) return Oku(ElemanAdıDizisi, (string)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
-                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) return Oku_Sayı(ElemanAdıDizisi, (double)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
-                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) return Oku_TamSayı(ElemanAdıDizisi, (int)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
-                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) return Oku_Bit(ElemanAdıDizisi, (bool)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
-                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) return Oku_TarihSaat(ElemanAdıDizisi, (DateTime)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
-                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is byte[]) return Oku_BaytDizisi(ElemanAdıDizisi, (byte[])BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
-                else throw new Exception("Desteklenmeyen tür " + BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği.GetType().FullName);
+                return Depo_Ayarlar[ElemanAdıDizisi, SıraNo, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği];
             }
             set
             {
-                if (value is string) Yaz(ElemanAdıDizisi, (string)value, SıraNo);
-                else if (value is double) Yaz(ElemanAdıDizisi, (double)value, SıraNo);
-                else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
-                else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
-                else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
-                else if (value is byte[]) Yaz(ElemanAdıDizisi, (byte[])value, SıraNo);
-                else throw new Exception("Desteklenmeyen tür " + value.GetType().FullName);
+                Depo_Ayarlar[ElemanAdıDizisi, SıraNo, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği] = value;
             }
         }
 
@@ -304,6 +292,18 @@ namespace ArgeMup.HazirKod
         public void Sil(string ElemanAdıDizisi, bool Sadeceİçeriğini, bool SadeceElemanlarını)
         {
             Depo_Ayarlar.Sil(ElemanAdıDizisi, Sadeceİçeriğini, SadeceElemanlarını);
+        }
+        /// <summary>
+        /// ElemanAdıDizisi ile seçilen elemana ait içerik veya alt elemanları sıralamak için kullanılabilir
+        /// EnAzBir_ElemanAdıVeyaİçeriği_Değişti bayrağını mutlaka kurar
+        /// </summary>
+        /// <param name="ElemanAdıDizisi">İstenilen elemanın adı</param>
+        /// <param name="SıraNo">-2 : Elemanın İÇERİĞİNİ istenilen türe çevirip sıralar \n -1 : Elemanın ALT_ELEMANLARINI, ALT_ELEMANIN_ADI bilgisini istenilen türe çevirip sıralar \n 0 ... : Elemanın ALT_ELEMANLARINI, ALT_ELEMANIN_BELİRTİLEN_SIRANO içeriğini istenilen türe çevirip sıralar</param>
+        /// <param name="BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği">Karşılaştırma yapılacak türün tayin edilmesi ve içeriğin olmaması durumunda kullanılır</param>
+        /// <param name="Tersten">İşaretlenirse -> Yazı : Z den A ya \n Sayı Büyükten küçüğe \n Tarih Saat : Yeniden Eskiye doğru sıralanır</param>
+        public void Sırala(string ElemanAdıDizisi, int SıraNo, object BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, bool Tersten = false)
+        {
+            Depo_Ayarlar.Sırala(ElemanAdıDizisi, SıraNo, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, Tersten);
         }
         public override string ToString()
         {

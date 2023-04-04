@@ -867,8 +867,8 @@ namespace ArgeMup.HazirKod
                     if (!Sadeceİçeriğini && !SadeceElemanlarını) bulunan.Adı = null; //tamamen silinsin
                     else
                     {
-                        if (Sadeceİçeriğini) _İçeriği = null;
-                        if (SadeceElemanlarını) _Elemanları = null;
+                        if (Sadeceİçeriğini) bulunan._İçeriği = null;
+                        if (SadeceElemanlarını) bulunan._Elemanları = null;
                     }
                 }
             }

@@ -141,6 +141,7 @@
                 {
                     Klasör.Oluştur(HedefKlasör + @"\" + kls);
                 }
+                Klasör.Oluştur(HedefKlasör);
 
                 using (ZipArchive Arşiv = ZipFile.Open(ListelenmişZipDosyasıİçeriği.Kök, ZipArchiveMode.Read))
                 {

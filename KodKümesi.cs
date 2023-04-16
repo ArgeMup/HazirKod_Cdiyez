@@ -12,7 +12,7 @@
     {
         public class KodKümesi_ : IDisposable
         {
-            public string Sürüm = "V1.0";
+            public string Sürüm = "V1.1";
             public delegate void KodKümesi_GeriBildirim_(object Çıktı, object Hatırlatıcı, string HataMesajı);
             
             class KodKümesi_İşlem_
@@ -142,9 +142,12 @@
                     Kopyası.Metod = tipi.GetMethod(İşlem);
                     if (Kopyası.Metod == null) throw new Exception("İşlem ( " + AlanAdıVeSınıf + "." + İşlem + " ) bulunamadı");
 
-                    Kopyası.Örnek = Activator.CreateInstance(tipi);
-                    if (Kopyası.Örnek == null) throw new Exception("İşlemin ( " + AlanAdıVeSınıf + "." + İşlem + " ) örneği edinilemedi");
-
+                    if (!Kopyası.Metod.IsStatic)
+                    {
+                        Kopyası.Örnek = Activator.CreateInstance(tipi);
+                        if (Kopyası.Örnek == null) throw new Exception("İşlemin ( " + AlanAdıVeSınıf + "." + İşlem + " ) örneği edinilemedi");
+                    }
+                    
                     İşlemler[AlanAdıVeSınıf + İşlem] = Kopyası;
                 }
 

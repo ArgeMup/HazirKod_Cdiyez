@@ -10,17 +10,26 @@ namespace ArgeMup.HazirKod
 {
     public class YeniYazılımKontrolü_ : IDisposable
     {
-    	public string Sürüm = "V1.2";
+    	public string Sürüm = "V1.3";
         public bool KontrolTamamlandı = false;
         public delegate void YeniYazılımKontrolü_GeriBildirim_(bool Sonuç, string Açıklama);
 
         WebClient İstemci = null;
         YeniYazılımKontrolü_GeriBildirim_ GeriBildirim_İşlemi = null;
         string İndirilenDosyanınAdı = "ArgeMuP.HazirKod.YeniYazılımKontrolü." + Path.GetRandomFileName();
+        string HedefDosyaYolu = Kendi.DosyaYolu;
 
-        public void Başlat(Uri DosyaKonumu, YeniYazılımKontrolü_GeriBildirim_ GeriBildirim = null)
+        public void Başlat(Uri DosyaKonumu, YeniYazılımKontrolü_GeriBildirim_ GeriBildirim = null, string HedefDosyaYolu = null)
         {
-            string[] ÖncekiDenemeler = Directory.GetFiles(Directory.GetCurrentDirectory(), "ArgeMuP.HazirKod.YeniYazılımKontrolü.*", SearchOption.TopDirectoryOnly);
+            if (HedefDosyaYolu == null) İndirilenDosyanınAdı = Kendi.Klasörü + @"\" + İndirilenDosyanınAdı; 
+            else
+            {
+                İndirilenDosyanınAdı = Path.GetDirectoryName(HedefDosyaYolu) + @"\" + İndirilenDosyanınAdı;
+                this.HedefDosyaYolu = HedefDosyaYolu;
+                Klasör.Oluştur(Path.GetDirectoryName(İndirilenDosyanınAdı));
+            }
+
+            string[] ÖncekiDenemeler = Directory.GetFiles(Path.GetDirectoryName(İndirilenDosyanınAdı), "ArgeMuP.HazirKod.YeniYazılımKontrolü.*", SearchOption.TopDirectoryOnly);
             if (ÖncekiDenemeler != null) foreach (string dsy in ÖncekiDenemeler) Dosya.Sil(dsy);
 
             İstemci = new WebClient();
@@ -45,29 +54,33 @@ namespace ArgeMup.HazirKod
         {
             if (e.Error == null)
             {
-                string şimdiki_dosya_yolu = Kendi.DosyaYolu;
-                FileVersionInfo gelen = FileVersionInfo.GetVersionInfo(İndirilenDosyanınAdı);
-                FileVersionInfo şimdiki = FileVersionInfo.GetVersionInfo(şimdiki_dosya_yolu);
+                FileVersionInfo gelen = FileVersionInfo.GetVersionInfo(İndirilenDosyanınAdı), şimdiki = null;
 
-                bool gelen_daha_yeni = false;
-                if (gelen.FileMajorPart > şimdiki.FileMajorPart) gelen_daha_yeni = true;
-                else if (gelen.FileMajorPart == şimdiki.FileMajorPart)
+                bool gelen_daha_yeni = false, HedefDosyaVarMı = File.Exists(HedefDosyaYolu);
+                if (HedefDosyaVarMı)
                 {
-                    if (gelen.FileMinorPart > şimdiki.FileMinorPart) gelen_daha_yeni = true;
-                    else if (gelen.FileMinorPart == şimdiki.FileMinorPart)
+                    şimdiki = FileVersionInfo.GetVersionInfo(HedefDosyaYolu);
+
+                    if (gelen.FileMajorPart > şimdiki.FileMajorPart) gelen_daha_yeni = true;
+                    else if (gelen.FileMajorPart == şimdiki.FileMajorPart)
                     {
-                        if (DoğrulamaKodu.Üret.Dosyadan(İndirilenDosyanınAdı) != DoğrulamaKodu.Üret.Dosyadan(şimdiki_dosya_yolu)) gelen_daha_yeni = true; //uzaktaki dosyanın daha sağlıklı oduğunu varsayarak devam et
+                        if (gelen.FileMinorPart > şimdiki.FileMinorPart) gelen_daha_yeni = true;
+                        else if (gelen.FileMinorPart == şimdiki.FileMinorPart)
+                        {
+                            if (DoğrulamaKodu.Üret.Dosyadan(İndirilenDosyanınAdı) != DoğrulamaKodu.Üret.Dosyadan(HedefDosyaYolu)) gelen_daha_yeni = true; //uzaktaki dosyanın daha sağlıklı oduğunu varsayarak devam et
+                        }
                     }
                 }
+                else gelen_daha_yeni = true;
 
                 if (gelen_daha_yeni)
                 {
                     try
                     {
-                        File.Move(şimdiki_dosya_yolu, şimdiki_dosya_yolu + ".V" + şimdiki.FileVersion);
-                        File.Move(İndirilenDosyanınAdı, şimdiki_dosya_yolu);
+                        if (HedefDosyaVarMı) File.Move(HedefDosyaYolu, HedefDosyaYolu + ".V" + şimdiki.FileVersion);
+                        File.Move(İndirilenDosyanınAdı, HedefDosyaYolu);
 
-                        GeriBildirim_İşlemi?.Invoke(true, "Eski:V" + şimdiki.FileVersion + " Yeni:V" + gelen.FileVersion);
+                        GeriBildirim_İşlemi?.Invoke(true, (HedefDosyaVarMı ? "Eski:V" + şimdiki.FileVersion + " " : null) + "Yeni:V" + gelen.FileVersion);
                     }
                     catch (Exception ex)
                     {

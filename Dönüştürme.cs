@@ -1,14 +1,7 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
 using System;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Globalization;
-
-#if HazirKod_Cdiyez_Görsel
-    using System.Drawing;
-#endif
 
 namespace ArgeMup.HazirKod.Dönüştürme
 {
@@ -19,7 +12,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
         public static byte[] BaytDizisine(string Girdi)
         {
             if (string.IsNullOrEmpty(Girdi)) return null;
-            return Encoding.UTF8.GetBytes(Girdi);
+            return System.Text.Encoding.UTF8.GetBytes(Girdi);
         }
         public static string BaytDizisinden(byte[] Girdi, int Boyut = int.MinValue)
         {
@@ -27,7 +20,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
             if (Boyut == int.MinValue) Boyut = Girdi.Length;
             if (Boyut > Girdi.Length) Boyut = Girdi.Length;
 
-            return Encoding.UTF8.GetString(Girdi, 0, Boyut).TrimEnd('\0');
+            return System.Text.Encoding.UTF8.GetString(Girdi, 0, Boyut).TrimEnd('\0');
         }
 
         public static string Taban64e(string Girdi)
@@ -73,8 +66,8 @@ namespace ArgeMup.HazirKod.Dönüştürme
     {
         public const string Sürüm = "V1.1";
 
-        public static readonly char ayraç_kesir = Convert.ToChar(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
-        public static readonly char ayraç_tamsayı = Convert.ToChar(CultureInfo.InvariantCulture.NumberFormat.NumberGroupSeparator);
+        public static readonly char ayraç_kesir = Convert.ToChar(System.Globalization.CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
+        public static readonly char ayraç_tamsayı = Convert.ToChar(System.Globalization.CultureInfo.InvariantCulture.NumberFormat.NumberGroupSeparator);
         public static double Yazıdan(string Girdi, bool TamKontrol = true, bool GeçersizKarakterleriSil = true)
         {
             if (!string.IsNullOrEmpty(Girdi))
@@ -150,7 +143,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
                     }
                 }
 
-                if (double.TryParse(Girdi, NumberStyles.Float, CultureInfo.InvariantCulture, out double Çıktı))
+                if (double.TryParse(Girdi, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double Çıktı))
                 {
                     return Çıktı;
                 }
@@ -170,7 +163,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
                     }
 
                     //tekrar dene
-                    if (double.TryParse(yeni, NumberStyles.Float, CultureInfo.InvariantCulture, out Çıktı))
+                    if (double.TryParse(yeni, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out Çıktı))
                     {
                         return Çıktı;
                     }
@@ -181,7 +174,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
         }
         public static string Yazıya(double Girdi)
         {
-            return Girdi.ToString(CultureInfo.InvariantCulture);
+            return Girdi.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
     }
 
@@ -189,8 +182,8 @@ namespace ArgeMup.HazirKod.Dönüştürme
     {
         public const string Sürüm = "V1.2";
 
-        public static string KullanılmayacakKarakterler_DosyaAdı { get { return new string(Path.GetInvalidFileNameChars()); } }
-        public static string KullanılmayacakKarakterler_KlasörYolu { get { return new string(Path.GetInvalidPathChars()); } }
+        public static string KullanılmayacakKarakterler_DosyaAdı { get { return new string(System.IO.Path.GetInvalidFileNameChars()); } }
+        public static string KullanılmayacakKarakterler_KlasörYolu { get { return new string(System.IO.Path.GetInvalidPathChars()); } }
         
         public static string Düzelt(string Girdi, bool GeçersizKarakterleriSil = true)
         {
@@ -200,7 +193,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
             {
                 string kök = "", kls = "", dsy = "";
 
-                int konum_bölüm = Girdi.LastIndexOf(Path.DirectorySeparatorChar);
+                int konum_bölüm = Girdi.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
                 if (konum_bölüm >= 0)
                 {
                     dsy = Girdi.Substring(konum_bölüm + 1);
@@ -220,9 +213,9 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
                 string birleştirilmiş = (string.IsNullOrEmpty(kls) ? null : kls) + dsy;
 
-                kök = Path.GetPathRoot(birleştirilmiş);
+                kök = System.IO.Path.GetPathRoot(birleştirilmiş);
                 string kls_köksüz = birleştirilmiş.Substring(kök.Length);
-                string tekli = Path.DirectorySeparatorChar.ToString();
+                string tekli = System.IO.Path.DirectorySeparatorChar.ToString();
                 string ikili = tekli + tekli;
                 while (kls_köksüz.Contains(ikili)) kls_köksüz = kls_köksüz.Replace(ikili, tekli);
 
@@ -248,11 +241,11 @@ namespace ArgeMup.HazirKod.Dönüştürme
         public const string Şablon_DosyaAdı = "dd_MM_yyyy_HH_mm_ss";
         public const string Şablon_DosyaAdı2 = "yyyy_MM_dd_HH_mm_ss_fff";
         
-        public static string Yazıya(DateTime Girdi, string Şablon = Şablon_Tarih_Saat_MiliSaniye, CultureInfo Kültür = null)
+        public static string Yazıya(DateTime Girdi, string Şablon = Şablon_Tarih_Saat_MiliSaniye, System.Globalization.CultureInfo Kültür = null)
         {
-            return Girdi.ToString(Şablon, Kültür == null ? CultureInfo.InvariantCulture : Kültür);
+            return Girdi.ToString(Şablon, Kültür == null ? System.Globalization.CultureInfo.InvariantCulture : Kültür);
         }
-        public static string Yazıya(double Girdi, string Şablon = Şablon_Tarih_Saat_MiliSaniye, CultureInfo Kültür = null)
+        public static string Yazıya(double Girdi, string Şablon = Şablon_Tarih_Saat_MiliSaniye, System.Globalization.CultureInfo Kültür = null)
         {
             return Yazıya(Tarihe(Girdi), Şablon, Kültür);
         }
@@ -331,7 +324,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
     {
         public const string Sürüm = "V1.1";
 
-        public static byte[] BaytDizisine(MemoryStream Girdi, int Boyut = int.MinValue)
+        public static byte[] BaytDizisine(System.IO.MemoryStream Girdi, int Boyut = int.MinValue)
         {
             if (Girdi == null) return null;
             if (Boyut == int.MinValue) Boyut = (int)Girdi.Length;
@@ -341,7 +334,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
             Girdi.Read(Çıktı, 0, Boyut);
             return Çıktı;
         }
-        public static void BaytDizisinden(byte[] Girdi, ref MemoryStream Çıktı, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
+        public static void BaytDizisinden(byte[] Girdi, ref System.IO.MemoryStream Çıktı, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
         {
             if (Girdi == null) return;
             if (Adet == int.MinValue) Adet = Girdi.Length - BaşlangıçKonumu;
@@ -360,7 +353,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
             if (Girdi == null) return null;
 
             byte[] Çıktı;
-            using (var mS = new MemoryStream())
+            using (var mS = new System.IO.MemoryStream())
             {
                 var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 bf.Serialize(mS, Girdi);
@@ -375,11 +368,11 @@ namespace ArgeMup.HazirKod.Dönüştürme
             if (Adet > Girdi.Length - BaşlangıçKonumu) Adet = Girdi.Length - BaşlangıçKonumu;
 
             object Çıktı;
-            using (var mS = new MemoryStream())
+            using (var mS = new System.IO.MemoryStream())
             {
                 var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 mS.Write(Girdi, BaşlangıçKonumu, Adet);
-                mS.Seek(0, SeekOrigin.Begin);
+                mS.Seek(0, System.IO.SeekOrigin.Begin);
                 Çıktı = bf.Deserialize(mS);
             }
             return Çıktı;
@@ -401,14 +394,14 @@ namespace ArgeMup.HazirKod.Dönüştürme
         {
             public const string Sürüm = "V1.0";
 
-            public static Icon Yazıdan(string Yazı, Icon ikon, Font font, Color Renk, Point Konum, Color ArkaPlan)
+            public static System.Drawing.Icon Yazıdan(string Yazı, System.Drawing.Icon ikon, System.Drawing.Font font, System.Drawing.Color Renk, System.Drawing.Point Konum, System.Drawing.Color ArkaPlan)
             {
-                Brush brush = new SolidBrush(Renk);
-                Bitmap bitmap = new Bitmap(ikon.Width, ikon.Height);
-                Graphics graphics = Graphics.FromImage(bitmap);
+                System.Drawing.Brush brush = new System.Drawing.SolidBrush(Renk);
+                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(ikon.Width, ikon.Height);
+                System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(bitmap);
                 graphics.Clear(ArkaPlan);
                 graphics.DrawString(Yazı, font, brush, Konum.X, Konum.Y);
-                Icon createdIcon = Icon.FromHandle(bitmap.GetHicon());
+                System.Drawing.Icon createdIcon = System.Drawing.Icon.FromHandle(bitmap.GetHicon());
 
                 brush.Dispose();
                 graphics.Dispose();
@@ -417,7 +410,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
                 return createdIcon;
             }
 
-            public static void Yoket(Icon ikon)
+            public static void Yoket(System.Drawing.Icon ikon)
             {
                 W32_8.DestroyIcon(ikon.Handle);
                 ikon.Dispose();

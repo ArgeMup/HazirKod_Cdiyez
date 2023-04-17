@@ -149,9 +149,7 @@ namespace ArgeMup.HazirKod
             if (Girdi.Length <= AzamiKarakterSayısı) return rsa.Encrypt(Girdi, false);
             else
             {
-                if (rnd == null) rnd = RNGCryptoServiceProvider.Create();
-                byte[] şifre = new byte[AesParolaKarakterSayısı];
-                rnd.GetNonZeroBytes(şifre);
+                byte[] şifre = ParolaÜret();
 
                 if (dçk == null) dçk = new DahaCokKarmasiklastirma_();
                 byte[] şifreli = dçk.Karıştır(Girdi, şifre);
@@ -194,6 +192,16 @@ namespace ArgeMup.HazirKod
             }
         }
 
+        public byte[] ParolaÜret(int KarakterSayısı_Bayt = AesParolaKarakterSayısı)
+        {
+            byte[] Parola = new byte[KarakterSayısı_Bayt];
+
+            if (rnd == null) rnd = RNGCryptoServiceProvider.Create();
+            rnd.GetNonZeroBytes(Parola);
+
+            return Parola;
+        }
+
         public byte[] İmzala(byte[] Belge)
         {
             return rsa.SignData(Belge, HashAlgorithmName.SHA512, RSASignaturePadding.Pkcs1);
@@ -222,6 +230,10 @@ namespace ArgeMup.HazirKod
         public string AçıkVeGizliAnahtarlar
         {
             get { return rsa.ToXmlString(true); }
+        }
+        public int AnahtarGücü_Bit
+        {
+            get { return rsa.KeySize; }
         }
     }
 }

@@ -36,13 +36,18 @@ namespace ArgeMup.HazirKod.Ekİşlemler
         }
 
         static ArgeMup.HazirKod.DahaCokKarmasiklastirma_ DaÇoKa = new ArgeMup.HazirKod.DahaCokKarmasiklastirma_();
-        public static string Şifrele(this string Girdi, string Şifre)
+        public static string Karıştır(this string Girdi, string Şifre)
         {
             return DaÇoKa.Karıştır(Girdi, Şifre);
         }
-        public static string ŞifresiniÇöz(this string Girdi, string Şifre)
+        public static string Düzelt(this string Girdi, string Şifre)
         {
             return DaÇoKa.Düzelt(Girdi, Şifre);
+        }
+
+        public static byte[] Taban64ten(this string Girdi)
+        {
+            return ArgeMup.HazirKod.Dönüştürme.D_Yazı.Taban64ten(Girdi);
         }
 
         public static bool BoşMu(this string Girdi, bool BoşluğuGörmezdenGel = false)
@@ -121,6 +126,21 @@ namespace ArgeMup.HazirKod.Ekİşlemler
         public static string HexYazıya(this byte[] Girdi, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
         {
             return ArgeMup.HazirKod.Dönüştürme.D_HexYazı.BaytDizisinden(Girdi, Adet, BaşlangıçKonumu);
+        }
+
+        static ArgeMup.HazirKod.DahaCokKarmasiklastirma_ DaÇoKa = new ArgeMup.HazirKod.DahaCokKarmasiklastirma_();
+        public static byte[] Karıştır(this byte[] Girdi, byte[] Şifre)
+        {
+            return DaÇoKa.Karıştır(Girdi, Şifre);
+        }
+        public static byte[] Düzelt(this byte[] Girdi, byte[] Şifre)
+        {
+            return DaÇoKa.Düzelt(Girdi, Şifre);
+        }
+
+        public static string Taban64e(this byte[] Girdi)
+        {
+            return ArgeMup.HazirKod.Dönüştürme.D_BaytDizisi.Taban64e(Girdi);
         }
 
         public static byte[] Günlük(this byte[] Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0)

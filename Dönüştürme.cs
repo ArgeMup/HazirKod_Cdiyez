@@ -7,7 +7,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
 {
     public static class D_Yazı
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
 
         public static byte[] BaytDizisine(string Girdi)
         {
@@ -23,13 +23,9 @@ namespace ArgeMup.HazirKod.Dönüştürme
             return System.Text.Encoding.UTF8.GetString(Girdi, 0, Boyut).TrimEnd('\0');
         }
 
-        public static string Taban64e(string Girdi)
+        public static byte[] Taban64ten(string Girdi)
         {
-            return Convert.ToBase64String(BaytDizisine(Girdi));
-        }
-        public static string Taban64ten(string Girdi)
-        {
-            return BaytDizisinden(Convert.FromBase64String(Girdi));
+            return Convert.FromBase64String(Girdi);
         }
     }
 
@@ -609,6 +605,11 @@ namespace ArgeMup.HazirKod.Dönüştürme
             string Çık = Kay.Replace(Ara, Yen);
 
             return D_HexYazı.BaytDizisine(Çık);
+        }
+
+        public static string Taban64e(byte[] Girdi)
+        {
+            return Convert.ToBase64String(Girdi);
         }
     }
 }

@@ -86,7 +86,7 @@ namespace ArgeMup.HazirKod
         }
 
         // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~Karmasiklastirma_() {
+        // ~DahaCokKarmasiklastirma_() {
         //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         //   Dispose(false);
         // }
@@ -102,7 +102,7 @@ namespace ArgeMup.HazirKod
         #endregion
     }
 
-    public class DahaCokKarmasiklastirma_Asimetrik_
+    public class DahaCokKarmasiklastirma_Asimetrik_ : IDisposable
     {
         public const string Sürüm = "V1.0";
         public static void AnahtarÜret(out string SadeceAçıkAnahtar, out string AçıkVeGizliAnahtarBirlikte, int AnahtarUzunluğu_Bit = 2048)
@@ -235,6 +235,41 @@ namespace ArgeMup.HazirKod
         {
             get { return rsa.KeySize; }
         }
+
+        #region IDisposable
+        private bool disposedValue;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                    rsa?.Dispose();
+                    rnd?.Dispose();
+                    dçk?.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~DahaCokKarmasiklastirma_Asimetrik_()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
 

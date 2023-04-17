@@ -1,9 +1,7 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
 using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace ArgeMup.HazirKod
 {
@@ -47,7 +45,7 @@ namespace ArgeMup.HazirKod
         public const string Sürüm = "V0.0";
 
         [DllImport("user32.dll")]
-        public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+        public static extern int GetWindowText(IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
 
         [DllImport("user32.dll")]
         public static extern int GetWindowTextLength(IntPtr hWnd);
@@ -146,6 +144,45 @@ namespace ArgeMup.HazirKod
 
             if (Evet) ShowWindow(handle, SW_SHOW);
             else ShowWindow(handle, SW_HIDE);
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////
+
+        [DllImport("Kernel32")]
+        static extern bool SetConsoleCtrlHandler(SetConsoleCtrlEventHandler handler, bool add);
+
+        public enum CtrlType
+        {
+            CTRL_C_EVENT = 0,
+            CTRL_BREAK_EVENT = 1,
+            CTRL_CLOSE_EVENT = 2,
+            CTRL_LOGOFF_EVENT = 5,
+            CTRL_SHUTDOWN_EVENT = 6
+        }
+        delegate bool SetConsoleCtrlEventHandler(CtrlType sig);
+        static bool GeriBildirimİşlemi_SetConsoleCtrlEventHandler(CtrlType signal)
+        {
+            switch (signal)
+            {
+                case CtrlType.CTRL_BREAK_EVENT:
+                case CtrlType.CTRL_C_EVENT:
+                case CtrlType.CTRL_LOGOFF_EVENT:
+                case CtrlType.CTRL_SHUTDOWN_EVENT:
+                case CtrlType.CTRL_CLOSE_EVENT:
+                    GeriBildirimİşlemi?.Invoke(signal);
+                    break; 
+            }
+
+            return false;
+        }
+
+        static Action<CtrlType> GeriBildirimİşlemi = null;
+        public static void KapatıldığındaHaberVer(Action<CtrlType> GeriBildirimİşlemi) 
+        {
+            if (GeriBildirimİşlemi == null) throw new System.Exception("GeriBildirimİşlemi boş olamaz");
+            W32_Konsol.GeriBildirimİşlemi = GeriBildirimİşlemi;
+
+            if (!SetConsoleCtrlHandler(GeriBildirimİşlemi_SetConsoleCtrlEventHandler, true)) throw new System.Exception("KapatıldığındaHaberVer Başarısız");
         }
     }
 }

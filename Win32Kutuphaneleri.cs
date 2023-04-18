@@ -93,9 +93,9 @@ namespace ArgeMup.HazirKod
                 public uint length;
                 public uint flags;
                 public uint showCmd; //0 gizli, 1 normal, 2 mini, 3 maxi, 5 olduğu gibi
-                public Point ptMinPosition;
-                public Point ptMaxPosition;
-                public Rectangle rcNormalPosition;
+                public System.Drawing.Point ptMinPosition;
+                public System.Drawing.Point ptMaxPosition;
+                public System.Drawing.Rectangle rcNormalPosition;
             };
 
             [DllImport("user32.dll")]

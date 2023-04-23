@@ -96,9 +96,10 @@ namespace ArgeMup.HazirKod
             return Aslolan.FizikselOlarakMevcut && (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0);
         }
 
-		public enum Kapsamı { Geçici, TümKullanıcılar, BuKullanıcı_BuİşletimSistemi, BuKullanıcı_TümİşletimSistemleri };     
+		public enum Kapsamı { Geçici, Masaüstü, TümKullanıcılar, BuKullanıcı_BuİşletimSistemi, BuKullanıcı_TümİşletimSistemleri };
         /// <summary>
         /// Geçici                              : C:\Users\<Kullanıcı Adı>\AppData\Local\Temp\<Aile>\<Uygulama>\<Sürüm>
+        /// Masaüstü                            : C:\Users\<Kullanıcı Adı>\Desktop\<Aile>\<Uygulama>\<Sürüm>
         /// TümKullanıcılar                     : C:\ProgramData\<Aile>\<Uygulama>\<Sürüm>
         /// BuKullanıcı_BuİşletimSistemi        : C:\Users\<Kullanıcı Adı>\AppData\Local\<Aile>\<Uygulama>\<Sürüm>
         /// BuKullanıcı_TümİşletimSistemleri    : C:\Users\<Kullanıcı Adı>\AppData\Roaming\<Aile>\<Uygulama>\<Sürüm>
@@ -116,6 +117,10 @@ namespace ArgeMup.HazirKod
             {
                 switch (HedeflenenKapsamı)
                 {
+                    case Kapsamı.Masaüstü:
+                        Tür = Environment.SpecialFolder.DesktopDirectory;
+                        break;
+
                     case Kapsamı.TümKullanıcılar:
                         Tür = Environment.SpecialFolder.CommonApplicationData;
                         break;

@@ -123,6 +123,14 @@ namespace ArgeMup.HazirKod
         public static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wp, IntPtr lp);
     }
 
+    public static class W32_10
+    {
+        public const string Sürüm = "V0.0";
+
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
+    }
+
     public static class W32_Konsol
     {
         public const string Sürüm = "V0.0";

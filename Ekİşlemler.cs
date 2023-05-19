@@ -59,6 +59,45 @@ namespace ArgeMup.HazirKod.Ekİşlemler
         {
             return !BoşMu(Girdi, BoşluğuGörmezdenGel);
         }
+        public static bool BenzerMi(this string Girdi, string Kıstas, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
+        {
+            if (Girdi.BoşMu() || Kıstas.BoşMu()) return false;
+            
+            string Ayraçç = Ayraç.ToString();
+            if (Kıstas == Ayraçç) return true;
+
+            if (!BüyükKüçükHarfDuyarlı)
+            {
+                Girdi = Girdi.ToLower();
+                Kıstas = Kıstas.ToLower();
+            }
+
+            if (Kıstas.StartsWith(Ayraçç)) Kıstas = Kıstas.TrimStart(Ayraç);
+            else
+            {
+                string ilk_kıstas = Kıstas.Split(Ayraç)[0];
+                if (!Girdi.StartsWith(ilk_kıstas)) return false;
+            }
+
+            if (Kıstas.EndsWith(Ayraçç)) Kıstas = Kıstas.TrimEnd(Ayraç);
+            else
+            {
+                string[] kıstas_lar = Kıstas.Split(Ayraç);
+                string son_kıstas = kıstas_lar[kıstas_lar.Length - 1];
+                if (!Girdi.EndsWith(son_kıstas)) return false;
+            }
+
+            int konum = 0;
+            foreach (string kst in Kıstas.Split(Ayraç))
+            {
+                konum = Girdi.IndexOf(kst, konum);
+                if (konum < 0) return false;
+
+                konum += kst.Length;
+            }
+
+            return true;
+        }
 
         public static string DosyaYolu_Düzelt(this string DosyaYolu, bool GeçersizKarakterleriSil = true)
         {

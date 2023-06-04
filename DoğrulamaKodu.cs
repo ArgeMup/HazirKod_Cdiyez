@@ -177,7 +177,7 @@ namespace ArgeMup.HazirKod
                 string[] dsy_l = Directory.GetFiles(KlasörYolu, "*.*", Kapsamı);
                 string[] kls_l = Directory.GetDirectories(KlasörYolu, "*", Kapsamı);
                 
-                while (!ö.TümüÖğütüldüMü()) System.Threading.Thread.Sleep(5);
+                while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && !ö.TümüÖğütüldüMü()) System.Threading.Thread.Sleep(5);
                 if (dsy_sayac_hata != 0) return Durum_.Farklı;
 
                 if (Dosyalar.Count  != dsy_l.Length - 1 /*DoğrulamaKodu_DosyaAdı*/ ||

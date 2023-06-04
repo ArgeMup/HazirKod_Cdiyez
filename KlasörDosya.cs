@@ -356,7 +356,7 @@ namespace ArgeMup.HazirKod
 
             if (BitmesiniBekle)
             {
-                while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+                while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && !ö.TümüÖğütüldüMü()) Thread.Sleep(5);
                 Dosyalar = dsy_l.Durdur();
             }
 
@@ -501,7 +501,7 @@ namespace ArgeMup.HazirKod
                 dsy_ö.Ekle(dsy);
             }
 
-            while (!kls_ö.TümüÖğütüldüMü() || !dsy_ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+            while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && (!kls_ö.TümüÖğütüldüMü() || !dsy_ö.TümüÖğütüldüMü())) Thread.Sleep(5);
             Sonuç.Klasörler = kls_l.Durdur();
             Sonuç.Dosyalar = dsy_l.Durdur();
 
@@ -556,7 +556,7 @@ namespace ArgeMup.HazirKod
                 dsy_ö.Ekle(dsy);
             }
 
-            while (!kls_ö.TümüÖğütüldüMü() || !dsy_ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+            while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && (!kls_ö.TümüÖğütüldüMü() || !dsy_ö.TümüÖğütüldüMü())) Thread.Sleep(5);
             Sonuç.Klasörler = kls_l.Durdur();
             Sonuç.Dosyalar = dsy_l.Durdur();
 
@@ -622,7 +622,7 @@ namespace ArgeMup.HazirKod
                     ö.Ekle(dsy);
                 }
 
-                while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+                while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && !ö.TümüÖğütüldüMü()) Thread.Sleep(5);
             }
 
             return HataOldu == 0;
@@ -649,7 +649,7 @@ namespace ArgeMup.HazirKod
                     KapladığıAlan_bayt -= dsy.KapladığıAlan_bayt;
                 }
 
-                while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+                while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && !ö.TümüÖğütüldüMü()) Thread.Sleep(5);
             }
 
             return HataOldu == 0;
@@ -676,7 +676,7 @@ namespace ArgeMup.HazirKod
                     ö.Ekle(dsy);
                 }
 
-                while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+                while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && !ö.TümüÖğütüldüMü()) Thread.Sleep(5);
             }
 
             return HataOldu == 0;
@@ -715,7 +715,7 @@ namespace ArgeMup.HazirKod
                 KapladığıAlan_bayt -= dsy.KapladığıAlan_bayt;
             }
 
-            while (!ö.TümüÖğütüldüMü()) Thread.Sleep(5);
+            while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && !ö.TümüÖğütüldüMü()) Thread.Sleep(5);
             
             return HataOldu == 0;
 

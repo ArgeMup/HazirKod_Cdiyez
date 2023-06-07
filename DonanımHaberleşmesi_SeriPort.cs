@@ -122,7 +122,8 @@
                         GeriBildirim_Islemi?.Invoke(ErişimNoktasıAçıklaması, GeriBildirim_Türü_.BağlantıKurulmasıTekrarDenecek, null, Hatırlatıcı);
 
                         Durdur();
-                        Thread.Sleep(TekrarDeneme_ZamanAşımı_msn); 
+
+                        if (Çalışşsın) Thread.Sleep(1000);
                     }
                 }
 

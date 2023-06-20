@@ -18,7 +18,7 @@
             public NotifyIcon Tepsiİkonu = null;
 
             Form Pencere;
-            Ayarlar_Xml_ Ayarlar;
+            Ayarlar_ Ayarlar;
             GörevÇubuğundaYüzdeGösterimiDurumu İlerlemeDurumu_ = GörevÇubuğundaYüzdeGösterimiDurumu.Kapalı;
             FormWindowState PencereDurumu;
             bool UygulamaKüçültüldüğündeGörevÇubuğundaGörünsün = true;
@@ -49,7 +49,7 @@
             /// Form LOAD içerisinde çağırılmalı
             /// </summary>
             /// <param name="ŞeffafBaşlangıç">Kullanılacak ise form un OPACİTY özelliği SIFIR yapılmalı</param>
-            public PencereVeTepsiIkonuKontrolu_(Form Pencere_, Ayarlar_Xml_ Ayarlar__ = null,  bool UygulamaKüçültüldüğündeGörevÇubuğundaGörünsün_ = false, string TakmaAd = "", int X = 0, int Y = 0, int Genişlik = -1, int Yükseklik = -1, bool ŞeffafBaşlangıç = true)
+            public PencereVeTepsiIkonuKontrolu_(Form Pencere_, Ayarlar_ Ayarlar__ = null,  bool UygulamaKüçültüldüğündeGörevÇubuğundaGörünsün_ = false, string TakmaAd = "", int X = 0, int Y = 0, int Genişlik = -1, int Yükseklik = -1, bool ŞeffafBaşlangıç = true)
             {
                 Pencere = Pencere_;
                 Pencere.Shown += Pencere_Shown;
@@ -67,8 +67,7 @@
                 }
                 else şeffaflık = 1;
 
-                bool sonuç;
-                if (Ayarlar__ == null) Ayarlar = new Ayarlar_Xml_(out sonuç, "", "", false, 0, 0);
+                if (Ayarlar__ == null) Ayarlar = new Ayarlar_();
                 else Ayarlar = Ayarlar__;
 
                 if (Genişlik == -1) Genişlik = Screen.PrimaryScreen.WorkingArea.Width;
@@ -79,9 +78,9 @@
 
                 UygulamaKüçültüldüğündeGörevÇubuğundaGörünsün = UygulamaKüçültüldüğündeGörevÇubuğundaGörünsün_;
 
-                Pencere.Location = new Point(Convert.ToInt32(Ayarlar.Oku(TakmaAdı + "_PencereKonumu_X", X.ToString())), Convert.ToInt32(Ayarlar.Oku(TakmaAdı + "_PencereKonumu_Y", Y.ToString())));
-                Pencere.Width = Convert.ToInt32(Ayarlar.Oku(TakmaAdı + "_PencereBoyutu_Genişlik", Genişlik.ToString()));
-                Pencere.Height = Convert.ToInt32(Ayarlar.Oku(TakmaAdı + "_PencereBoyutu_Yükseklik", Yükseklik.ToString()));
+                Pencere.Location = new Point(Ayarlar.Oku_TamSayı(TakmaAdı + "_PencereKonumu_X", X), Ayarlar.Oku_TamSayı(TakmaAdı + "_PencereKonumu_Y", Y));
+                Pencere.Width = Ayarlar.Oku_TamSayı(TakmaAdı + "_PencereBoyutu_Genişlik", Genişlik);
+                Pencere.Height = Ayarlar.Oku_TamSayı(TakmaAdı + "_PencereBoyutu_Yükseklik", Yükseklik);
 
                 if (Pencere.WindowState == FormWindowState.Normal && !Screen.AllScreens.Any(s => s.WorkingArea.IntersectsWith(new Rectangle(Pencere.Left, Pencere.Top, Pencere.Width, Pencere.Height))))
                 {
@@ -222,7 +221,7 @@
                 Application.DoEvents();
                 Pencere.Opacity = şeffaflık;
 
-                Pencere.WindowState = (FormWindowState)Convert.ToInt32(Ayarlar.Oku(TakmaAdı + "_PencereDurumu", "0"));
+                Pencere.WindowState = (FormWindowState)Ayarlar.Oku_TamSayı(TakmaAdı + "_PencereDurumu");
                 Pencere_Resize(null, null);
 
                 Pencere.Resize += Pencere_Resize;
@@ -358,20 +357,20 @@
                 {
                     if (Ayarlar != null)
                     {
-                        Ayarlar.Yaz(TakmaAdı + "_PencereDurumu", ((int)Pencere.WindowState).ToString());
+                        Ayarlar.Yaz(TakmaAdı + "_PencereDurumu", (int)Pencere.WindowState);
                         if (Pencere.WindowState == FormWindowState.Normal)
                         {
-                            Ayarlar.Yaz(TakmaAdı + "_PencereKonumu_X", Pencere.Location.X.ToString());
-                            Ayarlar.Yaz(TakmaAdı + "_PencereKonumu_Y", Pencere.Location.Y.ToString());
-                            Ayarlar.Yaz(TakmaAdı + "_PencereBoyutu_Genişlik", Pencere.Width.ToString());
-                            Ayarlar.Yaz(TakmaAdı + "_PencereBoyutu_Yükseklik", Pencere.Height.ToString());
+                            Ayarlar.Yaz(TakmaAdı + "_PencereKonumu_X", Pencere.Location.X);
+                            Ayarlar.Yaz(TakmaAdı + "_PencereKonumu_Y", Pencere.Location.Y);
+                            Ayarlar.Yaz(TakmaAdı + "_PencereBoyutu_Genişlik", Pencere.Width);
+                            Ayarlar.Yaz(TakmaAdı + "_PencereBoyutu_Yükseklik", Pencere.Height);
                         }
                         else
                         {
-                            Ayarlar.Yaz(TakmaAdı + "_PencereKonumu_X", Pencere.RestoreBounds.X.ToString());
-                            Ayarlar.Yaz(TakmaAdı + "_PencereKonumu_Y", Pencere.RestoreBounds.Y.ToString());
-                            Ayarlar.Yaz(TakmaAdı + "_PencereBoyutu_Genişlik", Pencere.RestoreBounds.Width.ToString());
-                            Ayarlar.Yaz(TakmaAdı + "_PencereBoyutu_Yükseklik", Pencere.RestoreBounds.Height.ToString());
+                            Ayarlar.Yaz(TakmaAdı + "_PencereKonumu_X", Pencere.RestoreBounds.X);
+                            Ayarlar.Yaz(TakmaAdı + "_PencereKonumu_Y", Pencere.RestoreBounds.Y);
+                            Ayarlar.Yaz(TakmaAdı + "_PencereBoyutu_Genişlik", Pencere.RestoreBounds.Width);
+                            Ayarlar.Yaz(TakmaAdı + "_PencereBoyutu_Yükseklik", Pencere.RestoreBounds.Height);
                         }
 
                         Ayarlar.DeğişiklikleriKaydet();

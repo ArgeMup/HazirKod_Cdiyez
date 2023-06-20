@@ -166,9 +166,9 @@ namespace ArgeMup.HazirKod
         {
             Depo_Ayarlar.Yaz(ElemanAdıDizisi, TamSayı, SıraNo);
         }
-        public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, int SıraNo = 0)
+        public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int SıraNo = 0)
         {
-            Depo_Ayarlar.Yaz(ElemanAdıDizisi, BaytDizisi, Adet, BaşlangıçKonumu, SıraNo);
+            Depo_Ayarlar.Yaz(ElemanAdıDizisi, BaytDizisi, SıraNo);
         }
         public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo = 0)
         {

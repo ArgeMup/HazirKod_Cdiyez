@@ -46,7 +46,7 @@ namespace ArgeMup.HazirKod
         void Yaz(string ElemanAdıDizisi, string İçeriği, int SıraNo = 0);
         void Yaz(string ElemanAdıDizisi, double Sayı, int SıraNo = 0);
         void Yaz(string ElemanAdıDizisi, int TamSayı, int SıraNo = 0);
-        void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, int SıraNo = 0);
+        void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int SıraNo = 0);
         void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo = 0);
         void Yaz(string ElemanAdıDizisi, bool Bit, int SıraNo = 0);
 
@@ -657,7 +657,7 @@ namespace ArgeMup.HazirKod
                     else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
                     else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
                     else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
-                    else if (value is byte[]) Yaz(ElemanAdıDizisi, (byte[])value, int.MinValue, 0, SıraNo);
+                    else if (value is byte[]) Yaz(ElemanAdıDizisi, (byte[])value, SıraNo);
                     else throw new Exception("Desteklenmeyen tür " + value.GetType().FullName);
                 }
             }
@@ -704,9 +704,9 @@ namespace ArgeMup.HazirKod
             {
                 Yaz(ElemanAdıDizisi, TamSayı.ToString(), SıraNo);
             }
-            public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet, int BaşlangıçKonumu, int SıraNo)
+            public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int SıraNo)
             {
-                Yaz(ElemanAdıDizisi, Dönüştürme.D_HexYazı.BaytDizisinden(BaytDizisi, Adet, BaşlangıçKonumu), SıraNo);
+                Yaz(ElemanAdıDizisi, Dönüştürme.D_HexYazı.BaytDizisinden(BaytDizisi), SıraNo);
             }
             public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo)
             {
@@ -958,9 +958,9 @@ namespace ArgeMup.HazirKod
         {
             Bul(ElemanAdıDizisi, true, false).Yaz(null, TamSayı, SıraNo);
         }
-        public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, int SıraNo = 0)
+        public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int SıraNo = 0)
         {
-            Bul(ElemanAdıDizisi, true, false).Yaz(null, BaytDizisi, Adet, BaşlangıçKonumu, SıraNo);
+            Bul(ElemanAdıDizisi, true, false).Yaz(null, BaytDizisi, SıraNo);
         }
         public void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo = 0)
         {
@@ -1363,7 +1363,7 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                     else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
                     else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
                     else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
-                    else if (value is byte[]) Yaz(ElemanAdıDizisi, (byte[])value, int.MinValue, 0, SıraNo);
+                    else if (value is byte[]) Yaz(ElemanAdıDizisi, (byte[])value, SıraNo);
                     else throw new Exception("Desteklenmeyen tür " + value.GetType().FullName);
                 }
             }
@@ -1408,11 +1408,11 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
 
                 Depo.Kilit.ReleaseMutex();
             }
-            public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet, int BaşlangıçKonumu, int SıraNo)
+            public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int SıraNo)
             {
                 if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
-                AsılEleman.Yaz(ElemanAdıDizisi, BaytDizisi, Adet, BaşlangıçKonumu, SıraNo);
+                AsılEleman.Yaz(ElemanAdıDizisi, BaytDizisi, SıraNo);
                 Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
 
                 Depo.Kilit.ReleaseMutex();
@@ -1591,11 +1591,11 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
 
             Kilit.ReleaseMutex();
         }
-        public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, int SıraNo = 0)
+        public void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int SıraNo = 0)
         {
             if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
-            Depo.Yaz(ElemanAdıDizisi, BaytDizisi, Adet, BaşlangıçKonumu, SıraNo);
+            Depo.Yaz(ElemanAdıDizisi, BaytDizisi, SıraNo);
             EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
 
             Kilit.ReleaseMutex();

@@ -148,7 +148,8 @@ namespace ArgeMup.HazirKod
         {
             Yolu = D_DosyaKlasörAdı.Düzelt(Yolu);
 
-            string kök = Path.GetPathRoot(Yolu).TrimEnd(Path.DirectorySeparatorChar);
+            string kök = Path.GetPathRoot(Yolu);
+            if (!string.IsNullOrEmpty(kök)) kök = kök.TrimEnd(Path.DirectorySeparatorChar);
             if (string.IsNullOrEmpty(kök))
             {
                 int konum_bölüm = Yolu.TrimStart(Path.DirectorySeparatorChar).IndexOf(Path.DirectorySeparatorChar);
@@ -249,10 +250,8 @@ namespace ArgeMup.HazirKod
         }
     }
 
-    [Serializable]
     public class Klasör_
     {
-        [NonSerialized]
         public const string Sürüm = "V1.2";
 
         public string Kök = "";
@@ -262,7 +261,6 @@ namespace ArgeMup.HazirKod
         public List<İçerik_Dosya_> Dosyalar = null;
 
         #region Tanımlar
-        [Serializable]
         public class İçerik_Dosya_
         {
             public string Yolu;
@@ -378,8 +376,8 @@ namespace ArgeMup.HazirKod
        
         public Farklılık_ Karşılaştır(Klasör_ Sağdaki)
         {
-            Klasör_ soldaki = (Klasör_)D_Nesne.BaytDizisinden(D_Nesne.BaytDizisine(this));
-            Klasör_ sağdaki = (Klasör_)D_Nesne.BaytDizisinden(D_Nesne.BaytDizisine(Sağdaki));
+            Klasör_ soldaki = Listeleri_Kopyala(this);
+            Klasör_ sağdaki = Listeleri_Kopyala(Sağdaki);
 
             Farklılık_ Farklar = new Farklılık_();
 
@@ -725,6 +723,14 @@ namespace ArgeMup.HazirKod
             }
         }
         #endregion
+
+        Klasör_ Listeleri_Kopyala(Klasör_ Girdi)
+        {
+            Klasör_ yeni = new Klasör_(":");
+            yeni.Dosyalar = new List<İçerik_Dosya_>(Girdi.Dosyalar);
+            yeni.Klasörler = new List<string>(Girdi.Klasörler);
+            return yeni;
+        }
 
         #region Sıralama
         class _Sıralayıcı_EskidenYeniye : IComparer<İçerik_Dosya_>

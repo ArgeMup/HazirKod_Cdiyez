@@ -64,7 +64,7 @@
                             Tepsiİkonu.ShowBalloonTip(ZamanAşımı, Tepsiİkonu.Text, Mesaj, İkon);
                             Tepsiİkonu.Tag = Mesaj;
                         }
-                        else Tepsiİkonu.Tag = Tepsiİkonu.Tag as string + "\r\r" + Mesaj;
+                        else Tepsiİkonu.Tag = (Tepsiİkonu.Tag as string) + "\r\r" + Mesaj;
 
                         Süre_Tepsiİkonu = ZamanAşımı;
                     }

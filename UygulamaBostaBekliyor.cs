@@ -7,9 +7,7 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using System.Threading;
-    using System.Windows.Forms;
 
     namespace ArgeMup.HazirKod
     {
@@ -28,7 +26,7 @@
             bool DurdurKapat, DosyalarıÖnceKopyalaSonraOynat;
             BackgroundWorker ArkaPlan;
             Process Oynatıcı;
-            Ayarlar_Xml_ Ayarlar;
+            Ayarlar_ Ayarlar;
             KlavyeFareGozlemcisi_ Gözlemci; 
             #endregion
 
@@ -47,16 +45,16 @@
                 else if(Directory.Exists(AğdakiReklamVideolarınınYolu)) UzaktakiOynatılacakVideolarListesi = Directory.GetFiles(AğdakiReklamVideolarınınYolu).ToList();
 
                 if (YerelDepolamaKonumu == "") YerelKlasör = Kendi.Klasörü + "\\UygulamaBoştaBekliyor\\";
-                else if (YerelDepolamaKonumu.Contains("\\")) YerelKlasör = YerelDepolamaKonumu;
+                else if (YerelDepolamaKonumu.Contains('\\')) YerelKlasör = YerelDepolamaKonumu;
                 else YerelKlasör = Kendi.Klasörü + "\\" + YerelDepolamaKonumu + "\\UygulamaBoştaBekliyor\\";
 
                 bool var;
-                Ayarlar = new Ayarlar_Xml_(out var, "", YerelKlasör + "UygulamaBostaBekliyor.Ayarlar");
+                Ayarlar = new Ayarlar_(AyarlarDosyası:YerelKlasör + "UygulamaBostaBekliyor.Ayarlar");
                 
                 if (UzaktakiOynatılacakVideolarListesi.Count == 0)
                 {
                     if (Directory.Exists(YerelKlasör)) UzaktakiOynatılacakVideolarListesi = Directory.GetFiles(YerelKlasör).ToList();
-                    UzaktakiOynatılacakVideolarListesi.Remove(Ayarlar.AyarlarDosyasıYolunuAl());
+                    UzaktakiOynatılacakVideolarListesi.Remove(Ayarlar.AyarlarDosyasıYolu);
                     if (UzaktakiOynatılacakVideolarListesi.Count == 0) return;
                 }
                 else
@@ -66,7 +64,7 @@
                     foreach (var nesne in Dizi)
                     {
                         string DosyaAdı = Path.GetFileName(nesne);
-                        if (DosyaAdı != Path.GetFileName(Ayarlar.AyarlarDosyasıYolunuAl()))
+                        if (DosyaAdı != Path.GetFileName(Ayarlar.AyarlarDosyasıYolu))
                         {
                             var = false;
                             foreach (var uzak in UzaktakiOynatılacakVideolarListesi)
@@ -158,8 +156,7 @@
 
                                 if (Durum != Durum_.GörüntüBaşlatılıyor)
                                 {
-                                    List<Depo_Xml.Biri> Liste = Ayarlar.Listele();
-                                    foreach (var nesne in Liste) Ayarlar.Sil(nesne.Adı);
+                                    Ayarlar.Sil(null, false, false);
                                 }
                                 break;
 

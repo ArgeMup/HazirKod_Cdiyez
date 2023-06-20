@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using ArgeMup.HazirKod.ArkaPlan;
 using ArgeMup.HazirKod.Dönüştürme;
 
@@ -25,16 +26,11 @@ namespace ArgeMup.HazirKod
                 {
                     try
                     {
-                        byte[] çıktı = null;
-
-                        using (var SHA512 = System.Security.Cryptography.SHA512.Create())
+                        byte[] çıktı;
+                        using (var stream = File.OpenRead(DosyaYolu))
                         {
-                            using (var stream = File.OpenRead(DosyaYolu))
-                            {
-                                çıktı = SHA512.ComputeHash(stream);
-                            }
+                            çıktı = D_GeriDönülemezKarmaşıklaştırmaMetodu.Akıştan(stream, 64);
                         }
-
                         return D_HexYazı.BaytDizisinden(çıktı);
                     }
                     catch (Exception) 
@@ -49,17 +45,9 @@ namespace ArgeMup.HazirKod
             {
                 return D_HexYazı.BaytDizisinden(BaytDizisinden(D_Yazı.BaytDizisine(Yazı)));
             }
-            static public byte[] BaytDizisinden(byte[] Dizi, int BaşlangıçKonumu = 0, int Adet = -1)
+            static public byte[] BaytDizisinden(byte[] Dizi)
             {
-                if (Adet == -1) Adet = Dizi.Length - BaşlangıçKonumu;
-
-                byte[] çıktı = null;
-                using (var SHA512 = System.Security.Cryptography.SHA512.Create())
-                {
-                    çıktı = SHA512.ComputeHash(Dizi, BaşlangıçKonumu, Adet);
-                }
-
-                return çıktı;
+                return D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(Dizi, 64);
             }
             static public string Akıştan(Stream Akış)
             {

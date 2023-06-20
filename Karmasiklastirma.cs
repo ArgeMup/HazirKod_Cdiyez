@@ -18,21 +18,31 @@ namespace ArgeMup.HazirKod
         {
             try
             {
-                Aes aes = new AesManaged();
-                aes.IV = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+                byte[] çıktı;
 
-                PasswordDeriveBytes pdb = new PasswordDeriveBytes(Parola, aes.IV);
-                MemoryStream ms = new MemoryStream();
+                using (Aes aesAlg = Aes.Create())
+                {
+                    aesAlg.Mode = CipherMode.CBC;
+                    aesAlg.Padding = PaddingMode.PKCS7;
+                    aesAlg.IV = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
-                aes.Mode = CipherMode.CBC;
-                aes.Padding = PaddingMode.PKCS7;
-                aes.Key = pdb.GetBytes(aes.KeySize / 8);
-                aes.IV = pdb.GetBytes(aes.BlockSize / 8);
+                    PasswordDeriveBytes pdb = new PasswordDeriveBytes(Parola, aesAlg.IV);
+                    aesAlg.Key = pdb.GetBytes(aesAlg.KeySize / 8);
+                    aesAlg.IV = pdb.GetBytes(aesAlg.BlockSize / 8);
 
-                CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write);
-                cs.Write(Girdi, 0, Girdi.Length);
-                cs.Close();
-                return ms.ToArray();
+                    ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                    using (MemoryStream msEncrypt = new MemoryStream())
+                    {
+                        using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+	                    {
+	                        csEncrypt.Write(Girdi, 0, Girdi.Length);
+	                    }
+	                    çıktı = msEncrypt.ToArray();
+	                }
+                }
+
+                return çıktı;
             }
             catch (Exception) { }
             return null;
@@ -46,21 +56,34 @@ namespace ArgeMup.HazirKod
         {
             try
             {
-                Aes aes = new AesManaged();
-                aes.IV = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+                byte[] çıktı = null;
 
-                PasswordDeriveBytes pdb = new PasswordDeriveBytes(Parola, aes.IV);
-                MemoryStream ms = new MemoryStream();
+                using (Aes aesAlg = Aes.Create())
+                {
+                    aesAlg.Mode = CipherMode.CBC;
+                    aesAlg.Padding = PaddingMode.PKCS7;
+                    aesAlg.IV = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
-                aes.Mode = CipherMode.CBC;
-                aes.Padding = PaddingMode.PKCS7;
-                aes.Key = pdb.GetBytes(aes.KeySize / 8);
-                aes.IV = pdb.GetBytes(aes.BlockSize / 8);
+                    PasswordDeriveBytes pdb = new PasswordDeriveBytes(Parola, aesAlg.IV);
+                    aesAlg.Key = pdb.GetBytes(aesAlg.KeySize / 8);
+                    aesAlg.IV = pdb.GetBytes(aesAlg.BlockSize / 8);
 
-                CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write);
-                cs.Write(Girdi, 0, Girdi.Length);
-                cs.Close();
-                return ms.ToArray();
+                    ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                    using (MemoryStream msEncrypt = new MemoryStream(Girdi))
+                    {
+                        using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, decryptor, CryptoStreamMode.Read))
+                        {
+		                    using (MemoryStream ms = new MemoryStream())
+		                    {
+		                        csEncrypt.CopyTo(ms);
+		                        çıktı = ms.ToArray();
+		                    }
+		                }
+                    }
+                }
+
+                return çıktı;
             }
             catch (Exception) { }
             return null;
@@ -279,14 +302,54 @@ namespace ArgeMup.HazirKod.Dönüştürme
     {
         public const string Sürüm = "V1.0";
 
-        /// <summary>
-        /// Sha256 Oluşturucu
-        /// </summary>
-        /// <param name="ÇıktıKarakterSayısı">Geçersiz, Sadece uyumluluk için</param>
-        /// <returns></returns>
         public static byte[] BaytDizisinden(byte[] Dizi, int ÇıktıKarakterSayısı = 32)
         {
-            return new SHA256Managed().ComputeHash(Dizi);
+            #if NET7_0_OR_GREATER
+                return ÇıktıKarakterSayısı == 64 ? SHA512.HashData(Dizi) : ÇıktıKarakterSayısı == 32 ? SHA256.HashData(Dizi) : throw new NotSupportedException();
+            #else
+                byte[] çıktı;
+                if (ÇıktıKarakterSayısı == 64)
+                {
+                    using (var SHA512 = System.Security.Cryptography.SHA512.Create())
+                    {
+                        çıktı = SHA512.ComputeHash(Dizi);
+                    }
+                }
+                else if (ÇıktıKarakterSayısı == 32)
+                {
+                    using (var SHA256 = System.Security.Cryptography.SHA256.Create())
+                    {
+                        çıktı = SHA256.ComputeHash(Dizi);
+                    }
+                }
+                else throw new NotSupportedException();
+                return çıktı;
+            #endif
+        }
+
+        public static byte[] Akıştan(Stream Akış, int ÇıktıKarakterSayısı = 32)
+        {
+            #if NET7_0_OR_GREATER
+                return ÇıktıKarakterSayısı == 64 ? SHA512.HashData(Akış) : ÇıktıKarakterSayısı == 32 ? SHA256.HashData(Akış) : throw new NotSupportedException();
+            #else
+                byte[] çıktı;
+                if (ÇıktıKarakterSayısı == 64)
+                {
+                    using (var SHA512 = System.Security.Cryptography.SHA512.Create())
+                    {
+                        çıktı = SHA512.ComputeHash(Akış);
+                    }
+                }
+                else if (ÇıktıKarakterSayısı == 32)
+                {
+                    using (var SHA256 = System.Security.Cryptography.SHA256.Create())
+                    {
+                        çıktı = SHA256.ComputeHash(Akış);
+                    }
+                }
+                else throw new NotSupportedException();
+                return çıktı;
+            #endif
         }
 
         public static string Yazıdan(string Girdi, int ÇıktıKarakterSayısı = 32)

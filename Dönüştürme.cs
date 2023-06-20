@@ -342,37 +342,90 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
     public static class D_Nesne
     {
-        public const string Sürüm = "V1.1";
+        #if NET7_0_OR_GREATER
+            /// <summary>
+            /// Sadece public değişkenler dahil edilir
+            /// 
+            /// Bir sınıfı açıp kapatırken, ilgili sınıfın ve içindeki diğer sınıfların
+            /// alttaki kıstaslardan birisine uygun olduğunu teyit et
+            /// tersi durumda ThrowInvalidOperationException_ConstructorParameterIncompleteBinding
+            /// 
+            /// A)Başlatıcı işlem parametresiz olmalı
+            /// B)Başlatıcı işlemin parametrelerinin isimleri ile json içeriğinde geçen isimler aynı olmalı
+            /// 
+            /// public class Örnek_Üst
+            /// {
+            ///    public string Yaz1, Yaz2;
+            ///    public List<Örnek_Alt> Alttakiler;
+            ///
+            ///    public Örnek_Üst() { }                            //A maddesine örnek
+            ///    public Örnek_Üst(string Yaz1, string Yaz2) { }    //B maddesine örnek
+            /// }
+            /// public class Örnek_Alt
+            /// {
+            ///    public string Yaz1, Yaz2;
+            ///
+            ///    public Örnek_Alt() { }                            //A maddesine örnek
+            ///    public Örnek_Alt(string Yaz1, string Yaz2) { }    //B maddesine örnek
+            /// }
+            /// 
+            /// Örnek_Üst ü = new Örnek_Üst() { Yaz1 = "ust_1_", Yaz2 = "ust_2_", Alttakiler = new List<Örnek_Alt>() };
+            /// ü.Alttakiler.Add(new Örnek_Alt() { Yaz1 = "alt_a_1", Yaz2 = "alt_a_2" });
+            /// byte[] dizi = D_Nesne.BaytDizisine(ü);
+            /// Trace.WriteLine(dizi.Yazıya());
+            /// Örnek_Üst üü = (Örnek_Üst)D_Nesne.BaytDizisinden(dizi, typeof(Örnek_Üst));
+            /// 
+            /// {"Yaz1":"ust_1_","Yaz2":"ust_2_","Alttakiler":[{"Yaz1":"alt_a_1","Yaz2":"alt_a_2"}]}
+            /// </summary>
 
-        public static byte[] BaytDizisine(object Girdi)
-        {
-            if (Girdi == null) return null;
+            public const string Sürüm = "V1.2";
+            static readonly System.Text.Json.JsonSerializerOptions seçenekler = new System.Text.Json.JsonSerializerOptions() { IncludeFields = true };
 
-            byte[] Çıktı;
-            using (var mS = new System.IO.MemoryStream())
+            public static byte[] BaytDizisine(object Girdi)
             {
-                var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                bf.Serialize(mS, Girdi);
-                Çıktı = mS.ToArray();
-            }
-            return Çıktı;
-        }
-        public static object BaytDizisinden(byte[] Girdi, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
-        {
-            if (Girdi == null) return null;
-            if (Adet == int.MinValue) Adet = Girdi.Length - BaşlangıçKonumu;
-            if (Adet > Girdi.Length - BaşlangıçKonumu) Adet = Girdi.Length - BaşlangıçKonumu;
+                if (Girdi == null) return null;
 
-            object Çıktı;
-            using (var mS = new System.IO.MemoryStream())
-            {
-                var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                mS.Write(Girdi, BaşlangıçKonumu, Adet);
-                mS.Seek(0, System.IO.SeekOrigin.Begin);
-                Çıktı = bf.Deserialize(mS);
+                return System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(Girdi, Girdi.GetType(), seçenekler);
             }
-            return Çıktı;
-        }
+            public static object BaytDizisinden(byte[] Girdi, Type Tipi)
+            {
+                if (Girdi == null || Girdi.Length < 1) return null;
+
+                return System.Text.Json.JsonSerializer.Deserialize(Girdi, Tipi, seçenekler);
+            }
+        #else
+            public const string Sürüm = "V1.1";
+
+            public static byte[] BaytDizisine(object Girdi)
+            {
+                if (Girdi == null) return null;
+
+                byte[] Çıktı;
+                using (var mS = new System.IO.MemoryStream())
+                {
+                    var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bf.Serialize(mS, Girdi);
+                    Çıktı = mS.ToArray();
+                }
+                return Çıktı;
+            }
+            public static object BaytDizisinden(byte[] Girdi, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
+            {
+                if (Girdi == null) return null;
+                if (Adet == int.MinValue) Adet = Girdi.Length - BaşlangıçKonumu;
+                if (Adet > Girdi.Length - BaşlangıçKonumu) Adet = Girdi.Length - BaşlangıçKonumu;
+
+                object Çıktı;
+                using (var mS = new System.IO.MemoryStream())
+                {
+                    var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    mS.Write(Girdi, BaşlangıçKonumu, Adet);
+                    mS.Seek(0, System.IO.SeekOrigin.Begin);
+                    Çıktı = bf.Deserialize(mS);
+                }
+                return Çıktı;
+            }
+        #endif
     }
 
     public static class D_WwwAdresi
@@ -410,7 +463,6 @@ namespace ArgeMup.HazirKod.Dönüştürme
             {
                 W32_8.DestroyIcon(ikon.Handle);
                 ikon.Dispose();
-                ikon = null;
             }
         }
 	#endif

@@ -27,15 +27,28 @@ namespace ArgeMup.HazirKod
             return Oku(Tipi, Depo, Depo[0] /*Sadece basit tipteki değişkenlerin okunabilmesi için*/);
         }
 
-        bool Filtre_KontrolEt_Kullanılsın(string DeğişkenAdı)
+        bool KontrolEt_KullanılsınMı(FieldInfo Değişken, out string Adı)
         {
+            Adı = Değişken.Name;
+
+            //getter setter leri atla
+            if (Değişken.GetCustomAttribute<System.Runtime.CompilerServices.CompilerGeneratedAttribute>() != null) return false; 
+
+            //Nitelik kontrolü
+            Niteliği.Adını_DeğiştirAttribute AdınıDeğiştir = Değişken.GetCustomAttribute<Niteliği.Adını_DeğiştirAttribute>();
+            if (AdınıDeğiştir != null && AdınıDeğiştir.KullanılacakAdı.DoluMu(true)) Adı = AdınıDeğiştir.KullanılacakAdı;
+
+            if (Değişken.GetCustomAttribute<Niteliği.Bunu_Kesinlikle_KullanAttribute>() != null) return true;
+            if (Değişken.GetCustomAttribute<Niteliği.Bunu_Kesinlikle_KullanmaAttribute>() != null) return false;
+            
+            //Filtre kontrolü
             if (Filtre_Değişkenİsimleri != null)
             {
                 if (Filtre_Filtre_Değişkenİsimlerini_DahilEt1_HariçTut0)
                 {
                     foreach (string f in Filtre_Değişkenİsimleri)
                     {
-                        if (f.DoluMu() && DeğişkenAdı.BenzerMi(f, Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç)) return true;
+                        if (f.DoluMu() && Adı.BenzerMi(f, Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç)) return true;
                     }
 
                     return false;
@@ -44,7 +57,7 @@ namespace ArgeMup.HazirKod
                 {
                     foreach (string f in Filtre_Değişkenİsimleri)
                     {
-                        if (f.DoluMu() && DeğişkenAdı.BenzerMi(f, Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç)) return false;
+                        if (f.DoluMu() && Adı.BenzerMi(f, Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç)) return false;
                     }
                 }
             }
@@ -119,167 +132,216 @@ namespace ArgeMup.HazirKod
                     for (int i = 0; i < Elemanları.Length && !Tipi.IsEnum; i++)
                     {
                         FieldInfo eleman = Elemanları[i];
-                        if (eleman.GetCustomAttribute<System.Runtime.CompilerServices.CompilerGeneratedAttribute>() != null) continue; //getter setter leri atla
-                        if (!Filtre_KontrolEt_Kullanılsın(eleman.Name)) continue;
+                        if (!KontrolEt_KullanılsınMı(eleman, out string Adı)) continue; //istenmeyenleri atla
 
-                        Yaz(eleman.GetValue(Nesne), Depo[eleman.Name], Basit_Tipte_Mi(eleman.FieldType) ? 0 : i);
+                        if (Depo.Oku(Adı).DoluMu()) throw new Exception(Tipi.Name + " içindeki " + eleman.Name + (eleman.Name != Adı ? " (" + Adı + ")" : null) + " adı önceden kullanıldı, farklı bir isim seçiniz");
+
+                        Yaz(eleman.GetValue(Nesne), Depo[Adı], Basit_Tipte_Mi(eleman.FieldType) ? 0 : i);
                     }
                 }
             }
         }
         object Oku(Type Tipi, IDepo_Eleman Depo, string İçerik)
         {
-            object Nesne = null;
+            object Nesne;
 
-            try
+            if (Basit_Tipte_Mi(Tipi))
             {
-                if (Basit_Tipte_Mi(Tipi))
+                if (İçerik.DoluMu())
                 {
-                    if (İçerik.DoluMu())
+                    try
                     {
-                        if (Tipi.IsEnum)
-                        {
-                            if (Tipi.IsEnumDefined(İçerik))
-                            {
-                                return Enum.Parse(Tipi, İçerik);
-                            }
-                        }
+                        if (Tipi.IsEnum) return Enum.Parse(Tipi, İçerik);
                         else return Convert.ChangeType(İçerik, Tipi, System.Globalization.CultureInfo.InvariantCulture);
                     }
-
-                    return null;
+                    catch (Exception) { } // Tip dönüşüm hatası : Değişkenin ilk değerini koruması için geri dön 
                 }
-                else if (Tipi.IsArray)
+
+                return null;
+            }
+            else if (Tipi.IsArray)
+            {
+                Type Tipi_eleman = Tipi.GetElementType();
+
+                if (Tipi_eleman == typeof(byte))
                 {
-                    Type Tipi_eleman = Tipi.GetElementType();
+                    return Depo.Oku_BaytDizisi(null);
+                }
+                else
+                {
+                    Array Üretilen_Dizi = null;
 
-                    if (Tipi_eleman == typeof(byte))
+                    if (Basit_Tipte_Mi(Tipi_eleman))
                     {
-                        return Depo.Oku_BaytDizisi(null);
-                    }
-                    else
-                    {
-                        Array Üretilen_Dizi = null;
-
-                        if (Basit_Tipte_Mi(Tipi_eleman))
-                        {
-                            Üretilen_Dizi = Array.CreateInstance(Tipi_eleman, Depo.İçeriği.Length);
+                        Üretilen_Dizi = Array.CreateInstance(Tipi_eleman, Depo.İçeriği.Length);
                             
+                        for (int i = 0; i < Üretilen_Dizi.Length; i++)
+                        {
+                            object değeri = Oku(Tipi_eleman, Depo, Depo[i]);
+                            if (değeri != null) Üretilen_Dizi.SetValue(değeri, i);
+                        }
+                    }
+                    else if (Depo.Elemanları.Length > 0)
+                    {
+                        //en büyük numaradan dizideki azami eleman noyu bul
+                        int enbüyük = -1;
+                        foreach (IDepo_Eleman biri in Depo.Elemanları)
+                        {
+                            if (!int.TryParse(biri.Adı, out int değeri))
+                            {
+                                enbüyük = -1;
+                                break;
+                            }
+
+                            if (değeri > enbüyük) enbüyük = değeri;
+                        }
+
+                        if (enbüyük < 0)
+                        {
+                            //dizideki elemanların isimlendirmelerinden en az biri uygun değil, doğrudan diziye kaydet 
+                            Üretilen_Dizi = Array.CreateInstance(Tipi_eleman, Depo.Elemanları.Length);
                             for (int i = 0; i < Üretilen_Dizi.Length; i++)
                             {
-                                object değeri = Oku(Tipi_eleman, Depo, Depo[i]);
+                                object değeri = Oku(Tipi_eleman, Depo.Elemanları[i], Depo.Elemanları[i][0]);
                                 if (değeri != null) Üretilen_Dizi.SetValue(değeri, i);
                             }
                         }
-                        else if (Depo.Elemanları.Length > 0)
+                        else
                         {
-                            //en büyük numaradan dizideki azami eleman noyu bul
-                            int enbüyük = -1;
+                            //elemanın ismini dizideki konum olacak şekilde diziye kaydet
+                            enbüyük++; //0 dan başlıyor
+                            Üretilen_Dizi = Array.CreateInstance(Tipi_eleman, enbüyük);
                             foreach (IDepo_Eleman biri in Depo.Elemanları)
                             {
-                                if (!int.TryParse(biri.Adı, out int değeri))
-                                {
-                                    enbüyük = -1;
-                                    break;
-                                }
-
-                                if (değeri > enbüyük) enbüyük = değeri;
-                            }
-
-                            if (enbüyük < 0)
-                            {
-                                //dizideki elemanların isimlendirmelerinden en az biri uygun değil, doğrudan diziye kaydet 
-                                Üretilen_Dizi = Array.CreateInstance(Tipi_eleman, Depo.Elemanları.Length);
-                                for (int i = 0; i < Üretilen_Dizi.Length; i++)
-                                {
-                                    object değeri = Oku(Tipi_eleman, Depo.Elemanları[i], Depo.Elemanları[i][0]);
-                                    if (değeri != null) Üretilen_Dizi.SetValue(değeri, i);
-                                }
-                            }
-                            else
-                            {
-                                //elemanın ismini dizideki konum olacak şekilde diziye kaydet
-                                enbüyük++; //0 dan başlıyor
-                                Üretilen_Dizi = Array.CreateInstance(Tipi_eleman, enbüyük);
-                                foreach (IDepo_Eleman biri in Depo.Elemanları)
-                                {
-                                    object değeri = Oku(Tipi_eleman, biri, biri[0]);
-                                    if (değeri != null) Üretilen_Dizi.SetValue(değeri, int.Parse(biri.Adı));
-                                }
+                                object değeri = Oku(Tipi_eleman, biri, biri[0]);
+                                if (değeri != null) Üretilen_Dizi.SetValue(değeri, int.Parse(biri.Adı));
                             }
                         }
+                    }
 
-                        return Üretilen_Dizi;
+                    return Üretilen_Dizi;
+                }
+            }
+            else if (Tipi.IsGenericType && Tipi.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                Nesne = Activator.CreateInstance(Tipi);
+                Tipi = Tipi.GenericTypeArguments[0];
+                if (Basit_Tipte_Mi(Tipi))
+                {
+                    for (int i = 0; i < Depo.İçeriği.Length; i++)
+                    {
+                        object değeri = Oku(Tipi, Depo, Depo[i]);
+                        if (değeri != null) ((IList)Nesne).Add(değeri);
                     }
                 }
-                else if (Tipi.IsGenericType && Tipi.GetGenericTypeDefinition() == typeof(List<>))
+                else
                 {
-                    Nesne = Activator.CreateInstance(Tipi);
-                    Tipi = Tipi.GenericTypeArguments[0];
-                    if (Basit_Tipte_Mi(Tipi))
+                    foreach (IDepo_Eleman eleman in Depo.Elemanları)
                     {
-                        for (int i = 0; i < Depo.İçeriği.Length; i++)
-                        {
-                            object değeri = Oku(Tipi, Depo, Depo[i]);
-                            if (değeri != null) ((IList)Nesne).Add(değeri);
-                        }
+                        object değeri = Oku(Tipi, eleman, eleman[0]);
+                        if (değeri != null) ((IList)Nesne).Add(değeri);
                     }
-                    else
+                }
+
+                return Nesne;
+            }
+            else if (Tipi.IsGenericType && Tipi.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                Type tip_anahtar = Tipi.GenericTypeArguments[0];
+                if (Basit_Tipte_Mi(tip_anahtar))
+                {
+                    Type tip_içerik = Tipi.GenericTypeArguments[1];
+                    Type dictType = typeof(Dictionary<,>).MakeGenericType(tip_anahtar, tip_içerik);
+                    Nesne = Activator.CreateInstance(dictType);
+
+                    foreach (IDepo_Eleman eleman in Depo.Elemanları)
                     {
-                        foreach (IDepo_Eleman eleman in Depo.Elemanları)
-                        {
-                            object değeri = Oku(Tipi, eleman, eleman[0]);
-                            if (değeri != null) ((IList)Nesne).Add(değeri);
-                        }
+                        object anahtar = Oku(tip_anahtar, eleman, eleman.Adı);
+                        object içerik = Oku(tip_içerik, eleman, eleman[0]);
+                            
+                        if (anahtar == null || içerik == null) continue;
+
+                        ((IDictionary)Nesne).Add(anahtar, içerik);
                     }
 
                     return Nesne;
                 }
-                else if (Tipi.IsGenericType && Tipi.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-                {
-                    Type tip_anahtar = Tipi.GenericTypeArguments[0];
-                    if (Basit_Tipte_Mi(tip_anahtar))
-                    {
-                        Type tip_içerik = Tipi.GenericTypeArguments[1];
-                        Type dictType = typeof(Dictionary<,>).MakeGenericType(tip_anahtar, tip_içerik);
-                        Nesne = Activator.CreateInstance(dictType);
-
-                        foreach (IDepo_Eleman eleman in Depo.Elemanları)
-                        {
-                            object anahtar = Oku(tip_anahtar, eleman, eleman.Adı);
-                            object içerik = Oku(tip_içerik, eleman, eleman[0]);
-                            
-                            if (anahtar == null || içerik == null) continue;
-
-                            ((IDictionary)Nesne).Add(anahtar, içerik);
-                        }
-
-                        return Nesne;
-                    }
-                    else throw new Exception(Depo.Adı + " sözlüğünün anahtar bölümü tek başına yazıya dönüştürülebilen basit tipte olmalıdır");
-                }
-                else Nesne = Activator.CreateInstance(Tipi);
-
-                FieldInfo[] Elemanları = Tipi.GetFields(Filtre_TipTürü);
-                if (Elemanları == null || Elemanları.Length == 0) return Nesne;
-
-                for (int i = 0; i < Elemanları.Length; i++)
-                {
-                    FieldInfo eleman = Elemanları[i];
-                    IDepo_Eleman eleman_depo = Depo.Bul(eleman.Name);
-                    if (eleman_depo == null || eleman.GetCustomAttribute<System.Runtime.CompilerServices.CompilerGeneratedAttribute>() != null) continue; //kaydı olmayan veya getter setter leri atla
-                    if (!Filtre_KontrolEt_Kullanılsın(eleman.Name)) continue;
-
-                    object üretilen = Oku(eleman.FieldType, Depo[eleman.Name], Depo[eleman.Name][Basit_Tipte_Mi(eleman.FieldType) ? 0 : i]);
-                    if (üretilen != null) eleman.SetValue(Nesne, üretilen);
-                }
+                else throw new Exception(Depo.Adı + " sözlüğünün anahtar bölümü tek başına yazıya dönüştürülebilen basit tipte olmalıdır");
             }
-            catch (Exception ex) 
-            { 
-                ex.Günlük(Seviyesi: Günlük.Seviye.HazirKod);
+            else Nesne = Activator.CreateInstance(Tipi);
+
+            FieldInfo[] Elemanları = Tipi.GetFields(Filtre_TipTürü);
+            if (Elemanları == null || Elemanları.Length == 0) return Nesne;
+
+            for (int i = 0; i < Elemanları.Length; i++)
+            {
+                FieldInfo eleman = Elemanları[i];
+                if (!KontrolEt_KullanılsınMı(eleman, out string Adı)) continue; //istenmeyenleri atla
+
+                IDepo_Eleman eleman_depo = Depo.Bul(Adı);
+                if (eleman_depo == null)
+                {
+                    Niteliği.Sürüm_Geçişi_İçin_Eski_AdıAttribute Sürüm_Geçişi_İçin_Eski_Adı = eleman.GetCustomAttribute<Niteliği.Sürüm_Geçişi_İçin_Eski_AdıAttribute>();
+                    if (Sürüm_Geçişi_İçin_Eski_Adı != null && Sürüm_Geçişi_İçin_Eski_Adı.EskiAdı.DoluMu(true))
+                    {
+                        eleman_depo = Depo.Bul(Sürüm_Geçişi_İçin_Eski_Adı.EskiAdı);
+                    }
+
+                    if (eleman_depo == null) continue; //kaydı olmayanları atla
+                }
+
+                object üretilen = Oku(eleman.FieldType, eleman_depo, eleman_depo[Basit_Tipte_Mi(eleman.FieldType) ? 0 : i]);
+                if (üretilen != null) eleman.SetValue(Nesne, üretilen);
             }
 
             return Nesne;
         }
+
+        #region Nitelik
+        public class Niteliği
+        {
+            /// <summary>
+            /// Değişkenin kendi adı yerine burada belirtilen adı kullanılır
+            /// </summary>
+            [AttributeUsage(AttributeTargets.Field)]
+            public class Adını_DeğiştirAttribute : Attribute
+            {
+                public string KullanılacakAdı;
+
+                public Adını_DeğiştirAttribute(string Adı)
+                {
+                    KullanılacakAdı = Adı;
+                }
+            }
+
+            /// <summary>
+            /// Depodan nesneye aktarırken kendi adı için bir içerik bulamaması durumunda buradaki ad ile tekrar kontrol eder
+            /// </summary>
+            [AttributeUsage(AttributeTargets.Field)]
+            public class Sürüm_Geçişi_İçin_Eski_AdıAttribute : Attribute
+            {
+                public string EskiAdı;
+
+                public Sürüm_Geçişi_İçin_Eski_AdıAttribute(string Adı)
+                {
+                    EskiAdı = Adı;
+                }
+            }
+
+            /// <summary>
+            /// Belirtilen nesneyi dahil eder<br>
+            /// Bir filtre ile çakışması önemsizdir
+            /// </summary>
+            [AttributeUsage(AttributeTargets.Field)]
+            public class Bunu_Kesinlikle_KullanAttribute : Attribute { }
+
+            /// <summary>
+            /// Belirtilen nesneyi hariç tutar<br>
+            /// Bir filtre ile çakışması önemsizdir
+            /// </summary>
+            [AttributeUsage(AttributeTargets.Field)]
+            public class Bunu_Kesinlikle_KullanmaAttribute : Attribute { }
+        }
+        #endregion
     }
 }

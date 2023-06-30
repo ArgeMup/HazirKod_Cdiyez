@@ -257,6 +257,24 @@ namespace ArgeMup.HazirKod.Ekİşlemler
     {
         public const string Sürüm = "V1.0";
 
+        public static bool BoşVeyaVarsayılanDeğerdeMi<T>(this T Nesne)
+        {
+            if (Nesne == null) return true;
+            if (object.Equals(Nesne, default(T))) return true;
+
+            System.Type TipinTipi = typeof(T);
+            if (System.Nullable.GetUnderlyingType(TipinTipi) != null) return false;
+
+            System.Type NesneTipi = Nesne.GetType();
+            if (NesneTipi.IsValueType && NesneTipi != TipinTipi)
+            {
+                object gölgesi = System.Activator.CreateInstance(NesneTipi);
+                return gölgesi.Equals(Nesne);
+            }
+
+            return false;
+        }
+
         public static object Günlük(this object Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0, bool Hemen = false)
         {
             ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + (Girdi == null ? "null" : Girdi.GetType().FullName + " " + Girdi.ToString()), Seviyesi, ÇağıranDosya, ÇağıranSatırNo, Hemen);

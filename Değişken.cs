@@ -16,18 +16,20 @@ namespace ArgeMup.HazirKod
         public BindingFlags Filtre_TipTürü = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
         public string[] Filtre_Değişkenİsimleri = null;
         public bool Filtre_Filtre_Değişkenİsimlerini_DahilEt1_HariçTut0 = true;
+        public bool Filtre_BoşVeyaVarsayılanDeğerdeİse_HariçTut = false;
         public bool Filtre_BüyükKüçükHarfDuyarlı = true;
         public char Filtre_Ayraç = '*';
+        public int İzinVerilen_İçİçeÇağrıSayısı_Sabiti = 15;
         public void Depola(object Nesne, IDepo_Eleman Depo)
         {
-            Yaz(Nesne, Depo, 0);
+            Yaz(Nesne, Depo, 0, 0);
         }
         public object Üret(Type Tipi, IDepo_Eleman Depo)
         {
-            return Oku(Tipi, Depo, Depo[0] /*Sadece basit tipteki değişkenlerin okunabilmesi için*/);
+            return Oku(Tipi, Depo, Depo[0] /*Sadece basit tipteki değişkenlerin okunabilmesi için*/, 0);
         }
 
-        bool KontrolEt_KullanılsınMı(FieldInfo Değişken, out string Adı)
+        bool KontrolEt_Kullanılsın_Mı(FieldInfo Değişken, out string Adı)
         {
             Adı = Değişken.Name;
 
@@ -76,14 +78,18 @@ namespace ArgeMup.HazirKod
 
             return false;
         }
-        void Yaz(object Nesne, IDepo_Eleman Depo, int Konum)
+        void Yaz(object Nesne, IDepo_Eleman Depo, int Konum, int İçİçeÇağrıSayısı)
         {
-            if (Nesne == null) return;
+            if (Nesne == null || ++İçİçeÇağrıSayısı > İzinVerilen_İçİçeÇağrıSayısı_Sabiti) return; //Çok fazla iç içe çağrı yapıldı
 
             Type Tipi = Nesne.GetType();
             if (Basit_Tipte_Mi(Tipi))
             {
-                Depo.Yaz(null, Convert.ToString(Nesne, System.Globalization.CultureInfo.InvariantCulture), Konum);
+                if ( !(Nesne.BoşVeyaVarsayılanDeğerdeMi() && Filtre_BoşVeyaVarsayılanDeğerdeİse_HariçTut) )
+                {
+                    if (Tipi == typeof(DateTime)) Depo.Yaz(null, (DateTime)Nesne, Konum);
+                    else Depo.Yaz(null, Convert.ToString(Nesne, System.Globalization.CultureInfo.InvariantCulture), Konum);
+                }
             }
             else if (Tipi.IsArray || (Tipi.IsGenericType && Tipi.GetGenericTypeDefinition() == typeof(List<>)))
             {
@@ -100,7 +106,7 @@ namespace ArgeMup.HazirKod
                     bool bilinen_tipte_dizi_mi = Basit_Tipte_Mi(elm_tipi);
                     foreach (var alt_dizi_elm in (IEnumerable)Nesne)
                     {
-                        Yaz(alt_dizi_elm, bilinen_tipte_dizi_mi ? Depo : Depo[sıra_no.ToString()], sıra_no++);
+                        Yaz(alt_dizi_elm, bilinen_tipte_dizi_mi ? Depo : Depo[sıra_no.ToString()], sıra_no++, İçİçeÇağrıSayısı);
                     }
                 }
             }
@@ -119,7 +125,7 @@ namespace ArgeMup.HazirKod
                         if (içerik == null) continue;
 
                         Type Tipi_Sıradaki = içerik.GetType();
-                        Yaz(içerik, Depo[anahtar], Basit_Tipte_Mi(Tipi_Sıradaki) ? 0 : sıra_no++);
+                        Yaz(içerik, Depo[anahtar], Basit_Tipte_Mi(Tipi_Sıradaki) ? 0 : sıra_no++, İçİçeÇağrıSayısı);
                     }
                 }
                 else throw new Exception(Depo.Adı + " sözlüğünün anahtar bölümü tek başına yazıya dönüştürülebilen basit tipte olmalıdır");
@@ -129,21 +135,25 @@ namespace ArgeMup.HazirKod
                 FieldInfo[] Elemanları = Tipi.GetFields(Filtre_TipTürü);
                 if (Elemanları != null)
                 {
+                    List<string> Kullanılanİsimler = new List<string>();
                     for (int i = 0; i < Elemanları.Length && !Tipi.IsEnum; i++)
                     {
                         FieldInfo eleman = Elemanları[i];
-                        if (!KontrolEt_KullanılsınMı(eleman, out string Adı)) continue; //istenmeyenleri atla
+                        bool snç = KontrolEt_Kullanılsın_Mı(eleman, out string Adı);
 
-                        if (Depo.Oku(Adı).DoluMu()) throw new Exception(Tipi.Name + " içindeki " + eleman.Name + (eleman.Name != Adı ? " (" + Adı + ")" : null) + " adı önceden kullanıldı, farklı bir isim seçiniz");
+                        if (Kullanılanİsimler.Contains(Adı)) throw new Exception(Tipi.Name + " içindeki " + eleman.Name + (eleman.Name != Adı ? " (" + Adı + ")" : null) + " değişken adı olarak zaten kullanıldı, farklı bir isim seçiniz");
+                        else Kullanılanİsimler.Add(Adı); //kullanılmayacak olsa bile ileride çakışma olmaması için şimdiden uyarabilmek adına listeye ekle
+                        if (!snç) continue; //istenmeyenleri atla
 
-                        Yaz(eleman.GetValue(Nesne), Depo[Adı], Basit_Tipte_Mi(eleman.FieldType) ? 0 : i);
+                        Yaz(eleman.GetValue(Nesne), Depo[Adı], Basit_Tipte_Mi(eleman.FieldType) ? 0 : i, İçİçeÇağrıSayısı);
                     }
                 }
             }
         }
-        object Oku(Type Tipi, IDepo_Eleman Depo, string İçerik)
+        object Oku(Type Tipi, IDepo_Eleman Depo, string İçerik, int İçİçeÇağrıSayısı)
         {
             object Nesne;
+            if (++İçİçeÇağrıSayısı > İzinVerilen_İçİçeÇağrıSayısı_Sabiti) return null; //Çok fazla iç içe çağrı yapıldı
 
             if (Basit_Tipte_Mi(Tipi))
             {
@@ -152,7 +162,11 @@ namespace ArgeMup.HazirKod
                     try
                     {
                         if (Tipi.IsEnum) return Enum.Parse(Tipi, İçerik);
-                        else return Convert.ChangeType(İçerik, Tipi, System.Globalization.CultureInfo.InvariantCulture);
+                        else
+                        {
+                            if (Tipi == typeof(DateTime)) return İçerik.TarihSaate();
+                            else return Convert.ChangeType(İçerik, Tipi, System.Globalization.CultureInfo.InvariantCulture);
+                        }
                     }
                     catch (Exception) { } // Tip dönüşüm hatası : Değişkenin ilk değerini koruması için geri dön 
                 }
@@ -177,7 +191,7 @@ namespace ArgeMup.HazirKod
                             
                         for (int i = 0; i < Üretilen_Dizi.Length; i++)
                         {
-                            object değeri = Oku(Tipi_eleman, Depo, Depo[i]);
+                            object değeri = Oku(Tipi_eleman, Depo, Depo[i], İçİçeÇağrıSayısı);
                             if (değeri != null) Üretilen_Dizi.SetValue(değeri, i);
                         }
                     }
@@ -202,7 +216,7 @@ namespace ArgeMup.HazirKod
                             Üretilen_Dizi = Array.CreateInstance(Tipi_eleman, Depo.Elemanları.Length);
                             for (int i = 0; i < Üretilen_Dizi.Length; i++)
                             {
-                                object değeri = Oku(Tipi_eleman, Depo.Elemanları[i], Depo.Elemanları[i][0]);
+                                object değeri = Oku(Tipi_eleman, Depo.Elemanları[i], Depo.Elemanları[i][0], İçİçeÇağrıSayısı);
                                 if (değeri != null) Üretilen_Dizi.SetValue(değeri, i);
                             }
                         }
@@ -213,7 +227,7 @@ namespace ArgeMup.HazirKod
                             Üretilen_Dizi = Array.CreateInstance(Tipi_eleman, enbüyük);
                             foreach (IDepo_Eleman biri in Depo.Elemanları)
                             {
-                                object değeri = Oku(Tipi_eleman, biri, biri[0]);
+                                object değeri = Oku(Tipi_eleman, biri, biri[0], İçİçeÇağrıSayısı);
                                 if (değeri != null) Üretilen_Dizi.SetValue(değeri, int.Parse(biri.Adı));
                             }
                         }
@@ -230,7 +244,7 @@ namespace ArgeMup.HazirKod
                 {
                     for (int i = 0; i < Depo.İçeriği.Length; i++)
                     {
-                        object değeri = Oku(Tipi, Depo, Depo[i]);
+                        object değeri = Oku(Tipi, Depo, Depo[i], İçİçeÇağrıSayısı);
                         if (değeri != null) ((IList)Nesne).Add(değeri);
                     }
                 }
@@ -238,7 +252,7 @@ namespace ArgeMup.HazirKod
                 {
                     foreach (IDepo_Eleman eleman in Depo.Elemanları)
                     {
-                        object değeri = Oku(Tipi, eleman, eleman[0]);
+                        object değeri = Oku(Tipi, eleman, eleman[0], İçİçeÇağrıSayısı);
                         if (değeri != null) ((IList)Nesne).Add(değeri);
                     }
                 }
@@ -256,8 +270,8 @@ namespace ArgeMup.HazirKod
 
                     foreach (IDepo_Eleman eleman in Depo.Elemanları)
                     {
-                        object anahtar = Oku(tip_anahtar, eleman, eleman.Adı);
-                        object içerik = Oku(tip_içerik, eleman, eleman[0]);
+                        object anahtar = Oku(tip_anahtar, eleman, eleman.Adı, İçİçeÇağrıSayısı);
+                        object içerik = Oku(tip_içerik, eleman, eleman[0], İçİçeÇağrıSayısı);
                             
                         if (anahtar == null || içerik == null) continue;
 
@@ -276,7 +290,7 @@ namespace ArgeMup.HazirKod
             for (int i = 0; i < Elemanları.Length; i++)
             {
                 FieldInfo eleman = Elemanları[i];
-                if (!KontrolEt_KullanılsınMı(eleman, out string Adı)) continue; //istenmeyenleri atla
+                if (!KontrolEt_Kullanılsın_Mı(eleman, out string Adı)) continue; //istenmeyenleri atla
 
                 IDepo_Eleman eleman_depo = Depo.Bul(Adı);
                 if (eleman_depo == null)
@@ -290,7 +304,7 @@ namespace ArgeMup.HazirKod
                     if (eleman_depo == null) continue; //kaydı olmayanları atla
                 }
 
-                object üretilen = Oku(eleman.FieldType, eleman_depo, eleman_depo[Basit_Tipte_Mi(eleman.FieldType) ? 0 : i]);
+                object üretilen = Oku(eleman.FieldType, eleman_depo, eleman_depo[Basit_Tipte_Mi(eleman.FieldType) ? 0 : i], İçİçeÇağrıSayısı);
                 if (üretilen != null) eleman.SetValue(Nesne, üretilen);
             }
 
@@ -329,15 +343,15 @@ namespace ArgeMup.HazirKod
             }
 
             /// <summary>
-            /// Belirtilen nesneyi dahil eder<br>
-            /// Bir filtre ile çakışması önemsizdir
+            /// Belirtilen nesneyi dahil eder
+            /// <br>Bir filtre ile çakışması önemsizdir</br>
             /// </summary>
             [AttributeUsage(AttributeTargets.Field)]
             public class Bunu_Kesinlikle_KullanAttribute : Attribute { }
 
             /// <summary>
-            /// Belirtilen nesneyi hariç tutar<br>
-            /// Bir filtre ile çakışması önemsizdir
+            /// Belirtilen nesneyi hariç tutar
+            /// <br>Bir filtre ile çakışması önemsizdir</br>
             /// </summary>
             [AttributeUsage(AttributeTargets.Field)]
             public class Bunu_Kesinlikle_KullanmaAttribute : Attribute { }

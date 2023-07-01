@@ -10,7 +10,7 @@ namespace ArgeMup.HazirKod
 {
     public class YeniYazılımKontrolü_ : IDisposable
     {
-    	public string Sürüm = "V1.3";
+    	public string Sürüm = "V1.4";
         public bool KontrolTamamlandı = false;
         public delegate void YeniYazılımKontrolü_GeriBildirim_(bool Sonuç, string Açıklama);
 
@@ -52,48 +52,53 @@ namespace ArgeMup.HazirKod
         }
         void İstemci_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            if (e.Error == null)
+            try
             {
-                FileVersionInfo gelen = FileVersionInfo.GetVersionInfo(İndirilenDosyanınAdı), şimdiki = null;
-
-                bool gelen_daha_yeni = false, HedefDosyaVarMı = File.Exists(HedefDosyaYolu);
-                if (HedefDosyaVarMı)
+                if (e.Error == null)
                 {
-                    şimdiki = FileVersionInfo.GetVersionInfo(HedefDosyaYolu);
+                    FileVersionInfo gelen = FileVersionInfo.GetVersionInfo(İndirilenDosyanınAdı), şimdiki = null;
 
-                    if (gelen.FileMajorPart > şimdiki.FileMajorPart) gelen_daha_yeni = true;
-                    else if (gelen.FileMajorPart == şimdiki.FileMajorPart)
+                    bool gelen_daha_yeni = false, HedefDosyaVarMı = File.Exists(HedefDosyaYolu);
+                    if (HedefDosyaVarMı)
                     {
-                        if (gelen.FileMinorPart > şimdiki.FileMinorPart) gelen_daha_yeni = true;
-                        else if (gelen.FileMinorPart == şimdiki.FileMinorPart)
+                        şimdiki = FileVersionInfo.GetVersionInfo(HedefDosyaYolu);
+
+                        if (gelen.FileMajorPart > şimdiki.FileMajorPart) gelen_daha_yeni = true;
+                        else if (gelen.FileMajorPart == şimdiki.FileMajorPart)
                         {
-                            if (DoğrulamaKodu.Üret.Dosyadan(İndirilenDosyanınAdı) != DoğrulamaKodu.Üret.Dosyadan(HedefDosyaYolu)) gelen_daha_yeni = true; //uzaktaki dosyanın daha sağlıklı oduğunu varsayarak devam et
+                            if (gelen.FileMinorPart > şimdiki.FileMinorPart) gelen_daha_yeni = true;
+                            else if (gelen.FileMinorPart == şimdiki.FileMinorPart)
+                            {
+                                if (DoğrulamaKodu.Üret.Dosyadan(İndirilenDosyanınAdı) != DoğrulamaKodu.Üret.Dosyadan(HedefDosyaYolu)) gelen_daha_yeni = true; //uzaktaki dosyanın daha sağlıklı oduğunu varsayarak devam et
+                            }
                         }
                     }
-                }
-                else gelen_daha_yeni = true;
+                    else gelen_daha_yeni = true;
 
-                if (gelen_daha_yeni)
-                {
-                    try
+                    if (gelen_daha_yeni)
                     {
-                        if (HedefDosyaVarMı) File.Move(HedefDosyaYolu, HedefDosyaYolu + ".V" + şimdiki.FileVersion);
-                        File.Move(İndirilenDosyanınAdı, HedefDosyaYolu);
+                        if (HedefDosyaVarMı)
+                        {
+                            string HedefDosyaYolununYedeği = HedefDosyaYolu + ".V" + şimdiki.FileVersion;
+                            if (!Dosya.Sil(HedefDosyaYolununYedeği)) GeriBildirim_İşlemi?.Invoke(false, "Yedek dosya silinemedi");
+                            else File.Move(HedefDosyaYolu, HedefDosyaYolununYedeği);
+                        }
 
-                        GeriBildirim_İşlemi?.Invoke(true, (HedefDosyaVarMı ? "Eski:V" + şimdiki.FileVersion + " " : null) + "Yeni:V" + gelen.FileVersion);
+                        if (File.Exists(HedefDosyaYolu)) GeriBildirim_İşlemi?.Invoke(false, "Hedef dosya silinemedi");
+                        else if (!Dosya.Kopyala(İndirilenDosyanınAdı, HedefDosyaYolu)) GeriBildirim_İşlemi?.Invoke(false, "Hedef dosya oluşturulamadı");
+                        else GeriBildirim_İşlemi?.Invoke(true, (HedefDosyaVarMı ? "Eski:V" + şimdiki.FileVersion + " " : null) + "Yeni:V" + gelen.FileVersion);
                     }
-                    catch (Exception ex)
-                    {
-                        GeriBildirim_İşlemi?.Invoke(false, ex.Message);
-                    }
+                    else GeriBildirim_İşlemi?.Invoke(true, "Güncel V" + şimdiki.FileVersion);
                 }
-                else GeriBildirim_İşlemi?.Invoke(true, "Güncel V" + şimdiki.FileVersion);
+                else GeriBildirim_İşlemi?.Invoke(false, e.Error.Message);
+
+                Dosya.Sil(İndirilenDosyanınAdı);
+                Durdur();
             }
-            else GeriBildirim_İşlemi?.Invoke(false, e.Error.Message);
-
-            if (File.Exists(İndirilenDosyanınAdı)) File.Delete(İndirilenDosyanınAdı);
-
-            Durdur();
+            catch (Exception ex)
+            {
+                GeriBildirim_İşlemi?.Invoke(false, ex.Message);
+            }
         }
 
         #region IDisposable Support

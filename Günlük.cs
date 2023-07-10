@@ -140,6 +140,10 @@ namespace ArgeMup.HazirKod
             }
 
             Console.WriteLine(Mesaj);
+            #if DEBUG && NET7_0_OR_GREATER
+                System.Diagnostics.Debug.WriteLine(Mesaj);
+                #warning Günlük işlemleri ciddi oranda YAVAŞLADI
+            #endif
 
             if (Dosyalama != null)
             {

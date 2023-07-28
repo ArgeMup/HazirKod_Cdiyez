@@ -8,7 +8,7 @@ namespace ArgeMup.HazirKod
 {
     public class Çalıştır_ : IDisposable
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
         EşZamanlıÇokluErişim.Liste_<Process> Tümü = new EşZamanlıÇokluErişim.Liste_<Process>();
 
         public void DosyaGezginindeGöster(string KlasörVeyaDosyaYolu)
@@ -21,12 +21,18 @@ namespace ArgeMup.HazirKod
 
             //işlem hemen çıkıyor
         }
-        public Process UygulamayıDoğrudanÇalıştır(string ExeDosyaYolu, string Girdi = null, bool ÖnyüzüGizle = false, bool KapanırkenZorlaKapat = true)
+        public Process UygulamayıDoğrudanÇalıştır(string ExeDosyaYolu, string[] Girdiler = null, bool ÖnyüzüGizle = false, bool KapanırkenZorlaKapat = true)
         {
             Process Uygulama = new Process();
             Uygulama.StartInfo.UseShellExecute = false;
             Uygulama.StartInfo.FileName = "\"" + ExeDosyaYolu + "\"";
-            if (Girdi.DoluMu()) Uygulama.StartInfo.Arguments = "\"" + Girdi + "\"";
+            if (Girdiler != null)
+            {
+                foreach (string Girdi in Girdiler)
+                {
+                    Uygulama.StartInfo.Arguments += "\"" + Girdi + "\" ";
+                }
+            }
             if (ÖnyüzüGizle)
             {
                 Uygulama.StartInfo.CreateNoWindow = true;
@@ -42,11 +48,23 @@ namespace ArgeMup.HazirKod
 
             return Uygulama;
         }
-        public Process UygulamayaİşletimSistemiKararVersin(string DosyaYolu, bool KapanırkenZorlaKapat = true)
+        public Process UygulamayaİşletimSistemiKararVersin(string DosyaYolu, string[] Girdiler = null, bool ÖnyüzüGizle = false, bool KapanırkenZorlaKapat = true)
         {
             Process Uygulama = new Process();
             Uygulama.StartInfo.UseShellExecute = true;
             Uygulama.StartInfo.FileName = "\"" + DosyaYolu + "\"";
+            if (Girdiler != null)
+            {
+                foreach (string Girdi in Girdiler)
+                {
+                    Uygulama.StartInfo.Arguments += "\"" + Girdi + "\" ";
+                }
+            }
+            if (ÖnyüzüGizle)
+            {
+                Uygulama.StartInfo.CreateNoWindow = true;
+                Uygulama.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            }
             Uygulama.Start();
 
             if (KapanırkenZorlaKapat)

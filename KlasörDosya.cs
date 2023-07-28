@@ -5,7 +5,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using ArgeMup.HazirKod.Dönüştürme;
-using ArgeMup.HazirKod.ArkaPlan;
 using System.Threading;
 
 namespace ArgeMup.HazirKod
@@ -69,7 +68,7 @@ namespace ArgeMup.HazirKod
         {
             Klasör_ Soldaki = new Klasör_(Sol, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle:false);
             Klasör_ Sağdaki = new Klasör_(Sağ, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle:false);
-            while (Soldaki.Dosyalar == null || Sağdaki.Dosyalar == null) Thread.Sleep(5);
+            while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && (Soldaki.Dosyalar == null || Sağdaki.Dosyalar == null)) Thread.Sleep(5);
 
             Klasör_.Farklılık_ Farklar = Soldaki.Karşılaştır(Sağdaki);
 
@@ -79,7 +78,7 @@ namespace ArgeMup.HazirKod
         {
             Klasör_ Soldaki = new Klasör_(Sol, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false);
             Klasör_ Sağdaki = new Klasör_(Sağ, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false);
-            while (Soldaki.Dosyalar == null || Sağdaki.Dosyalar == null) Thread.Sleep(5);
+            while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && (Soldaki.Dosyalar == null || Sağdaki.Dosyalar == null)) Thread.Sleep(5);
 
             Klasör_.Farklılık_ Farklar = Soldaki.Eşitle(Sağdaki, EşZamanlıİşlemSayısı);
 
@@ -89,8 +88,8 @@ namespace ArgeMup.HazirKod
         {
             Klasör_ Aslolan = new Klasör_(Asıl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false);
             Klasör_ Kopyası = new Klasör_(Kopya, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false);
-            while (Aslolan.Dosyalar == null || Kopyası.Dosyalar == null) Thread.Sleep(5);
-
+            while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && (Aslolan.Dosyalar == null || Kopyası.Dosyalar == null)) Thread.Sleep(5);
+            
             Klasör_.Farklılık_ Farklar = Kopyası.AslınaUygunHaleGetir(Aslolan, FazlaKlasörVeDosyalarıSil, EşZamanlıİşlemSayısı);
 
             return Aslolan.FizikselOlarakMevcut && (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0);
@@ -333,8 +332,8 @@ namespace ArgeMup.HazirKod
             EşZamanlıÇokluErişim.Liste_<İçerik_Dosya_> dsy_l = new EşZamanlıÇokluErişim.Liste_<İçerik_Dosya_>();
             Action<object> TümüÖğütülünceÇağırılacakİşlem = null;
             if (!BitmesiniBekle) TümüÖğütülünceÇağırılacakİşlem = İşl_bitti;
-            
-            Öğütücü_<string> ö = new Öğütücü_<string>(İşl_dsy, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, TümüÖğütülünceÇağırılacakİşlem: TümüÖğütülünceÇağırılacakİşlem);
+
+            ArgeMup.HazirKod.ArkaPlan.Öğütücü_<string> ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<string>(İşl_dsy, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, TümüÖğütülünceÇağırılacakİşlem: TümüÖğütülünceÇağırılacakİşlem);
 
             Klasörler = Directory.GetDirectories(Kök, Filtre_Klasör, TümAltKlasörlerleBirlikte ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList();
             
@@ -486,8 +485,8 @@ namespace ArgeMup.HazirKod
 
             EşZamanlıÇokluErişim.Liste_<Fark_Klasör_> kls_l = new EşZamanlıÇokluErişim.Liste_<Fark_Klasör_>();
             EşZamanlıÇokluErişim.Liste_<Fark_Dosya_> dsy_l = new EşZamanlıÇokluErişim.Liste_<Fark_Dosya_>();
-            Öğütücü_<Fark_Klasör_> kls_ö = new Öğütücü_<Fark_Klasör_>(İşl_Kls, null, EşZamanlıİşlemSayısı);
-            Öğütücü_<Fark_Dosya_> dsy_ö = new Öğütücü_<Fark_Dosya_>(İşl_Dsy, null, EşZamanlıİşlemSayısı);
+            ArgeMup.HazirKod.ArkaPlan.Öğütücü_<Fark_Klasör_> kls_ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<Fark_Klasör_>(İşl_Kls, null, EşZamanlıİşlemSayısı);
+            ArgeMup.HazirKod.ArkaPlan.Öğütücü_<Fark_Dosya_> dsy_ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<Fark_Dosya_>(İşl_Dsy, null, EşZamanlıİşlemSayısı);
 
             foreach (Fark_Klasör_ kls in Güncel.Klasörler)
             {
@@ -541,8 +540,8 @@ namespace ArgeMup.HazirKod
 
             EşZamanlıÇokluErişim.Liste_<Fark_Klasör_> kls_l = new EşZamanlıÇokluErişim.Liste_<Fark_Klasör_>();
             EşZamanlıÇokluErişim.Liste_<Fark_Dosya_> dsy_l = new EşZamanlıÇokluErişim.Liste_<Fark_Dosya_>();
-            Öğütücü_<Fark_Klasör_> kls_ö = new Öğütücü_<Fark_Klasör_>(İşl_Kls, null, EşZamanlıİşlemSayısı);
-            Öğütücü_<Fark_Dosya_> dsy_ö = new Öğütücü_<Fark_Dosya_>(İşl_Dsy, null, EşZamanlıİşlemSayısı);
+            ArgeMup.HazirKod.ArkaPlan.Öğütücü_<Fark_Klasör_> kls_ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<Fark_Klasör_>(İşl_Kls, null, EşZamanlıİşlemSayısı);
+            ArgeMup.HazirKod.ArkaPlan.Öğütücü_<Fark_Dosya_> dsy_ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<Fark_Dosya_>(İşl_Dsy, null, EşZamanlıİşlemSayısı);
 
             foreach (Fark_Klasör_ kls in Güncel.Klasörler)
             {
@@ -606,7 +605,7 @@ namespace ArgeMup.HazirKod
         public bool Dosya_Sil_TarihineGöre(double Gün, int EşZamanlıİşlemSayısı = 5)
         {
             int HataOldu = 0;
-            Öğütücü_<İçerik_Dosya_> ö = new Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
+            ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_> ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
 
             if (FizikselOlarakMevcut)
             {
@@ -633,7 +632,7 @@ namespace ArgeMup.HazirKod
         public bool Dosya_Sil_BoyutunaGöre(long TümDosyaların_KapladığıAlan_bayt, int EşZamanlıİşlemSayısı = 5)
         {
             int HataOldu = 0;
-            Öğütücü_<İçerik_Dosya_> ö = new Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
+            ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_> ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
 
             if (FizikselOlarakMevcut)
             {
@@ -660,7 +659,7 @@ namespace ArgeMup.HazirKod
         public bool Dosya_Sil_SayısınaGöre(int AzamiToplamDosyaSayısı, int EşZamanlıİşlemSayısı = 5)
         {
             int HataOldu = 0;
-            Öğütücü_<İçerik_Dosya_> ö = new Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
+            ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_> ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
 
             if (FizikselOlarakMevcut)
             {
@@ -702,7 +701,7 @@ namespace ArgeMup.HazirKod
             }
 
             int HataOldu = 0;
-            Öğütücü_<İçerik_Dosya_> ö = new Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
+            ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_> ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
 
             foreach (var dsy in Dosyalar)
             {

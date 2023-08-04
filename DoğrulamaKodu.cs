@@ -103,7 +103,7 @@ namespace ArgeMup.HazirKod
         {
             public enum Durum_ { DoğrulamaDosyasıYok = -3, DoğrulamaDosyasıİçeriğiHatalı, Farklı, Aynı = 1, FazlaKlasörVeyaDosyaVar };
 
-            static public Durum_ Klasör(string KlasörYolu, SearchOption Kapsamı = SearchOption.AllDirectories, string SihirliKelime = "ArGeMuP", int EşZamanlıİşlemSayısı = 5)
+            static public Durum_ Klasör(string KlasörYolu, SearchOption Kapsamı = SearchOption.AllDirectories, string SihirliKelime = "ArGeMuP", int EşZamanlıİşlemSayısı = ArgeMup.HazirKod.Klasör.EşZamanlıİşlemSayısı_Sabiti)
             {
                 Salkım_ Salkım = new Salkım_
                 {

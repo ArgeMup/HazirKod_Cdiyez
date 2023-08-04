@@ -100,12 +100,17 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
         }
         class Listeleyici : IEnumerator, IEnumerator<T>
         {
-            readonly Liste_<T> ÜstSınıf;
+            readonly List<T> ÜstSınıf;
             int konum = -1;
  
             public Listeleyici(Liste_<T> ÜstSınıf)
             {
-                this.ÜstSınıf = ÜstSınıf;
+                this.ÜstSınıf = ÜstSınıf.HassasAraİşlem_Başlat();
+
+                if (this.ÜstSınıf == null) this.ÜstSınıf = new List<T>(); 
+                else this.ÜstSınıf = new List<T>(this.ÜstSınıf);
+
+                ÜstSınıf.HassasAraİşlem_Bitir();
             }
             public object Current
             {

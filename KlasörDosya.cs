@@ -12,6 +12,7 @@ namespace ArgeMup.HazirKod
     public class Klasör
     {
         public const string Sürüm = "V1.2";
+        public const int EşZamanlıİşlemSayısı_Sabiti = 10;
 
         public static bool Oluştur(string Yolu, bool Düzelt = true)
         {
@@ -60,11 +61,11 @@ namespace ArgeMup.HazirKod
                 if (dsy_lar.Length == 0 && kls_ler.Length == 0) Sil(_Yolu_);
             }
         }
-        public static bool Kopyala(string Kaynak, string Hedef, int EşZamanlıİşlemSayısı = 5)
+        public static bool Kopyala(string Kaynak, string Hedef, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti)
         {
             return AslınaUygunHaleGetir(Kaynak, Hedef, false, EşZamanlıİşlemSayısı);
         }
-        public static bool AynıMı(string Sol, string Sağ, int EşZamanlıİşlemSayısı = 5)
+        public static bool AynıMı(string Sol, string Sağ, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ Soldaki = new Klasör_(Sol, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle:false);
             Klasör_ Sağdaki = new Klasör_(Sağ, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle:false);
@@ -74,7 +75,7 @@ namespace ArgeMup.HazirKod
 
             return Soldaki.FizikselOlarakMevcut && Sağdaki.FizikselOlarakMevcut && Farklar.FarklılıkSayısı == 0;
         }
-        public static bool Eşitle(string Sol, string Sağ, int EşZamanlıİşlemSayısı = 5)
+        public static bool Eşitle(string Sol, string Sağ, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ Soldaki = new Klasör_(Sol, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false);
             Klasör_ Sağdaki = new Klasör_(Sağ, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false);
@@ -84,7 +85,7 @@ namespace ArgeMup.HazirKod
 
             return (Soldaki.FizikselOlarakMevcut || Sağdaki.FizikselOlarakMevcut) && (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0);
         }
-        public static bool AslınaUygunHaleGetir(string Asıl, string Kopya, bool FazlaKlasörVeDosyalarıSil = false, int EşZamanlıİşlemSayısı = 5)
+        public static bool AslınaUygunHaleGetir(string Asıl, string Kopya, bool FazlaKlasörVeDosyalarıSil = false, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ Aslolan = new Klasör_(Asıl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false);
             Klasör_ Kopyası = new Klasör_(Kopya, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false);
@@ -227,22 +228,22 @@ namespace ArgeMup.HazirKod
 
             return false;
         }
-        public static bool Sil_TarihineGöre(string Klasörü, double Gün, string Filtre, int EşZamanlıİşlemSayısı = 5)
+        public static bool Sil_TarihineGöre(string Klasörü, double Gün, string Filtre, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true, EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_TarihineGöre(Gün, EşZamanlıİşlemSayısı);
         }
-        public static bool Sil_BoyutunaGöre(string Klasörü, long TümDosyaların_KapladığıAlan_bayt, string Filtre, int EşZamanlıİşlemSayısı = 5)
+        public static bool Sil_BoyutunaGöre(string Klasörü, long TümDosyaların_KapladığıAlan_bayt, string Filtre, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true, EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_BoyutunaGöre(TümDosyaların_KapladığıAlan_bayt, EşZamanlıİşlemSayısı);
         }
-        public static bool Sil_SayısınaGöre(string Klasörü, int AzamiToplamDosyaSayısı, string Filtre, int EşZamanlıİşlemSayısı = 5)
+        public static bool Sil_SayısınaGöre(string Klasörü, int AzamiToplamDosyaSayısı, string Filtre, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true, EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_SayısınaGöre(AzamiToplamDosyaSayısı, EşZamanlıİşlemSayısı);
 		}
-        public static bool Sil_SayısınaVeBoyutunaGöre(string Klasörü, int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt, string Filtre, int EşZamanlıİşlemSayısı = 5)
+        public static bool Sil_SayısınaVeBoyutunaGöre(string Klasörü, int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt, string Filtre, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ kls = new Klasör_(Klasörü, "*", Filtre, true, EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_SayısınaVeBoyutunaGöre(AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt, EşZamanlıİşlemSayısı);
@@ -310,11 +311,11 @@ namespace ArgeMup.HazirKod
         #endregion
 
         #region Genel İşlemler
-        public Klasör_(string KökKlasör, string Filtre_Klasör = "*", string Filtre_Dosya = "*.*", bool TümAltKlasörlerleBirlikte = true, int EşZamanlıİşlemSayısı = 5, bool BitmesiniBekle = true)
+        public Klasör_(string KökKlasör, string Filtre_Klasör = "*", string Filtre_Dosya = "*.*", bool TümAltKlasörlerleBirlikte = true, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti, bool BitmesiniBekle = true)
         {
             Güncelle(KökKlasör, Filtre_Klasör, Filtre_Dosya, TümAltKlasörlerleBirlikte, EşZamanlıİşlemSayısı, BitmesiniBekle);
         }
-        public void Güncelle(string KökKlasör, string Filtre_Klasör = "*", string Filtre_Dosya = "*.*", bool TümAltKlasörlerleBirlikte = true, int EşZamanlıİşlemSayısı = 5, bool BitmesiniBekle = true)
+        public void Güncelle(string KökKlasör, string Filtre_Klasör = "*", string Filtre_Dosya = "*.*", bool TümAltKlasörlerleBirlikte = true, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti, bool BitmesiniBekle = true)
         {
             KapladığıAlan_bayt = 0;
             FizikselOlarakMevcut = false;
@@ -478,7 +479,7 @@ namespace ArgeMup.HazirKod
 
             return Farklar;
         }
-        public Farklılık_ Eşitle(Klasör_ Sağdaki, int EşZamanlıİşlemSayısı = 5)
+        public Farklılık_ Eşitle(Klasör_ Sağdaki, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Farklılık_ Güncel = Karşılaştır(Sağdaki);
             Farklılık_ Sonuç = new Farklılık_();
@@ -533,7 +534,7 @@ namespace ArgeMup.HazirKod
                 }
             }
         }
-        public Farklılık_ AslınaUygunHaleGetir(Klasör_ AsılKlasör, bool FazlaKlasörVeDosyalarıSil = false, int EşZamanlıİşlemSayısı = 5)
+        public Farklılık_ AslınaUygunHaleGetir(Klasör_ AsılKlasör, bool FazlaKlasörVeDosyalarıSil = false, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Farklılık_ Güncel = Karşılaştır(AsılKlasör);
             Farklılık_ Sonuç = new Farklılık_();
@@ -602,7 +603,7 @@ namespace ArgeMup.HazirKod
             }
         }
 
-        public bool Dosya_Sil_TarihineGöre(double Gün, int EşZamanlıİşlemSayısı = 5)
+        public bool Dosya_Sil_TarihineGöre(double Gün, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             int HataOldu = 0;
             ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_> ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
@@ -629,7 +630,7 @@ namespace ArgeMup.HazirKod
                 if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
             }
         }
-        public bool Dosya_Sil_BoyutunaGöre(long TümDosyaların_KapladığıAlan_bayt, int EşZamanlıİşlemSayısı = 5)
+        public bool Dosya_Sil_BoyutunaGöre(long TümDosyaların_KapladığıAlan_bayt, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             int HataOldu = 0;
             ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_> ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
@@ -656,7 +657,7 @@ namespace ArgeMup.HazirKod
                 if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
             }
         }
-        public bool Dosya_Sil_SayısınaGöre(int AzamiToplamDosyaSayısı, int EşZamanlıİşlemSayısı = 5)
+        public bool Dosya_Sil_SayısınaGöre(int AzamiToplamDosyaSayısı, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             int HataOldu = 0;
             ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_> ö = new ArgeMup.HazirKod.ArkaPlan.Öğütücü_<İçerik_Dosya_>(İşl, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
@@ -683,7 +684,7 @@ namespace ArgeMup.HazirKod
                 if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
             }
         }
-        public bool Dosya_Sil_SayısınaVeBoyutunaGöre(int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt, int EşZamanlıİşlemSayısı = 5)
+        public bool Dosya_Sil_SayısınaVeBoyutunaGöre(int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             // En yeni AzamiToplamDosyaSayısı kadar dosya tutulur
             // Haricindekiler TümDosyaların_KapladığıAlan_bayt aşıyorsa eskiden yeniye doğru silinir

@@ -14,11 +14,11 @@
 
             public static bool Klasörden(string Kaynak, string HedefZipDosyasıYolu, bool YeniBirDosyaOluştur = true)
             {
-                return Klasörden(new Klasör_(Kaynak), HedefZipDosyasıYolu, YeniBirDosyaOluştur);
+                return Klasörden(new Klasör_(Kaynak, DoğrulamaKodunuÜret:false), HedefZipDosyasıYolu, YeniBirDosyaOluştur);
             }
             public static void Klasöre(string KaynakZipDosyasıYolu, string HedefKlasör)
             {
-                Klasöre(Listele(KaynakZipDosyasıYolu), HedefKlasör);
+                Klasöre(Listele(KaynakZipDosyasıYolu, false), HedefKlasör);
             }
 
             public static bool Klasörden(Klasör_ Kaynak, string HedefZipDosyasıYolu, bool YeniBirDosyaOluştur = true)

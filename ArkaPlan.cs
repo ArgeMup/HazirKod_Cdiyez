@@ -314,29 +314,30 @@ namespace ArgeMup.HazirKod.ArkaPlan
             if (GeriBildirim_Islemi != null) ArkaPlanGörevi_Başlat();
         }
 
-        public DateTime SonrakiTetikleme_Kur(string TakmaAdı, bool GelecektekiBirZamanaKur = true)
+        public void SonrakiTetikleme_Kur(string TakmaAdıKıstası, bool GelecektekiBirZamanaKur = true, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
         {
-            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
-            if (bulunanlar == null || bulunanlar.Count == 0) return default;
-
-            if (GelecektekiBirZamanaKur)
+            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı.BenzerMi(TakmaAdıKıstası, BüyükKüçükHarfDuyarlı, Ayraç));
+            foreach (Biri_ b in bulunanlar)
             {
-                while (Çalışsın && Ortak.Çalışsın && bulunanlar[0].HesaplananTetiklemeAnı < DateTime.Now)
+                if (GelecektekiBirZamanaKur)
                 {
-                    bulunanlar[0].HesaplananTetiklemeAnı = SonrakiTetikleme_Hesapla(bulunanlar[0].HesaplananTetiklemeAnı, bulunanlar[0].TekrarlayıcıKomutCümlesi);
-                    if (bulunanlar[0].HesaplananTetiklemeAnı == default) return default;
+                    while (Çalışsın && Ortak.Çalışsın && b.HesaplananTetiklemeAnı < DateTime.Now)
+                    {
+                        b.HesaplananTetiklemeAnı = SonrakiTetikleme_Hesapla(b.HesaplananTetiklemeAnı, b.TekrarlayıcıKomutCümlesi);
+                        if (b.HesaplananTetiklemeAnı == default) break;
+                    }
                 }
-            }
-            else
-            {
-                bulunanlar[0].HesaplananTetiklemeAnı = SonrakiTetikleme_Hesapla(bulunanlar[0].HesaplananTetiklemeAnı, bulunanlar[0].TekrarlayıcıKomutCümlesi);
-                if (bulunanlar[0].HesaplananTetiklemeAnı == default) return default;
+                else
+                {
+                    b.HesaplananTetiklemeAnı = SonrakiTetikleme_Hesapla(b.HesaplananTetiklemeAnı, b.TekrarlayıcıKomutCümlesi);
+                }
+
+                if (b.HesaplananTetiklemeAnı == default) continue;
+
+                b.GeriBildirim_Islemini_çalıştır = true;
             }
 
-            bulunanlar[0].GeriBildirim_Islemini_çalıştır = true;
             ArkaPlanGörevi_Başlat(); //değişiklikleri işlet
-
-            return bulunanlar[0].HesaplananTetiklemeAnı;
         }
         public DateTime SonrakiTetikleme_Hesapla(DateTime BaşlangıçNoktası, string KomutCümlesi)
         {
@@ -411,9 +412,9 @@ namespace ArgeMup.HazirKod.ArkaPlan
             return default;
         }
 
-        public void Sil(string TakmaAdı)
+        public void Sil(string TakmaAdıKıstası, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
         {
-            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı == TakmaAdı);
+            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı.BenzerMi(TakmaAdıKıstası, BüyükKüçükHarfDuyarlı, Ayraç));
             foreach (Biri_ b in bulunanlar)
             {
                 b.Ayarlar.Sil(null);

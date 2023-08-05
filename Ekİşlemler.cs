@@ -98,6 +98,17 @@ namespace ArgeMup.HazirKod.Ekİşlemler
 
             return true;
         }
+        public static bool BenzerMi(this string Girdi, string[] Kıstaslar, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
+        {
+            if (Girdi.BoşMu() || Kıstaslar == null) return false;
+
+            foreach (string Kıstas in Kıstaslar)
+            {
+                if (Girdi.BenzerMi(Kıstas, BüyükKüçükHarfDuyarlı, Ayraç)) return true;
+            }
+
+            return false;
+        }
 
         public static string DosyaYolu_Düzelt(this string DosyaYolu, bool GeçersizKarakterleriSil = true)
         {

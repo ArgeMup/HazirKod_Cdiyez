@@ -42,7 +42,7 @@ namespace ArgeMup.HazirKod
 
                 Yolu = Klasörü + @"\" + D_TarihSaat.Yazıya(DateTime.Now, D_TarihSaat.Şablon_DosyaAdı) + ".Gunluk";
 
-                Dosya.Sil_SayısınaVeBoyutunaGöre(Klasörü, AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt, "*.Gunluk");
+                Dosya.Sil_SayısınaVeBoyutunaGöre(Klasörü, AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt, new string[] { "*.Gunluk" });
 
                 Dosyalama = new Öğütücü_<string>(İşlem_Dosyalama, AzamiElemanSayısı:5555);
             }

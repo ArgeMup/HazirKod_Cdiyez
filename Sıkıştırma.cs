@@ -100,7 +100,7 @@
 
                 return false;
             }
-            public static Klasör_ Listele(string KaynakZipDosyasıYolu)
+            public static Klasör_ Listele(string KaynakZipDosyasıYolu, bool DoğrulamaKodunuÜret = true)
             {
                 Klasör_ çıktı = new Klasör_("");
 
@@ -116,16 +116,19 @@
                         else
                         {
                             //dosya
-                            Klasör_.İçerik_Dosya_ Yeni = new Klasör_.İçerik_Dosya_("", Biri.FullName);
+                            Klasör_.İçerik_Dosya_ Yeni = new Klasör_.İçerik_Dosya_("", Biri.FullName, false);
                             Yeni.KapladığıAlan_bayt = Biri.Length;
                             Yeni.DeğiştirilmeTarihi = Biri.LastWriteTime.DateTime;
                             Yeni.Yolu = Biri.FullName;
 
-                            using (Stream Akış = Biri.Open())
+                            if (DoğrulamaKodunuÜret)
                             {
-                                Yeni.Doğrulama_Kodu = DoğrulamaKodu.Üret.Akıştan(Akış);
+                                using (Stream Akış = Biri.Open())
+                                {
+                                    Yeni.Doğrulama_Kodu = DoğrulamaKodu.Üret.Akıştan(Akış);
+                                }
                             }
-
+                            
                             çıktı.Dosyalar.Add(Yeni);
                             çıktı.KapladığıAlan_bayt += Yeni.KapladığıAlan_bayt;
                         }

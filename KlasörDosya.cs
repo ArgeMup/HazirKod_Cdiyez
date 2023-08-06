@@ -62,7 +62,7 @@ namespace ArgeMup.HazirKod
                 if (dsy_lar.Length == 0 && kls_ler.Length == 0) Sil(_Yolu_);
             }
         }
-        public static bool Kopyala(string Kaynak, string Hedef, bool HedeftekiFazlaKlasörVeDosyalarıSil = false, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti, bool DoğrulamaKodunuKontrolEt_Yavaşlatır = true)
+        public static bool Kopyala(string Kaynak, string Hedef, bool HedeftekiFazlaKlasörVeDosyalarıSil = false, bool DoğrulamaKodunuKontrolEt_Yavaşlatır = true, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ Kaynaktakiler = new Klasör_(Kaynak, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false, DoğrulamaKodunuÜret: DoğrulamaKodunuKontrolEt_Yavaşlatır);
             Klasör_ Hedeftekiler = new Klasör_(Hedef, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false, DoğrulamaKodunuÜret: DoğrulamaKodunuKontrolEt_Yavaşlatır);
@@ -72,7 +72,7 @@ namespace ArgeMup.HazirKod
 
             return Kaynaktakiler.FizikselOlarakMevcut && (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0);
         }
-        public static bool AynıMı(string Sol, string Sağ, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti, bool DoğrulamaKodunuKontrolEt_Yavaşlatır = true)
+        public static bool AynıMı(string Sol, string Sağ, bool DoğrulamaKodunuKontrolEt_Yavaşlatır = true, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ Soldaki = new Klasör_(Sol, DoğrulamaKodunuÜret: DoğrulamaKodunuKontrolEt_Yavaşlatır, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle:false);
             Klasör_ Sağdaki = new Klasör_(Sağ, DoğrulamaKodunuÜret: DoğrulamaKodunuKontrolEt_Yavaşlatır, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle:false);

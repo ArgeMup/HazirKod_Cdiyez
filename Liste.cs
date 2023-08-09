@@ -9,7 +9,7 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
 {
     public class Liste_<T> : IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable, ICollection
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
         public int Kilit_Devralma_ZamanAşımı_msn = 5000;
 
         Mutex Kilit = null;

@@ -14,8 +14,8 @@ namespace ArgeMup.HazirKod
         public const string Sürüm = "V1.0";
 
         public BindingFlags Filtre_TipTürü = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
-        public string[] Filtre_Değişkenİsimleri = null;
-        public bool Filtre_Filtre_Değişkenİsimlerini_DahilEt1_HariçTut0 = true;
+        public IEnumerable<string> Filtre_Değişkenİsimleri = null;
+        public bool Filtre_Değişkenİsimlerini_DahilEt1_HariçTut0 = true;
         public bool Filtre_BoşVeyaVarsayılanDeğerdeİse_HariçTut = false;
         public bool Filtre_BüyükKüçükHarfDuyarlı = true;
         public char Filtre_Ayraç = '*';
@@ -46,21 +46,15 @@ namespace ArgeMup.HazirKod
             //Filtre kontrolü
             if (Filtre_Değişkenİsimleri != null)
             {
-                if (Filtre_Filtre_Değişkenİsimlerini_DahilEt1_HariçTut0)
+                if (Filtre_Değişkenİsimlerini_DahilEt1_HariçTut0)
                 {
-                    foreach (string f in Filtre_Değişkenİsimleri)
-                    {
-                        if (f.DoluMu() && Adı.BenzerMi(f, Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç)) return true;
-                    }
-
+                    if (Adı.BenzerMi(Filtre_Değişkenİsimleri, Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç)) return true;
+                    
                     return false;
                 }
                 else
                 {
-                    foreach (string f in Filtre_Değişkenİsimleri)
-                    {
-                        if (f.DoluMu() && Adı.BenzerMi(f, Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç)) return false;
-                    }
+                    if (Adı.BenzerMi(Filtre_Değişkenİsimleri, Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç)) return false;
                 }
             }
                 

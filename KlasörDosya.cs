@@ -12,7 +12,7 @@ namespace ArgeMup.HazirKod
 {
     public class Klasör
     {
-        public const string Sürüm = "V1.2";
+        public const string Sürüm = "V1.3";
         public const int EşZamanlıİşlemSayısı_Sabiti = 10;
 
         public static bool Oluştur(string Yolu, bool Düzelt = true)
@@ -176,7 +176,7 @@ namespace ArgeMup.HazirKod
 
     public class Dosya
     {
-        public const string Sürüm = "V1.2";
+        public const string Sürüm = "V1.3";
 
         public static bool Kopyala(string Kaynak, string Hedef)
         {
@@ -225,22 +225,22 @@ namespace ArgeMup.HazirKod
 
             return false;
         }
-        public static bool Sil_TarihineGöre(string Klasörü, double Gün, string[] Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
+        public static bool Sil_TarihineGöre(string Klasörü, double Gün, IEnumerable<string> Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ kls = new Klasör_(Klasörü, Filtre_Dosya: Filtre, DoğrulamaKodunuÜret: false, Filtre_BüyükKüçükHarfDuyarlı: Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç: Filtre_Ayraç, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_TarihineGöre(Gün);
         }
-        public static bool Sil_BoyutunaGöre(string Klasörü, long TümDosyaların_KapladığıAlan_bayt, string[] Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
+        public static bool Sil_BoyutunaGöre(string Klasörü, long TümDosyaların_KapladığıAlan_bayt, IEnumerable<string> Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ kls = new Klasör_(Klasörü, Filtre_Dosya: Filtre, DoğrulamaKodunuÜret: false, Filtre_BüyükKüçükHarfDuyarlı: Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç: Filtre_Ayraç, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_BoyutunaGöre(TümDosyaların_KapladığıAlan_bayt);
         }
-        public static bool Sil_SayısınaGöre(string Klasörü, int AzamiToplamDosyaSayısı, string[] Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
+        public static bool Sil_SayısınaGöre(string Klasörü, int AzamiToplamDosyaSayısı, IEnumerable<string> Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ kls = new Klasör_(Klasörü, Filtre_Dosya: Filtre, DoğrulamaKodunuÜret: false, Filtre_BüyükKüçükHarfDuyarlı: Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç: Filtre_Ayraç, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_SayısınaGöre(AzamiToplamDosyaSayısı);
 		}
-        public static bool Sil_SayısınaVeBoyutunaGöre(string Klasörü, int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt, string[] Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
+        public static bool Sil_SayısınaVeBoyutunaGöre(string Klasörü, int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt, IEnumerable<string> Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ kls = new Klasör_(Klasörü, Filtre_Dosya: Filtre, DoğrulamaKodunuÜret: false, Filtre_BüyükKüçükHarfDuyarlı: Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç: Filtre_Ayraç, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_SayısınaVeBoyutunaGöre(AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt);
@@ -249,20 +249,20 @@ namespace ArgeMup.HazirKod
 
     public class Klasör_
     {
-        public const string Sürüm = "V1.2";
+        public const string Sürüm = "V1.3";
 
         public string Kök = "";
-        public long KapladığıAlan_bayt = 0;
-        public bool FizikselOlarakMevcut = false;
+        public long KapladığıAlan_bayt;
+        public bool FizikselOlarakMevcut;
         public List<string> Klasörler = new List<string>();
-        public List<İçerik_Dosya_> Dosyalar = null;
+        public List<İçerik_Dosya_> Dosyalar;
 
         public bool TümAltKlasörlerleBirlikte;
         public int EşZamanlıİşlemSayısı;
         public bool BitmesiniBekle;
         public bool DoğrulamaKodunuÜret;
-        public string[] Filtre_Klasör;
-        public string[] Filtre_Dosya;
+        public IEnumerable<string> Filtre_Klasör;
+        public IEnumerable<string> Filtre_Dosya;
         public bool Filtre_BüyükKüçükHarfDuyarlı;
         public char Filtre_Ayraç;
 
@@ -317,8 +317,8 @@ namespace ArgeMup.HazirKod
         #endregion
 
         #region Genel İşlemler
-        public Klasör_(string KökKlasör, 
-            string[] Filtre_Klasör = null, string[] Filtre_Dosya = null, 
+        public Klasör_(string KökKlasör,
+            IEnumerable<string> Filtre_Klasör = null, IEnumerable<string> Filtre_Dosya = null, 
             bool TümAltKlasörlerleBirlikte = true, bool DoğrulamaKodunuÜret = true, 
             bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', bool BitmesiniBekle = true, int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
@@ -812,7 +812,7 @@ namespace ArgeMup.HazirKod
 
         Klasör_ Listeleri_Kopyala(Klasör_ Girdi)
         {
-            Klasör_ yeni = new Klasör_(":");
+            Klasör_ yeni = new Klasör_("");
             yeni.Dosyalar = new List<İçerik_Dosya_>(Girdi.Dosyalar);
             yeni.Klasörler = new List<string>(Girdi.Klasörler);
             return yeni;

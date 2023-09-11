@@ -245,6 +245,221 @@ namespace ArgeMup.HazirKod
             Klasör_ kls = new Klasör_(Klasörü, Filtre_Dosya: Filtre, DoğrulamaKodunuÜret: false, Filtre_BüyükKüçükHarfDuyarlı: Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç: Filtre_Ayraç, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_SayısınaVeBoyutunaGöre(AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt);
         }
+        public static bool BaşkaBirYerdeAçıkMı(string Yolu, int ZamanAşımı_msn = 5000)
+        {
+            if (!File.Exists(Yolu)) return false;
+
+            int za = Environment.TickCount + ZamanAşımı_msn;
+            while (za > Environment.TickCount)
+            {
+                try
+                {
+                    FileStream KilitDosyası = new FileStream(Yolu, FileMode.Open, FileAccess.Read, FileShare.None);
+                    KilitDosyası.Close();
+
+                    return false;
+                }
+                catch (Exception) { }
+
+                Thread.Sleep(15);
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+
+            return true;
+        }
+
+        public class AğÜzerinde_ : IDisposable
+        {
+            public const string Sürüm = "V1.0";
+            public Uri Url;
+            public string HedefDosyaYolu;
+            public bool KontrolTamamlandı = false;
+            public bool Sonuç = false;
+
+            System.Net.Http.HttpClient İstemci = null;
+
+            //                                                           Sonuç İndirilenDosya_url İndirilenDosya_Adı
+            public AğÜzerinde_(Uri Url, string HedefDosyaYolu, Action<bool, Uri, string> GeriBildirim_Tamamlandı = null, int ZamanAşımı_msn = 15000)
+            {
+                this.Url = Url;
+                this.HedefDosyaYolu = HedefDosyaYolu;
+
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    await System.Threading.Tasks.Task.Delay(1); //eşzamanlı çalışma için
+
+                    if (!BaşkaBirYerdeAçıkMı(HedefDosyaYolu, ZamanAşımı_msn))
+                    {
+                        string kls = Path.GetDirectoryName(HedefDosyaYolu);
+                        if (kls.DoluMu(true)) Klasör.Oluştur(Path.GetDirectoryName(HedefDosyaYolu));
+
+                        using (İstemci = new System.Net.Http.HttpClient())
+                        {
+                            İstemci.Timeout = TimeSpan.FromMilliseconds(ZamanAşımı_msn);
+
+                            using (System.Net.Http.HttpResponseMessage cevap = await İstemci.GetAsync(Url))
+                            {
+                                if (cevap.IsSuccessStatusCode)
+                                {
+                                    byte[] içerik = await cevap.Content.ReadAsByteArrayAsync();
+                                    File.WriteAllBytes(HedefDosyaYolu, içerik);
+
+                                    Sonuç = File.Exists(HedefDosyaYolu);
+                                }
+                            }
+                        }
+                    }
+                }).ContinueWith((t) =>
+                {
+                    Durdur();
+
+                    GeriBildirim_Tamamlandı?.Invoke(Sonuç, Url, HedefDosyaYolu);
+                });
+            }
+            void Durdur()
+            {
+                if (İstemci == null) return;
+
+                KontrolTamamlandı = true;
+
+                İstemci.Dispose();
+                İstemci = null;
+            }
+
+            #region IDisposable
+            private bool disposedValue;
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        // TODO: dispose managed state (managed objects)
+                    }
+
+                    Durdur();
+
+                    // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                    // TODO: set large fields to null
+                    disposedValue = true;
+                }
+            }
+
+            // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+            // ~Dosya_Ağda_()
+            // {
+            //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            //     Dispose(disposing: false);
+            // }
+
+            public void Dispose()
+            {
+                // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+                Dispose(disposing: true);
+                GC.SuppressFinalize(this);
+            }
+            #endregion
+        }
+        public class AğÜzerinde_Çoklu_ : IDisposable
+        {
+            public string Sürüm = "V1.0";
+            public bool KontrolTamamlandı = false;
+            public bool Sonuç = false;
+            public AğÜzerinde_[] İstemciler = null;
+
+            public AğÜzerinde_Çoklu_(List<Uri> Uri_ler, List<string> HedefDosyaYol_ları, Action<bool> GeriBildirim_TümüTamamlandı = null, int ZamanAşımı_msn = 15000)
+            {
+                long Sayac_Tamamlandı = 0;
+
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    await System.Threading.Tasks.Task.Delay(1); //eşzamanlı çalışma için
+
+                    İstemciler = new AğÜzerinde_[Uri_ler.Count];
+                    for (int i = 0; i < Uri_ler.Count; i++)
+                    {
+                        İstemciler[i] = new AğÜzerinde_(Uri_ler[i], HedefDosyaYol_ları[i], GeriBildirim_İşlemi, ZamanAşımı_msn);
+                    }
+
+                    int zaman_aşımı_anı = Environment.TickCount + ZamanAşımı_msn + 1000;
+                    while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && Interlocked.Read(ref Sayac_Tamamlandı) != Uri_ler.Count && zaman_aşımı_anı > Environment.TickCount)
+                    {
+                        System.Threading.Tasks.Task.Delay(100).Wait();
+                    }
+
+                    void GeriBildirim_İşlemi(bool Onay, Uri uri, string Hedef)
+                    {
+                        Interlocked.Increment(ref Sayac_Tamamlandı);
+                    }
+                }).ContinueWith((t) =>
+                {
+                    if (Interlocked.Read(ref Sayac_Tamamlandı) == Uri_ler.Count)
+                    {
+                        Sonuç = true;
+                        foreach (AğÜzerinde_ İstemci in İstemciler)
+                        {
+                            if (!İstemci.KontrolTamamlandı || !İstemci.Sonuç)
+                            {
+                                Sonuç = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    Durdur();
+
+                    GeriBildirim_TümüTamamlandı?.Invoke(Sonuç);
+                });
+            }
+            void Durdur()
+            {
+                if (İstemciler == null) return;
+
+                KontrolTamamlandı = true;
+
+                foreach (AğÜzerinde_ İstemci in İstemciler)
+                {
+                    İstemci.Dispose();
+                }
+                İstemciler = null;
+            }
+
+            #region IDisposable
+            private bool disposedValue;
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        // TODO: dispose managed state (managed objects)
+                    }
+
+                    Durdur();
+
+                    // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                    // TODO: set large fields to null
+                    disposedValue = true;
+                }
+            }
+
+            // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+            // ~Dosya_Ağda_()
+            // {
+            //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            //     Dispose(disposing: false);
+            // }
+
+            public void Dispose()
+            {
+                // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+                Dispose(disposing: true);
+                GC.SuppressFinalize(this);
+            }
+            #endregion
+        }
     }
 
     public class Klasör_

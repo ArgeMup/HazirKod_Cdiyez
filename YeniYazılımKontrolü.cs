@@ -10,53 +10,53 @@ namespace ArgeMup.HazirKod
 {
     public class YeniYazılımKontrolü_ : IDisposable
     {
-    	public string Sürüm = "V1.4";
+    	public string Sürüm = "V1.5";
         public bool KontrolTamamlandı = false;
         public delegate void YeniYazılımKontrolü_GeriBildirim_(bool Sonuç, string Açıklama);
 
-        WebClient İstemci = null;
+        Dosya.AğÜzerinde_ İstemci = null;
         YeniYazılımKontrolü_GeriBildirim_ GeriBildirim_İşlemi = null;
-        string İndirilenDosyanınAdı = "ArgeMuP.HazirKod.YeniYazılımKontrolü." + Path.GetRandomFileName();
         string HedefDosyaYolu = Kendi.DosyaYolu;
 
-        public void Başlat(Uri DosyaKonumu, YeniYazılımKontrolü_GeriBildirim_ GeriBildirim = null, string HedefDosyaYolu = null)
+        public void Başlat(Uri DosyaKonumu, YeniYazılımKontrolü_GeriBildirim_ GeriBildirim = null, string HedefDosyaYolu = null, int ZamanAşımı_msn = 15000)
         {
+            string İndirilenDosyanınAdı = "ArgeMuP.HazirKod.YeniYazılımKontrolü." + Path.GetRandomFileName();
             if (HedefDosyaYolu == null) İndirilenDosyanınAdı = Kendi.Klasörü + @"\" + İndirilenDosyanınAdı; 
             else
             {
                 İndirilenDosyanınAdı = Path.GetDirectoryName(HedefDosyaYolu) + @"\" + İndirilenDosyanınAdı;
                 this.HedefDosyaYolu = HedefDosyaYolu;
-                Klasör.Oluştur(Path.GetDirectoryName(İndirilenDosyanınAdı));
             }
 
-            string[] ÖncekiDenemeler = Directory.GetFiles(Path.GetDirectoryName(İndirilenDosyanınAdı), "ArgeMuP.HazirKod.YeniYazılımKontrolü.*", SearchOption.TopDirectoryOnly);
-            if (ÖncekiDenemeler != null) foreach (string dsy in ÖncekiDenemeler) Dosya.Sil(dsy);
-
-            İstemci = new WebClient();
-
+            if (Directory.Exists(Path.GetDirectoryName(İndirilenDosyanınAdı)))
+            {
+                string[] ÖncekiDenemeler = Directory.GetFiles(Path.GetDirectoryName(İndirilenDosyanınAdı), "ArgeMuP.HazirKod.YeniYazılımKontrolü.*", SearchOption.TopDirectoryOnly);
+                if (ÖncekiDenemeler != null) foreach (string dsy in ÖncekiDenemeler) Dosya.Sil(dsy);
+            }
+            
             GeriBildirim_İşlemi = GeriBildirim;
 
-            İstemci.DownloadFileAsync(DosyaKonumu, İndirilenDosyanınAdı);
-            İstemci.DownloadFileCompleted += new AsyncCompletedEventHandler(İstemci_DownloadFileCompleted);
+            İstemci = new Dosya.AğÜzerinde_(DosyaKonumu, İndirilenDosyanınAdı, Tamamlandı, ZamanAşımı_msn);
         }
         public void Durdur()
         {
-            KontrolTamamlandı = true;
             if (İstemci == null) return;
 
-            if (İstemci.IsBusy) İstemci.CancelAsync();
+            KontrolTamamlandı = true;
+
             İstemci.Dispose();
             İstemci = null;
 
             GeriBildirim_İşlemi?.Invoke(false, "Durduruldu");
         }
-        void İstemci_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+
+        void Tamamlandı(bool Sonuç, Uri İndirilenDosya_url, string İndirilenDosya_Adı)
         {
             try
             {
-                if (e.Error == null)
+                if (Sonuç)
                 {
-                    FileVersionInfo gelen = FileVersionInfo.GetVersionInfo(İndirilenDosyanınAdı), şimdiki = null;
+                    FileVersionInfo gelen = FileVersionInfo.GetVersionInfo(İndirilenDosya_Adı), şimdiki = null;
 
                     bool gelen_daha_yeni = false, HedefDosyaVarMı = File.Exists(HedefDosyaYolu);
                     if (HedefDosyaVarMı)
@@ -69,7 +69,7 @@ namespace ArgeMup.HazirKod
                             if (gelen.FileMinorPart > şimdiki.FileMinorPart) gelen_daha_yeni = true;
                             else if (gelen.FileMinorPart == şimdiki.FileMinorPart)
                             {
-                                if (DoğrulamaKodu.Üret.Dosyadan(İndirilenDosyanınAdı) != DoğrulamaKodu.Üret.Dosyadan(HedefDosyaYolu)) gelen_daha_yeni = true; //uzaktaki dosyanın daha sağlıklı oduğunu varsayarak devam et
+                                if (DoğrulamaKodu.Üret.Dosyadan(İndirilenDosya_Adı) != DoğrulamaKodu.Üret.Dosyadan(HedefDosyaYolu)) gelen_daha_yeni = true; //uzaktaki dosyanın daha sağlıklı oduğunu varsayarak devam et
                             }
                         }
                     }
@@ -85,20 +85,21 @@ namespace ArgeMup.HazirKod
                         }
 
                         if (File.Exists(HedefDosyaYolu)) GeriBildirim_İşlemi?.Invoke(false, "Hedef dosya silinemedi");
-                        else if (!Dosya.Kopyala(İndirilenDosyanınAdı, HedefDosyaYolu)) GeriBildirim_İşlemi?.Invoke(false, "Hedef dosya oluşturulamadı");
+                        else if (!Dosya.Kopyala(İndirilenDosya_Adı, HedefDosyaYolu)) GeriBildirim_İşlemi?.Invoke(false, "Hedef dosya oluşturulamadı");
                         else GeriBildirim_İşlemi?.Invoke(true, (HedefDosyaVarMı ? "Eski:V" + şimdiki.FileVersion + " " : null) + "Yeni:V" + gelen.FileVersion);
                     }
                     else GeriBildirim_İşlemi?.Invoke(true, "Güncel V" + şimdiki.FileVersion);
                 }
-                else GeriBildirim_İşlemi?.Invoke(false, e.Error.Message);
+                else GeriBildirim_İşlemi?.Invoke(false, "Hatalı");
 
-                Dosya.Sil(İndirilenDosyanınAdı);
-                Durdur();
+                Dosya.Sil(İndirilenDosya_Adı);
             }
             catch (Exception ex)
             {
                 GeriBildirim_İşlemi?.Invoke(false, ex.Message);
             }
+
+            Durdur();
         }
 
         #region IDisposable Support
@@ -111,9 +112,9 @@ namespace ArgeMup.HazirKod
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
-
-                    Durdur();
                 }
+
+                Durdur();
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
                 // TODO: set large fields to null.
@@ -123,19 +124,18 @@ namespace ArgeMup.HazirKod
         }
 
         // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        ~YeniYazılımKontrolü_()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(false);
-        }
+        //~YeniYazılımKontrolü_()
+        //{
+        //    // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //    Dispose(false);
+        //}
 
         // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

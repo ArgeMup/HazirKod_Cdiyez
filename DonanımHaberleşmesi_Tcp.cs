@@ -22,7 +22,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         #endregion
 
         #region İç Kullanım
-        int ErişimNoktası = -1, Sessizlik_ZamanAşımı_Anı, Sessizlik_ZamanAşımı_msn = 0;
+        int ErişimNoktası = -1, Sessizlik_ZamanAşımı_Anı, Sessizlik_ZamanAşımı_msn = 0, AksayanBilgiAlımı_ZamanAşımı_msn;
         string IpVeyaAdı = "";
         bool Çalışşsın = true;
 
@@ -34,9 +34,9 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         StreamWriter Verici = null;
         #endregion
         
-        public Tcpİstemci_(int ErişimNoktası, string IpVeyaAdı = "127.0.0.1", GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, int Sessizlik_ZamanAşımı_msn = 0)
+        public Tcpİstemci_(int ErişimNoktası, string IpVeyaAdı = "127.0.0.1", GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, int Sessizlik_ZamanAşımı_msn = 0, int AksayanBilgiAlımı_ZamanAşımı_msn = 5)
         {
-            if (ErişimNoktası < 0) throw new Exception("ErişimNoktası > 0 olmalı");
+            if (ErişimNoktası < 0) throw new Exception("ErişimNoktası >= 0 olmalı");
 
             this.ErişimNoktası = ErişimNoktası;
             this.IpVeyaAdı = IpVeyaAdı;
@@ -46,10 +46,11 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             this.TekrarDeneme_ZamanAşımı_msn = TekrarDeneme_ZamanAşımı_msn;
             this.BilgiGönderme_ZamanAşımı_msn = BilgiGönderme_ZamanAşımı_msn;
             this.Sessizlik_ZamanAşımı_msn = Sessizlik_ZamanAşımı_msn;
+            this.AksayanBilgiAlımı_ZamanAşımı_msn = AksayanBilgiAlımı_ZamanAşımı_msn;
 
             new Thread(() => Görev_İşlemi_Tcpİstemci()).Start();
         }
-        public Tcpİstemci_(TcpClient İstemci, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, int Sessizlik_ZamanAşımı_msn = 0)
+        public Tcpİstemci_(TcpClient İstemci, GeriBildirim_Islemi_ GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SatırSatırGönderVeAl = true, int TekrarDeneme_ZamanAşımı_msn = 5000, int BilgiGönderme_ZamanAşımı_msn = 15000, int Sessizlik_ZamanAşımı_msn = 0, int AksayanBilgiAlımı_ZamanAşımı_msn = 5)
         {
             this.İstemci = İstemci;
             this.IpVeyaAdı = İstemci.Client.RemoteEndPoint.ToString();
@@ -59,6 +60,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
             this.TekrarDeneme_ZamanAşımı_msn = TekrarDeneme_ZamanAşımı_msn;
             this.BilgiGönderme_ZamanAşımı_msn = BilgiGönderme_ZamanAşımı_msn;
             this.Sessizlik_ZamanAşımı_msn = Sessizlik_ZamanAşımı_msn;
+            this.AksayanBilgiAlımı_ZamanAşımı_msn = AksayanBilgiAlımı_ZamanAşımı_msn;
 
             new Thread(() => Görev_İşlemi_Tcpİstemci()).Start();
         }
@@ -99,14 +101,29 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                             int ilk_gelen_bilgi = Aracı.ReadByte();
                             if (ilk_gelen_bilgi >= 0)
                             {
-                                int adet_bekleyen = İstemci.Available;
+                                int Tampon_Adet = 1;
+                                byte[] Tampon = new byte[1];
+                                Tampon[0] = (byte)ilk_gelen_bilgi;
 
-                                byte[] tampon_GelenBilgi = new byte[adet_bekleyen + 1];
-                                tampon_GelenBilgi[0] = (byte)ilk_gelen_bilgi;
+                                int AksayanBilgiAlımı_ZamanAşımı_msn_anı = Environment.TickCount + AksayanBilgiAlımı_ZamanAşımı_msn;
+                                while (AksayanBilgiAlımı_ZamanAşımı_msn_anı > Environment.TickCount || İstemci.Available > 0)
+                                {
+                                    int adet_bekleyen = İstemci.Available;
+                                    if (adet_bekleyen > 0)
+                                    {
+                                        Array.Resize(ref Tampon, Tampon_Adet + adet_bekleyen);
 
-                                int adet_okunan = Aracı.Read(tampon_GelenBilgi, 1, adet_bekleyen);
-                                if (adet_okunan != adet_bekleyen) Array.Resize(ref tampon_GelenBilgi, adet_okunan + 1);
-                                çıktı = tampon_GelenBilgi;
+                                        int adet_okunan = Aracı.Read(Tampon, Tampon_Adet, adet_bekleyen);
+                                        Tampon_Adet += adet_okunan;
+
+                                        AksayanBilgiAlımı_ZamanAşımı_msn_anı = Environment.TickCount + AksayanBilgiAlımı_ZamanAşımı_msn;
+                                    }
+                                    
+                                    Thread.Sleep(1);
+                                }
+
+                                if (Tampon.Length != Tampon_Adet) Array.Resize(ref Tampon, Tampon_Adet);
+                                çıktı = Tampon;
                             }
                         }
 

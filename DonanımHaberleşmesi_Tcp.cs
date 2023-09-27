@@ -313,11 +313,14 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                     Tcpİstemci_ Tcpİstemci = new Tcpİstemci_(gelen, GeriBildirim_Islemi, Hatırlatıcı, SatırSatırGönderVeAl, TekrarDeneme_ZamanAşımı_msn, BilgiGönderme_ZamanAşımı_msn, Sessizlik_ZamanAşımı_msn);
                     İstemciler.Add(gelen.Client.RemoteEndPoint.ToString(), Tcpİstemci);
 
-                    KeyValuePair<string, IDonanımHaberlleşmesi>[] BağlantısıKopanlar = İstemciler.Where(x => !x.Value.BağlantıKurulduMu()).ToArray();
-                    foreach (var biri in BağlantısıKopanlar)
+                    if (!Sunucu.Pending())
                     {
-                        biri.Value.Durdur();
-                        İstemciler.Remove(biri.Key);
+                        KeyValuePair<string, IDonanımHaberlleşmesi>[] BağlantısıKopanlar = İstemciler.Where(x => !x.Value.BağlantıKurulduMu()).ToArray();
+                        foreach (var biri in BağlantısıKopanlar)
+                        {
+                            biri.Value.Durdur();
+                            İstemciler.Remove(biri.Key);
+                        }
                     }
                 }
                 catch (Exception)

@@ -29,16 +29,21 @@ namespace ArgeMup.HazirKod
             return Oku(Tipi, Depo, Depo[0] /*Sadece basit tipteki değişkenlerin okunabilmesi için*/, 0);
         }
 
-        bool KontrolEt_Kullanılsın_Mı(FieldInfo Değişken, out string Adı)
+        bool KontrolEt_Kullanılsın_Mı(FieldInfo Değişken, out string Adı, out int SıraNo)
         {
             Adı = Değişken.Name;
+            SıraNo = 0;
 
             //getter setter leri atla
             if (Değişken.GetCustomAttribute<System.Runtime.CompilerServices.CompilerGeneratedAttribute>() != null) return false; 
 
             //Nitelik kontrolü
             Niteliği.Adını_DeğiştirAttribute AdınıDeğiştir = Değişken.GetCustomAttribute<Niteliği.Adını_DeğiştirAttribute>();
-            if (AdınıDeğiştir != null && AdınıDeğiştir.KullanılacakAdı.DoluMu(true)) Adı = AdınıDeğiştir.KullanılacakAdı;
+            if (AdınıDeğiştir != null && AdınıDeğiştir.KullanılacakAdı.DoluMu(true))
+            {
+                Adı = AdınıDeğiştir.KullanılacakAdı;
+                if (Basit_Tipte_Mi(Değişken.FieldType) && AdınıDeğiştir.KullanılacakSıraNo >= 0) SıraNo = AdınıDeğiştir.KullanılacakSıraNo;
+            }
 
             if (Değişken.GetCustomAttribute<Niteliği.Bunu_Kesinlikle_KullanAttribute>() != null) return true;
             if (Değişken.GetCustomAttribute<Niteliği.Bunu_Kesinlikle_KullanmaAttribute>() != null) return false;
@@ -133,13 +138,14 @@ namespace ArgeMup.HazirKod
                     for (int i = 0; i < Elemanları.Length && !Tipi.IsEnum; i++)
                     {
                         FieldInfo eleman = Elemanları[i];
-                        bool snç = KontrolEt_Kullanılsın_Mı(eleman, out string Adı);
+                        bool snç = KontrolEt_Kullanılsın_Mı(eleman, out string Adı, out int SıraNo);
 
-                        if (Kullanılanİsimler.Contains(Adı)) throw new Exception(Tipi.Name + " içindeki " + eleman.Name + (eleman.Name != Adı ? " (" + Adı + ")" : null) + " değişken adı olarak zaten kullanıldı, farklı bir isim seçiniz");
-                        else Kullanılanİsimler.Add(Adı); //kullanılmayacak olsa bile ileride çakışma olmaması için şimdiden uyarabilmek adına listeye ekle
+                        string GeciciAdı = Adı + (SıraNo > 0 ? "[" + SıraNo.Yazıya() + "]": null);
+                        if (Kullanılanİsimler.Contains(GeciciAdı)) throw new Exception(Tipi.Name + " içindeki " + eleman.Name + (eleman.Name != Adı ? " (" + GeciciAdı + ")" : null) + " değişken adı olarak zaten kullanıldı, farklı bir isim seçiniz");
+                        else Kullanılanİsimler.Add(GeciciAdı); //kullanılmayacak olsa bile ileride çakışma olmaması için şimdiden uyarabilmek adına listeye ekle
                         if (!snç) continue; //istenmeyenleri atla
 
-                        Yaz(eleman.GetValue(Nesne), Depo[Adı], Basit_Tipte_Mi(eleman.FieldType) ? 0 : i, İçİçeÇağrıSayısı);
+                        Yaz(eleman.GetValue(Nesne), Depo[Adı], Basit_Tipte_Mi(eleman.FieldType) ? SıraNo : i, İçİçeÇağrıSayısı);
                     }
                 }
             }
@@ -284,7 +290,7 @@ namespace ArgeMup.HazirKod
             for (int i = 0; i < Elemanları.Length; i++)
             {
                 FieldInfo eleman = Elemanları[i];
-                if (!KontrolEt_Kullanılsın_Mı(eleman, out string Adı)) continue; //istenmeyenleri atla
+                if (!KontrolEt_Kullanılsın_Mı(eleman, out string Adı, out int SıraNo)) continue; //istenmeyenleri atla
 
                 IDepo_Eleman eleman_depo = Depo.Bul(Adı);
                 if (eleman_depo == null)
@@ -293,12 +299,13 @@ namespace ArgeMup.HazirKod
                     if (Sürüm_Geçişi_İçin_Eski_Adı != null && Sürüm_Geçişi_İçin_Eski_Adı.EskiAdı.DoluMu(true))
                     {
                         eleman_depo = Depo.Bul(Sürüm_Geçişi_İçin_Eski_Adı.EskiAdı);
+                        if (Basit_Tipte_Mi(eleman.FieldType) && Sürüm_Geçişi_İçin_Eski_Adı.EskiSıraNo >= 0) SıraNo = Sürüm_Geçişi_İçin_Eski_Adı.EskiSıraNo;
                     }
 
                     if (eleman_depo == null) continue; //kaydı olmayanları atla
                 }
 
-                object üretilen = Oku(eleman.FieldType, eleman_depo, eleman_depo[Basit_Tipte_Mi(eleman.FieldType) ? 0 : i], İçİçeÇağrıSayısı);
+                object üretilen = Oku(eleman.FieldType, eleman_depo, eleman_depo[Basit_Tipte_Mi(eleman.FieldType) ? SıraNo : i], İçİçeÇağrıSayısı);
                 if (üretilen != null) eleman.SetValue(Nesne, üretilen);
             }
 
@@ -315,10 +322,12 @@ namespace ArgeMup.HazirKod
             public class Adını_DeğiştirAttribute : Attribute
             {
                 public string KullanılacakAdı;
+                public int KullanılacakSıraNo;
 
-                public Adını_DeğiştirAttribute(string Adı)
+                public Adını_DeğiştirAttribute(string Adı, int SıraNo = 0)
                 {
                     KullanılacakAdı = Adı;
+                    KullanılacakSıraNo = SıraNo;
                 }
             }
 
@@ -329,10 +338,12 @@ namespace ArgeMup.HazirKod
             public class Sürüm_Geçişi_İçin_Eski_AdıAttribute : Attribute
             {
                 public string EskiAdı;
+                public int EskiSıraNo;
 
-                public Sürüm_Geçişi_İçin_Eski_AdıAttribute(string Adı)
+                public Sürüm_Geçişi_İçin_Eski_AdıAttribute(string Adı, int SıraNo = 0)
                 {
                     EskiAdı = Adı;
+                    EskiSıraNo = SıraNo;
                 }
             }
 

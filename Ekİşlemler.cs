@@ -34,6 +34,16 @@ namespace ArgeMup.HazirKod.Ekİşlemler
 
             throw new System.Exception("TarihSaate dönüştürülemedi " + Girdi);
         }
+#if NET7_0_OR_GREATER
+        public static System.DateOnly SadeceTarihe(this string Girdi, string Şablon = "dd.MM.yyyy", System.Globalization.CultureInfo Kültür = null, System.Globalization.DateTimeStyles Tip = System.Globalization.DateTimeStyles.AssumeLocal)
+        {
+            return ArgeMup.HazirKod.Dönüştürme.D_SadeceTarih.SadeceTarihe(Girdi, Şablon, Kültür, Tip);
+        }
+        public static System.TimeOnly SadeceSaate(this string Girdi, string Şablon = "HH:mm:ss.ffffff", System.Globalization.CultureInfo Kültür = null, System.Globalization.DateTimeStyles Tip = System.Globalization.DateTimeStyles.AssumeLocal)
+        {
+            return ArgeMup.HazirKod.Dönüştürme.D_SadeceSaat.SadeceSaate(Girdi, Şablon, Kültür, Tip);
+        }
+#endif
 
         static ArgeMup.HazirKod.DahaCokKarmasiklastirma_ DaÇoKa = new ArgeMup.HazirKod.DahaCokKarmasiklastirma_();
         public static string Karıştır(this string Girdi, string Şifre)
@@ -263,6 +273,38 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return Girdi;
         }
     }
+#if NET7_0_OR_GREATER
+    public static class _Ekİşlemler_SadeceTarih
+    {
+        public const string Sürüm = "V1.0";
+
+        public static string Yazıya(this System.DateOnly Girdi, string Şablon = "dd.MM.yyyy", System.Globalization.CultureInfo Kültür = null)
+        {
+            return ArgeMup.HazirKod.Dönüştürme.D_SadeceTarih.Yazıya(Girdi, Şablon, Kültür);
+        }
+
+        public static System.DateOnly Günlük(this System.DateOnly Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0, bool Hemen = false)
+        {
+            ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + Girdi.Yazıya(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo, Hemen);
+            return Girdi;
+        }
+    }
+    public static class _Ekİşlemler_SadeceSaat
+    {
+        public const string Sürüm = "V1.0";
+
+        public static string Yazıya(this System.TimeOnly Girdi, string Şablon = "HH:mm:ss.ffffff", System.Globalization.CultureInfo Kültür = null)
+        {
+            return ArgeMup.HazirKod.Dönüştürme.D_SadeceSaat.Yazıya(Girdi, Şablon, Kültür);
+        }
+
+        public static System.TimeOnly Günlük(this System.TimeOnly Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0, bool Hemen = false)
+        {
+            ArgeMup.HazirKod.Günlük.Ekle(ÖnYazı + Girdi.Yazıya(), Seviyesi, ÇağıranDosya, ÇağıranSatırNo, Hemen);
+            return Girdi;
+        }
+    }
+#endif
 
     public static class _Ekİşlemler_object
     {

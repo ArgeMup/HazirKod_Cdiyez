@@ -11,7 +11,7 @@ namespace ArgeMup.HazirKod
 {
     public class UygulamaOncedenCalistirildiMi_Basit : IDisposable
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
         static FileStream KilitDosyası = null;
 
         /// <summary>
@@ -157,27 +157,19 @@ namespace ArgeMup.HazirKod
                 if (Adı.EndsWith(".vshost")) Adı = Adı.Remove(Adı.Length - ".vshost".Length);
 #endif
 
-                W32_6.EnumWindows(delegate (IntPtr hWnd, int lParam)
+                int Şimdiki = Process.GetCurrentProcess().Id;
+                Process[] Diğerleri = Process.GetProcessesByName(Adı);
+                if (Diğerleri != null)
                 {
-                    uint windowPid;
-                    W32_5.GetWindowThreadProcessId(hWnd, out windowPid);
-                    if (windowPid == Process.GetCurrentProcess().Id) return true;
-
-                    int length = W32_4.GetWindowTextLength(hWnd);
-                    if (length == 0) return true;
-
-                    StringBuilder stringBuilder = new StringBuilder(length);
-                    W32_4.GetWindowText(hWnd, stringBuilder, length + 1);
-                    if (stringBuilder.ToString().Contains(Adı))
+                    foreach (Process Diğeri in Diğerleri)
                     {
-                        Process DiğerUygulama = Process.GetProcessById((int)windowPid);
+                        if (Diğeri.Id == Şimdiki) continue;
 
-                        if (ZorlaKapat) DiğerUygulama.Kill();
-                        else DiğerUygulama.Close();
+                        if (ZorlaKapat) Diğeri.Kill();
+                        else Diğeri.Close();
                         Adet++;
                     }
-                    return true;
-                }, 0);
+                }
             }
             catch (Exception) { }
             return Adet;

@@ -315,6 +315,55 @@ namespace ArgeMup.HazirKod.Dönüştürme
             throw new Exception(Girdi + " tarihe dönüştürülemiyor");
         }
     }
+#if NET7_0_OR_GREATER
+    public static class D_SadeceTarih
+    {
+        public const string Sürüm = "V1.0";
+
+        public const string Şablon_Tarih = "dd.MM.yyyy";
+
+        public static string Yazıya(DateOnly Girdi, string Şablon = Şablon_Tarih, System.Globalization.CultureInfo Kültür = null)
+        {
+            return Girdi.ToString(Şablon, Kültür == null ? System.Globalization.CultureInfo.InvariantCulture : Kültür);
+        }
+      
+        public static DateOnly SadeceTarihe(string Girdi, string Şablon = Şablon_Tarih, System.Globalization.CultureInfo Kültür = null, System.Globalization.DateTimeStyles Tip = System.Globalization.DateTimeStyles.AssumeLocal)
+        {
+            //DateOnly .net 8 ile gelecek
+            //if (System.DateOnly.TryParseExact(Girdi, Şablon, Kültür, Tip, out System.DateOnly yeni)) return yeni;
+            if (DateTime.TryParseExact(Girdi, Şablon, Kültür, Tip, out DateTime yeni)) return DateOnly.FromDateTime(yeni);
+
+            throw new Exception("Tarihe dönüştürülemedi " + Girdi);
+        }
+    }
+    public static class D_SadeceSaat
+    {
+        public const string Sürüm = "V1.0";
+
+        public const string Şablon_Saat = "HH:mm:ss.ffffff";
+
+        public static string Yazıya(TimeOnly Girdi, string Şablon = Şablon_Saat, System.Globalization.CultureInfo Kültür = null)
+        {
+            return Girdi.ToString(Şablon, Kültür == null ? System.Globalization.CultureInfo.InvariantCulture : Kültür);
+        }
+
+        public static TimeOnly SadeceSaate(string Girdi, string Şablon = Şablon_Saat, System.Globalization.CultureInfo Kültür = null, System.Globalization.DateTimeStyles Tip = System.Globalization.DateTimeStyles.AssumeLocal)
+        {
+            //TimeOnly .net 8 ile gelecek
+            //if (System.TimeOnly.TryParseExact(Girdi, Şablon, Kültür, Tip, out System.TimeOnly yeni)) return yeni;
+            try
+            {
+                string[] dizi = Girdi.Split(new string[] { ":", "." }, System.StringSplitOptions.None);
+                int saat = int.Parse(dizi[0]), dakika = int.Parse(dizi[1]), saniye = int.Parse(dizi[2]), milisaniye = int.Parse(dizi[3].Substring(0, 3)), mikrosaniye = int.Parse(dizi[3].Substring(3));
+                return new TimeOnly(saat, dakika, saniye, milisaniye, mikrosaniye);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Saate dönüştürülemedi " + Girdi);
+            }
+        }
+    }
+#endif
 
     public static class D_Akış
     {

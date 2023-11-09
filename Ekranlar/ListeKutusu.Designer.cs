@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace ArgeMup.HazirKod
+namespace ArgeMup.HazirKod.Ekranlar
 {
     partial class ListeKutusu
     {

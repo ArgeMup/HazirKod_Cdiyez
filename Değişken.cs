@@ -326,7 +326,30 @@ namespace ArgeMup.HazirKod
                 }
 
                 object üretilen = Oku(eleman.FieldType, eleman_depo, eleman_depo[Basit_Tipte_Mi(eleman.FieldType, out _) ? SıraNo : i], İçİçeÇağrıSayısı);
-                if (üretilen != null) eleman.SetValue(Nesne, üretilen);
+                if (üretilen != null)
+                {
+                    if (eleman.FieldType.IsArray)
+                    {
+                        object tanımlanan_dizi_ham = eleman.GetValue(Nesne);
+                        if (tanımlanan_dizi_ham != null)
+                        {
+                            Array tanımlanan_dizi = tanımlanan_dizi_ham as Array;
+                            Array üretilen_dizi = üretilen as Array;
+
+                            if (üretilen_dizi.Length < tanımlanan_dizi.Length)
+                            {
+                                for (int dd = 0; dd < üretilen_dizi.Length; dd++)
+                                {
+                                    tanımlanan_dizi.SetValue(üretilen_dizi.GetValue(dd), dd);
+                                }
+
+                                üretilen = tanımlanan_dizi;
+                            }
+                        }
+                    }
+                    
+                    eleman.SetValue(Nesne, üretilen);
+                }
             }
 
             return Nesne;

@@ -50,5 +50,30 @@ namespace ArgeMup.HazirKod
             return ( ( ( Bilgi - BilgiDizisi_EnDüşükDeğeri) / Fark_Bilgi) * Fark_Sınır) + AltSınır;
         }
     }
+
+    public class Rastgele
+    {
+        public const string Sürüm = "V1.0";
+        static System.Random rnd = new System.Random();
+        public static double Sayı(double EnKüçük = 0, double EnBüyük = double.MaxValue)
+        {
+            return rnd.NextDouble() * (EnBüyük - EnKüçük) + EnKüçük;
+        }
+        public static int Sayı(int EnKüçük = 0, int EnBüyük = int.MaxValue)
+        {
+            return rnd.Next(EnKüçük, EnBüyük);
+        }
+        public static byte[] BaytDizisi(int ElemanSayısı)
+        {
+            byte[] dizi = new byte[ElemanSayısı];
+            rnd.NextBytes(dizi);
+
+            return dizi;
+        }
+        public static string Yazı(int KarakterSayısı = 10)
+        {
+            return Dönüştürme.D_HexYazı.BaytDizisinden( BaytDizisi(KarakterSayısı / 2) );
+        }
+    }
 }
 

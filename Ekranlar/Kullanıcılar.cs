@@ -47,10 +47,13 @@ namespace ArgeMup.HazirKod.Ekranlar
                 case İşlemTürü_.Giriş:
                     Ayarlar_Kullanıcılar.GeçerliKullanıcı = null;
                     Ekran_Giriş_Kullanıcı.Items.AddRange(Kişiler_Yazı.ToArray());
-                    Ekran_Giriş_Kullanıcı.DroppedDown = true;
 
-                    Ekran_Giriş.Dock = DockStyle.Fill;
-                    Ekran_Giriş.Visible = true;
+                    Ekran_Giriş.Width = Ekran_Giriş_YeniParola_2.Width * 2;
+                    Ekran_Giriş.Left = (Width - Ekran_Giriş.Width) / 2;
+                    Ekran_Giriş.Top = (Height - Ekran_Giriş_Tamam.Top - Ekran_Giriş_Tamam.Height - 50) / 2;
+                    Ekran_Giriş_Parola.KeyDown += Ekran_Giriş_Parola_KeyDown;
+
+                    Ekran_Ayarlar.Visible = false;
                     break;
 
                 case İşlemTürü_.ParolaDeğiştirme:
@@ -64,8 +67,13 @@ namespace ArgeMup.HazirKod.Ekranlar
                     Ekran_Giriş_YeniParola.Visible = true;
                     Ekran_Giriş_YeniParolaTekrar.Visible = true;
                     Ekran_Giriş_Tamam.Text = "Kaydet";
-                    Ekran_Giriş.Dock = DockStyle.Fill;
-                    Ekran_Giriş.Visible = true;
+
+                    Ekran_Giriş.Width = Ekran_Giriş_YeniParola_2.Width * 2;
+                    Ekran_Giriş.Left = (Width - Ekran_Giriş.Width) / 2;
+                    Ekran_Giriş.Top = (Height - Ekran_Giriş_Tamam.Top - Ekran_Giriş_Tamam.Height - 50) / 2;
+                    Ekran_Giriş_YeniParolaTekrar.KeyDown += Ekran_Giriş_Parola_KeyDown;
+
+                    Ekran_Ayarlar.Visible = false;
                     break;
 
                 case İşlemTürü_.Ayarlar:
@@ -91,7 +99,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                     Uyarı.Visible = !Kullanıcılar.ParolaKontrolüGerekiyorMu;
 
                     Ekran_Ayarlar.Dock = DockStyle.Fill;
-                    Ekran_Ayarlar.Visible = true;
+                    Ekran_Giriş.Visible = false;
                     break;
             }
         }
@@ -105,7 +113,7 @@ namespace ArgeMup.HazirKod.Ekranlar
         }
 
         #region Ekran Ayarlar
-        void Ayarlar_Kaydet()
+        void Ayarlar_Kaydet(bool RollerGüncellendi = false)
         {
             Ayarlar_Kullanıcılar.Başlat();
             GeriBildirim_Değişiklikleri_Kaydet?.Invoke();
@@ -113,6 +121,12 @@ namespace ArgeMup.HazirKod.Ekranlar
             Uyarı.Visible = !Ayarlar_Kullanıcılar.ParolaKontrolüGerekiyorMu;
             ÖnYüzler_Kaydet_Kullanıcılar.Enabled = false;
             ÖnYüzler_Kaydet_Roller.Enabled = false;
+
+            if (RollerGüncellendi)
+            {
+                Kullanıcılar_Rol.Items.Clear();
+                Kullanıcılar_Rol.Items.AddRange(Ayarlar_Kullanıcılar.Roller.Keys.ToArray());
+            }
         }
 
         #region Kullanıcılar
@@ -161,7 +175,7 @@ namespace ArgeMup.HazirKod.Ekranlar
         {
             if (Kullanıcılar_Liste.SeçilenEleman_Adı.BoşMu()) return;
 
-            if (Kullanıcılar_Parola.Text.BoşMu()) Kullanıcılar_Parola.Text = null;
+            if (Kullanıcılar_Parola.Text.BoşMu(true)) Kullanıcılar_Parola.Text = null;
 
             Ayarlar_Kullanıcı_ Kullanıcı = Bul_Kullanıcı(Kullanıcılar_Liste.SeçilenEleman_Adı);
             if (Kullanıcı == null)
@@ -200,19 +214,19 @@ namespace ArgeMup.HazirKod.Ekranlar
 
                     case ListeKutusu.İşlemTürü.YeniEklendi:
                         Ayarlar_Kullanıcılar.Roller.Add(Adı, new bool[Ayarlar_Kullanıcılar.İzinDizisiElemanSayısı]);
-                        Ayarlar_Kaydet();
+                        Ayarlar_Kaydet(true);
                         return true;
 
                     case ListeKutusu.İşlemTürü.AdıDeğiştirildi:
                         Rol_Dizisi = Bul_Rol(Adı);
                         Ayarlar_Kullanıcılar.Roller.Remove(Adı);
                         Ayarlar_Kullanıcılar.Roller.Add(YeniAdı, Rol_Dizisi);
-                        Ayarlar_Kaydet();
+                        Ayarlar_Kaydet(true);
                         return true;
 
                     case ListeKutusu.İşlemTürü.Silindi:
                         Ayarlar_Kullanıcılar.Roller.Remove(Adı);
-                        Ayarlar_Kaydet();
+                        Ayarlar_Kaydet(true);
                         return true;
                 }
             }
@@ -244,9 +258,17 @@ namespace ArgeMup.HazirKod.Ekranlar
         #endregion
 
         #region Ekran Giriş
+        private void Ekran_Giriş_Kullanıcı_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Ekran_Giriş_Parola.Focus();
+        }
+        private void Ekran_Giriş_Parola_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter) Ekran_Giriş_Tamam_Click(null, null);
+        }
         private void Ekran_Giriş_Tamam_Click(object sender, EventArgs e)
         {
-            if ((sender as Button).Text == "Tamam")
+            if (Ekran_Giriş_Tamam.Text == "Tamam")
             {
                 //Giriş
                 if (Ayarlar_Kullanıcılar.ParolaKontrol(Ekran_Giriş_Kullanıcı.Text, Ekran_Giriş_Parola.Text))
@@ -257,16 +279,18 @@ namespace ArgeMup.HazirKod.Ekranlar
             else
             {
                 //Parola değiştirme
-                Ekran_Giriş_YeniParola.Text = Ekran_Giriş_YeniParola.Text.Trim();
+                if (Ekran_Giriş_YeniParola.Text.BoşMu(true)) Ekran_Giriş_YeniParola.Text = null;
 
                 if (Ekran_Giriş_YeniParola.Text.Length < 4 ||
-                    Ekran_Giriş_YeniParola.Text != Ekran_Giriş_YeniParolaTekrar.Text)
+                    Ekran_Giriş_YeniParola.Text != Ekran_Giriş_YeniParolaTekrar.Text ||
+                    Ekran_Giriş_Parola.Text != Ayarlar_Kullanıcılar.GeçerliKullanıcı.Parolası)
                 {
                     MessageBox.Show(
                         "Alttaki kuralları sağladığınızı kontrol ediniz." + Environment.NewLine + Environment.NewLine +
-                        "En az 4 karakter girilmeli" + Environment.NewLine +
-                        "Boşluk karakteri olmamalı" + Environment.NewLine +
-                        "Yeni parola ve tekrar parolası birbirinin aynısı olmalı",
+                        "Mevcut parolanızı giriniz" + Environment.NewLine +
+                        "En az 4 karakterden oluşan yeni bir parola belirleyiniz" + Environment.NewLine +
+                        "Yeni parolanızın başlangıç ve bitişinde boşluk karakterini kullanmayınız" + Environment.NewLine +
+                        "Yeni parola ve tekrar parolasının birbirinin aynısı olduğudan emin olunuz",
                         "Parola Değiştirme Ekranı");
                     return;
                 }
@@ -276,6 +300,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 GeriBildirim_Değişiklikleri_Kaydet?.Invoke();
             }
         }
+
         #endregion
     }
 
@@ -305,8 +330,10 @@ namespace ArgeMup.HazirKod.Ekranlar
 
             if (TamKontrol)
             {
-                foreach (KeyValuePair<string, bool[]> Rol in Roller)
+                for (int i = 0; i < Roller.Count; i++)
                 {
+                    KeyValuePair<string, bool[]> Rol = Roller.ElementAt(i);
+
                     if (Rol.Value.Length != this.İzinDizisiElemanSayısı)
                     {
                         bool[] Rol_Dizisi = Rol.Value;
@@ -335,7 +362,7 @@ namespace ArgeMup.HazirKod.Ekranlar
         {
             GeçerliKullanıcı = null;
             if (!ParolaKontrolüGerekiyorMu) return true;
-            else if (Parola.BoşMu(true)) return false;
+            else if (Parola.BoşMu()) return false;
 
             if (HatalıGirişDenemesi_Sayısı >= HatalıGirişDenemesi_Sabiti)
             {

@@ -77,6 +77,8 @@ namespace ArgeMup.HazirKod
         /// <br>Tarih Saat : Yeniden eskiye</br>
         /// <br>Bit : 1'den 0'a doğru sıralanır</br></param>
         void Sırala(string ElemanAdıDizisi, int SıraNo, object BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, bool Tersten = false);
+        void Sırala(string ElemanAdıDizisi, List<string> ElemanAdıSıralaması);
+        List<string> Listele(string ElemanAdıDizisi);
     }
 
     public class Depo_Ayraçlar
@@ -897,6 +899,52 @@ namespace ArgeMup.HazirKod
                     
                 bulunan._Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
             }
+            public void Sırala(string ElemanAdıDizisi, List<string> ElemanAdıSıralaması)
+            {
+                Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
+                if (bulunan == null || bulunan._Elemanları == null || bulunan._Elemanları.Length == 0 || ElemanAdıSıralaması == null || ElemanAdıSıralaması.Count == 0) return;
+
+                ElemanAdıSıralaması = new List<string>(ElemanAdıSıralaması); //kaynak listeyi bozmamak için
+                List<Eleman_> YeniElamanListesi = new List<Eleman_>();
+                List<Eleman_> EskiElamanListesi = bulunan._Elemanları.ToList();
+
+                //Verilen sıralamaya göre yeni listeyi oluştur
+                while (ElemanAdıSıralaması.Count > 0)
+                {
+                    string SıradakiElamanAdı = ElemanAdıSıralaması[0];
+                    ElemanAdıSıralaması.RemoveAt(0);
+                    if (string.IsNullOrEmpty(SıradakiElamanAdı)) continue;
+
+                    Eleman_ bulunan_alt_eleman = EskiElamanListesi.FirstOrDefault(x => x._Adı == SıradakiElamanAdı);
+                    if (bulunan_alt_eleman == null) bulunan_alt_eleman = new Eleman_(SıradakiElamanAdı, bulunan._Depo); //Sıralamada geçen fakat mevcut olmayan elemanı oluştur, istenen konuma yerleştir
+                    else EskiElamanListesi.Remove(bulunan_alt_eleman);
+
+                    YeniElamanListesi.Add(bulunan_alt_eleman);
+                }
+
+                //Yeni sıralamada olmayan elemanları listenin sonuna ekle
+                foreach (Eleman_ bulunan_alt_eleman in EskiElamanListesi)
+                {
+                    YeniElamanListesi.Add(bulunan_alt_eleman);
+                }
+
+                bulunan._Elemanları = YeniElamanListesi.ToArray();
+                bulunan._Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+            }
+            public List<string> Listele(string ElemanAdıDizisi)
+            {
+                List<string> ElemanAdıListesi = new List<string>();
+
+                Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
+                if (bulunan == null || bulunan._Elemanları == null || bulunan._Elemanları.Length == 0) return ElemanAdıListesi;
+
+                foreach (Eleman_ alt_eleman in bulunan._Elemanları)
+                {
+                    ElemanAdıListesi.Add(alt_eleman._Adı);
+                }
+
+                return ElemanAdıListesi;
+            }
             #endregion
         }
 
@@ -1111,6 +1159,18 @@ namespace ArgeMup.HazirKod
         {
             IDepo_Eleman bulunan = Bul(ElemanAdıDizisi);
             if (bulunan != null) bulunan.Sırala(null, SıraNo, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, Tersten);
+        }
+        public void Sırala(string ElemanAdıDizisi, List<string> ElemanAdıSıralaması)
+        {
+            IDepo_Eleman bulunan = Bul(ElemanAdıDizisi);
+            if (bulunan != null) bulunan.Sırala(null, ElemanAdıSıralaması);
+        }
+        public List<string> Listele(string ElemanAdıDizisi)
+        {
+            IDepo_Eleman bulunan = Bul(ElemanAdıDizisi);
+            if (bulunan != null) return bulunan.Listele(null);
+
+            return new List<string>();
         }
     }
 }
@@ -1545,6 +1605,25 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
 
                 Depo.Kilit.ReleaseMutex();
             }
+            public void Sırala(string ElemanAdıDizisi, List<string> ElemanAdıSıralaması)
+            {
+                if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+                AsılEleman.Sırala(ElemanAdıDizisi, ElemanAdıSıralaması);
+                Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+
+                Depo.Kilit.ReleaseMutex();
+            }
+            public List<string> Listele(string ElemanAdıDizisi)
+            {
+                if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+                List<string> ElemanAdıListesi = AsılEleman.Listele(ElemanAdıDizisi);
+
+                Depo.Kilit.ReleaseMutex();
+
+                return ElemanAdıListesi;
+            }
             #endregion
         }
 
@@ -1735,6 +1814,25 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
             EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
 
             Kilit.ReleaseMutex();
+        }
+        public void Sırala(string ElemanAdıDizisi, List<string> ElemanAdıSıralaması)
+        {
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+            Depo.Sırala(ElemanAdıDizisi, ElemanAdıSıralaması);
+            EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+
+            Kilit.ReleaseMutex();
+        }
+        public List<string> Listele(string ElemanAdıDizisi)
+        {
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+            List<string> ElemanAdıListesi = Depo.Listele(ElemanAdıDizisi);
+
+            Kilit.ReleaseMutex();
+
+            return ElemanAdıListesi;
         }
     }
 }

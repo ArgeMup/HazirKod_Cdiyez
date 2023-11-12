@@ -31,261 +31,278 @@ namespace ArgeMup.HazirKod.Ekranlar
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            SeçimKutusu = new ListBox();
-            AramaÇubuğu = new TextBox();
-            Adı = new TextBox();
-            Ekle = new Button();
-            AdıDeğiştir = new Button();
-            Sil = new Button();
-            Tabla_AltTuşlar = new Panel();
-            Göster = new Button();
-            Gizle = new Button();
-            İpucu = new ToolTip(components);
-            SeçimKutusu_TümünüSeç = new Button();
-            AramaÇubuğunuTemizle = new Button();
-            AşağıTaşı = new Button();
-            YukarıTaşı = new Button();
-            Sabit = new Button();
-            Tabla_ÜstTuşlar = new Panel();
-            Tabla_AltTuşlar.SuspendLayout();
-            Tabla_ÜstTuşlar.SuspendLayout();
-            SuspendLayout();
+            this.components = new System.ComponentModel.Container();
+            this.SeçimKutusu = new System.Windows.Forms.ListBox();
+            this.AramaÇubuğu = new System.Windows.Forms.TextBox();
+            this.Adı = new System.Windows.Forms.TextBox();
+            this.Ekle = new System.Windows.Forms.Button();
+            this.AdıDeğiştir = new System.Windows.Forms.Button();
+            this.Sil = new System.Windows.Forms.Button();
+            this.Tabla_AltTuşlar = new System.Windows.Forms.Panel();
+            this.Göster = new System.Windows.Forms.Button();
+            this.Gizle = new System.Windows.Forms.Button();
+            this.İpucu = new System.Windows.Forms.ToolTip(this.components);
+            this.SeçimKutusu_TümünüSeç = new System.Windows.Forms.Button();
+            this.AramaÇubuğunuTemizle = new System.Windows.Forms.Button();
+            this.AşağıTaşı = new System.Windows.Forms.Button();
+            this.YukarıTaşı = new System.Windows.Forms.Button();
+            this.Sabit = new System.Windows.Forms.Button();
+            this.Tabla_ÜstTuşlar = new System.Windows.Forms.Panel();
+            this.Tabla_AltTuşlar.SuspendLayout();
+            this.Tabla_ÜstTuşlar.SuspendLayout();
+            this.SuspendLayout();
             // 
             // SeçimKutusu
             // 
-            SeçimKutusu.Dock = DockStyle.Fill;
-            SeçimKutusu.FormattingEnabled = true;
-            SeçimKutusu.ItemHeight = 20;
-            SeçimKutusu.Location = new Point(0, 30);
-            SeçimKutusu.Name = "SeçimKutusu";
-            SeçimKutusu.Size = new Size(235, 175);
-            SeçimKutusu.TabIndex = 0;
-            SeçimKutusu.SelectedIndexChanged += SeçimKutusu_SelectedIndexChanged;
-            SeçimKutusu.KeyPress += SeçimKutusu_KeyPress;
+            this.SeçimKutusu.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SeçimKutusu.FormattingEnabled = true;
+            this.SeçimKutusu.ItemHeight = 16;
+            this.SeçimKutusu.Location = new System.Drawing.Point(0, 24);
+            this.SeçimKutusu.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.SeçimKutusu.Name = "SeçimKutusu";
+            this.SeçimKutusu.Size = new System.Drawing.Size(235, 140);
+            this.SeçimKutusu.TabIndex = 0;
+            this.SeçimKutusu.SelectedIndexChanged += new System.EventHandler(this.SeçimKutusu_SelectedIndexChanged);
+            this.SeçimKutusu.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SeçimKutusu_KeyPress);
             // 
             // AramaÇubuğu
             // 
-            AramaÇubuğu.BorderStyle = BorderStyle.FixedSingle;
-            AramaÇubuğu.Dock = DockStyle.Fill;
-            AramaÇubuğu.Location = new Point(0, 0);
-            AramaÇubuğu.Name = "AramaÇubuğu";
-            AramaÇubuğu.Size = new Size(62, 27);
-            AramaÇubuğu.TabIndex = 1;
-            İpucu.SetToolTip(AramaÇubuğu, "Arama Kutusu");
-            AramaÇubuğu.TextChanged += AramaÇubuğu_TextChanged;
-            AramaÇubuğu.KeyPress += AramaÇubuğu_KeyPress;
+            this.AramaÇubuğu.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.AramaÇubuğu.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AramaÇubuğu.Location = new System.Drawing.Point(0, 0);
+            this.AramaÇubuğu.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.AramaÇubuğu.Name = "AramaÇubuğu";
+            this.AramaÇubuğu.Size = new System.Drawing.Size(34, 22);
+            this.AramaÇubuğu.TabIndex = 1;
+            this.İpucu.SetToolTip(this.AramaÇubuğu, "Arama Kutusu");
+            this.AramaÇubuğu.TextChanged += new System.EventHandler(this.AramaÇubuğu_TextChanged);
+            this.AramaÇubuğu.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.AramaÇubuğu_KeyPress);
             // 
             // Adı
             // 
-            Adı.BorderStyle = BorderStyle.FixedSingle;
-            Adı.Dock = DockStyle.Fill;
-            Adı.Location = new Point(0, 0);
-            Adı.Name = "Adı";
-            Adı.Size = new Size(83, 27);
-            Adı.TabIndex = 2;
-            İpucu.SetToolTip(Adı, "Adı");
-            Adı.TextChanged += Adı_TextChanged;
+            this.Adı.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.Adı.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Adı.Location = new System.Drawing.Point(0, 0);
+            this.Adı.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Adı.Name = "Adı";
+            this.Adı.Size = new System.Drawing.Size(83, 22);
+            this.Adı.TabIndex = 2;
+            this.İpucu.SetToolTip(this.Adı, "Adı");
+            this.Adı.TextChanged += new System.EventHandler(this.Adı_TextChanged);
             // 
             // Ekle
             // 
-            Ekle.AutoSize = true;
-            Ekle.BackColor = Color.YellowGreen;
-            Ekle.Dock = DockStyle.Right;
-            Ekle.Location = new Point(83, 0);
-            Ekle.Name = "Ekle";
-            Ekle.Size = new Size(46, 30);
-            Ekle.TabIndex = 3;
-            Ekle.Text = "Ekle";
-            Ekle.UseVisualStyleBackColor = false;
-            Ekle.Visible = false;
-            Ekle.Click += Ekle_Click;
+            this.Ekle.AutoSize = true;
+            this.Ekle.BackColor = System.Drawing.Color.YellowGreen;
+            this.Ekle.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Ekle.Location = new System.Drawing.Point(83, 0);
+            this.Ekle.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Ekle.Name = "Ekle";
+            this.Ekle.Size = new System.Drawing.Size(46, 24);
+            this.Ekle.TabIndex = 3;
+            this.Ekle.Text = "Ekle";
+            this.Ekle.UseVisualStyleBackColor = false;
+            this.Ekle.Visible = false;
+            this.Ekle.Click += new System.EventHandler(this.Ekle_Click);
             // 
             // AdıDeğiştir
             // 
-            AdıDeğiştir.AutoSize = true;
-            AdıDeğiştir.BackColor = Color.Orange;
-            AdıDeğiştir.Dock = DockStyle.Right;
-            AdıDeğiştir.Location = new Point(129, 0);
-            AdıDeğiştir.Name = "AdıDeğiştir";
-            AdıDeğiştir.Size = new Size(71, 30);
-            AdıDeğiştir.TabIndex = 4;
-            AdıDeğiştir.Text = "Değiştir";
-            AdıDeğiştir.UseVisualStyleBackColor = false;
-            AdıDeğiştir.Visible = false;
-            AdıDeğiştir.Click += AdıDeğiştir_Gizle_Göster_Click;
+            this.AdıDeğiştir.AutoSize = true;
+            this.AdıDeğiştir.BackColor = System.Drawing.Color.Orange;
+            this.AdıDeğiştir.Dock = System.Windows.Forms.DockStyle.Right;
+            this.AdıDeğiştir.Location = new System.Drawing.Point(129, 0);
+            this.AdıDeğiştir.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.AdıDeğiştir.Name = "AdıDeğiştir";
+            this.AdıDeğiştir.Size = new System.Drawing.Size(71, 24);
+            this.AdıDeğiştir.TabIndex = 4;
+            this.AdıDeğiştir.Text = "Değiştir";
+            this.AdıDeğiştir.UseVisualStyleBackColor = false;
+            this.AdıDeğiştir.Visible = false;
+            this.AdıDeğiştir.Click += new System.EventHandler(this.AdıDeğiştir_Gizle_Göster_Click);
             // 
             // Sil
             // 
-            Sil.AutoSize = true;
-            Sil.BackColor = Color.Salmon;
-            Sil.Dock = DockStyle.Right;
-            Sil.Location = new Point(200, 0);
-            Sil.Name = "Sil";
-            Sil.Size = new Size(35, 30);
-            Sil.TabIndex = 5;
-            Sil.Text = "Sil";
-            Sil.UseVisualStyleBackColor = false;
-            Sil.Visible = false;
-            Sil.Click += Sil_Click;
+            this.Sil.AutoSize = true;
+            this.Sil.BackColor = System.Drawing.Color.Salmon;
+            this.Sil.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Sil.Location = new System.Drawing.Point(200, 0);
+            this.Sil.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Sil.Name = "Sil";
+            this.Sil.Size = new System.Drawing.Size(35, 24);
+            this.Sil.TabIndex = 5;
+            this.Sil.Text = "Sil";
+            this.Sil.UseVisualStyleBackColor = false;
+            this.Sil.Visible = false;
+            this.Sil.Click += new System.EventHandler(this.Sil_Click);
             // 
             // Tabla_AltTuşlar
             // 
-            Tabla_AltTuşlar.Controls.Add(Adı);
-            Tabla_AltTuşlar.Controls.Add(Ekle);
-            Tabla_AltTuşlar.Controls.Add(AdıDeğiştir);
-            Tabla_AltTuşlar.Controls.Add(Sil);
-            Tabla_AltTuşlar.Dock = DockStyle.Bottom;
-            Tabla_AltTuşlar.Location = new Point(0, 205);
-            Tabla_AltTuşlar.Name = "Tabla_AltTuşlar";
-            Tabla_AltTuşlar.Size = new Size(235, 30);
-            Tabla_AltTuşlar.TabIndex = 6;
+            this.Tabla_AltTuşlar.Controls.Add(this.Adı);
+            this.Tabla_AltTuşlar.Controls.Add(this.Ekle);
+            this.Tabla_AltTuşlar.Controls.Add(this.AdıDeğiştir);
+            this.Tabla_AltTuşlar.Controls.Add(this.Sil);
+            this.Tabla_AltTuşlar.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.Tabla_AltTuşlar.Location = new System.Drawing.Point(0, 164);
+            this.Tabla_AltTuşlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Tabla_AltTuşlar.Name = "Tabla_AltTuşlar";
+            this.Tabla_AltTuşlar.Size = new System.Drawing.Size(235, 24);
+            this.Tabla_AltTuşlar.TabIndex = 6;
             // 
             // Göster
             // 
-            Göster.AutoSize = true;
-            Göster.BackColor = Color.Khaki;
-            Göster.Dock = DockStyle.Right;
-            Göster.Location = new Point(156, 0);
-            Göster.Name = "Göster";
-            Göster.Size = new Size(28, 30);
-            Göster.TabIndex = 7;
-            Göster.Text = "●";
-            İpucu.SetToolTip(Göster, "Görünür duruma getir");
-            Göster.UseVisualStyleBackColor = false;
-            Göster.Visible = false;
-            Göster.Click += AdıDeğiştir_Gizle_Göster_Click;
+            this.Göster.AutoSize = true;
+            this.Göster.BackColor = System.Drawing.Color.Khaki;
+            this.Göster.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Göster.Location = new System.Drawing.Point(156, 0);
+            this.Göster.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Göster.Name = "Göster";
+            this.Göster.Size = new System.Drawing.Size(28, 24);
+            this.Göster.TabIndex = 7;
+            this.Göster.Text = "●";
+            this.İpucu.SetToolTip(this.Göster, "Görünür duruma getir");
+            this.Göster.UseVisualStyleBackColor = false;
+            this.Göster.Visible = false;
+            this.Göster.Click += new System.EventHandler(this.AdıDeğiştir_Gizle_Göster_Click);
             // 
             // Gizle
             // 
-            Gizle.AutoSize = true;
-            Gizle.BackColor = Color.Khaki;
-            Gizle.Dock = DockStyle.Right;
-            Gizle.Location = new Point(184, 0);
-            Gizle.Name = "Gizle";
-            Gizle.Size = new Size(28, 30);
-            Gizle.TabIndex = 6;
-            Gizle.Text = "◌";
-            İpucu.SetToolTip(Gizle, "Gizle");
-            Gizle.UseVisualStyleBackColor = false;
-            Gizle.Visible = false;
-            Gizle.Click += AdıDeğiştir_Gizle_Göster_Click;
+            this.Gizle.AutoSize = true;
+            this.Gizle.BackColor = System.Drawing.Color.Khaki;
+            this.Gizle.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Gizle.Location = new System.Drawing.Point(184, 0);
+            this.Gizle.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Gizle.Name = "Gizle";
+            this.Gizle.Size = new System.Drawing.Size(28, 24);
+            this.Gizle.TabIndex = 6;
+            this.Gizle.Text = "◌";
+            this.İpucu.SetToolTip(this.Gizle, "Gizle");
+            this.Gizle.UseVisualStyleBackColor = false;
+            this.Gizle.Visible = false;
+            this.Gizle.Click += new System.EventHandler(this.AdıDeğiştir_Gizle_Göster_Click);
             // 
             // İpucu
             // 
-            İpucu.AutomaticDelay = 100;
-            İpucu.AutoPopDelay = 10000;
-            İpucu.InitialDelay = 100;
-            İpucu.IsBalloon = true;
-            İpucu.ReshowDelay = 20;
-            İpucu.UseAnimation = false;
-            İpucu.UseFading = false;
+            this.İpucu.AutomaticDelay = 100;
+            this.İpucu.AutoPopDelay = 10000;
+            this.İpucu.InitialDelay = 100;
+            this.İpucu.IsBalloon = true;
+            this.İpucu.ReshowDelay = 20;
+            this.İpucu.UseAnimation = false;
+            this.İpucu.UseFading = false;
             // 
             // SeçimKutusu_TümünüSeç
             // 
-            SeçimKutusu_TümünüSeç.AutoSize = true;
-            SeçimKutusu_TümünüSeç.BackColor = Color.LightBlue;
-            SeçimKutusu_TümünüSeç.Dock = DockStyle.Right;
-            SeçimKutusu_TümünüSeç.Location = new Point(62, 0);
-            SeçimKutusu_TümünüSeç.Name = "SeçimKutusu_TümünüSeç";
-            SeçimKutusu_TümünüSeç.Size = new Size(30, 30);
-            SeçimKutusu_TümünüSeç.TabIndex = 8;
-            SeçimKutusu_TümünüSeç.Text = "✓";
-            İpucu.SetToolTip(SeçimKutusu_TümünüSeç, "Tümünü seç veya bırak");
-            SeçimKutusu_TümünüSeç.UseVisualStyleBackColor = false;
-            SeçimKutusu_TümünüSeç.Visible = false;
-            SeçimKutusu_TümünüSeç.Click += SeçimKutusu_TümünüSeç_Click;
+            this.SeçimKutusu_TümünüSeç.AutoSize = true;
+            this.SeçimKutusu_TümünüSeç.BackColor = System.Drawing.Color.LightBlue;
+            this.SeçimKutusu_TümünüSeç.Dock = System.Windows.Forms.DockStyle.Right;
+            this.SeçimKutusu_TümünüSeç.Location = new System.Drawing.Point(62, 0);
+            this.SeçimKutusu_TümünüSeç.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.SeçimKutusu_TümünüSeç.Name = "SeçimKutusu_TümünüSeç";
+            this.SeçimKutusu_TümünüSeç.Size = new System.Drawing.Size(30, 24);
+            this.SeçimKutusu_TümünüSeç.TabIndex = 8;
+            this.SeçimKutusu_TümünüSeç.Text = "✓";
+            this.İpucu.SetToolTip(this.SeçimKutusu_TümünüSeç, "Tümünü seç veya bırak");
+            this.SeçimKutusu_TümünüSeç.UseVisualStyleBackColor = false;
+            this.SeçimKutusu_TümünüSeç.Visible = false;
+            this.SeçimKutusu_TümünüSeç.Click += new System.EventHandler(this.SeçimKutusu_TümünüSeç_Click);
             // 
             // AramaÇubuğunuTemizle
             // 
-            AramaÇubuğunuTemizle.AutoSize = true;
-            AramaÇubuğunuTemizle.BackColor = Color.Wheat;
-            AramaÇubuğunuTemizle.Dock = DockStyle.Right;
-            AramaÇubuğunuTemizle.Location = new Point(34, 0);
-            AramaÇubuğunuTemizle.Name = "AramaÇubuğunuTemizle";
-            AramaÇubuğunuTemizle.Size = new Size(28, 30);
-            AramaÇubuğunuTemizle.TabIndex = 7;
-            AramaÇubuğunuTemizle.Text = "X";
-            İpucu.SetToolTip(AramaÇubuğunuTemizle, "Arama çubuğunu temizle");
-            AramaÇubuğunuTemizle.UseVisualStyleBackColor = false;
-            AramaÇubuğunuTemizle.Visible = false;
-            AramaÇubuğunuTemizle.Click += AramaÇubuğunuTemizle_Click;
+            this.AramaÇubuğunuTemizle.AutoSize = true;
+            this.AramaÇubuğunuTemizle.BackColor = System.Drawing.Color.Wheat;
+            this.AramaÇubuğunuTemizle.Dock = System.Windows.Forms.DockStyle.Right;
+            this.AramaÇubuğunuTemizle.Location = new System.Drawing.Point(34, 0);
+            this.AramaÇubuğunuTemizle.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.AramaÇubuğunuTemizle.Name = "AramaÇubuğunuTemizle";
+            this.AramaÇubuğunuTemizle.Size = new System.Drawing.Size(28, 24);
+            this.AramaÇubuğunuTemizle.TabIndex = 7;
+            this.AramaÇubuğunuTemizle.Text = "X";
+            this.İpucu.SetToolTip(this.AramaÇubuğunuTemizle, "Arama çubuğunu temizle");
+            this.AramaÇubuğunuTemizle.UseVisualStyleBackColor = false;
+            this.AramaÇubuğunuTemizle.Visible = false;
+            this.AramaÇubuğunuTemizle.Click += new System.EventHandler(this.AramaÇubuğunuTemizle_Click);
             // 
             // AşağıTaşı
             // 
-            AşağıTaşı.AutoSize = true;
-            AşağıTaşı.BackColor = Color.Thistle;
-            AşağıTaşı.Dock = DockStyle.Right;
-            AşağıTaşı.Location = new Point(124, 0);
-            AşağıTaşı.Name = "AşağıTaşı";
-            AşağıTaşı.Size = new Size(32, 30);
-            AşağıTaşı.TabIndex = 9;
-            AşağıTaşı.Text = "▼";
-            İpucu.SetToolTip(AşağıTaşı, "Listede aşağı taşı");
-            AşağıTaşı.UseVisualStyleBackColor = false;
-            AşağıTaşı.Visible = false;
-            AşağıTaşı.Click += KonumunuDeğiştir_Click;
+            this.AşağıTaşı.AutoSize = true;
+            this.AşağıTaşı.BackColor = System.Drawing.Color.Thistle;
+            this.AşağıTaşı.Dock = System.Windows.Forms.DockStyle.Right;
+            this.AşağıTaşı.Location = new System.Drawing.Point(124, 0);
+            this.AşağıTaşı.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.AşağıTaşı.Name = "AşağıTaşı";
+            this.AşağıTaşı.Size = new System.Drawing.Size(32, 24);
+            this.AşağıTaşı.TabIndex = 9;
+            this.AşağıTaşı.Text = "▼";
+            this.İpucu.SetToolTip(this.AşağıTaşı, "Listede aşağı taşı");
+            this.AşağıTaşı.UseVisualStyleBackColor = false;
+            this.AşağıTaşı.Visible = false;
+            this.AşağıTaşı.Click += new System.EventHandler(this.KonumunuDeğiştir_Click);
             // 
             // YukarıTaşı
             // 
-            YukarıTaşı.AutoSize = true;
-            YukarıTaşı.BackColor = Color.Thistle;
-            YukarıTaşı.Dock = DockStyle.Right;
-            YukarıTaşı.Location = new Point(92, 0);
-            YukarıTaşı.Name = "YukarıTaşı";
-            YukarıTaşı.Size = new Size(32, 30);
-            YukarıTaşı.TabIndex = 10;
-            YukarıTaşı.Text = "▲";
-            İpucu.SetToolTip(YukarıTaşı, "Listede yukarı taşı");
-            YukarıTaşı.UseVisualStyleBackColor = false;
-            YukarıTaşı.Visible = false;
-            YukarıTaşı.Click += KonumunuDeğiştir_Click;
+            this.YukarıTaşı.AutoSize = true;
+            this.YukarıTaşı.BackColor = System.Drawing.Color.Thistle;
+            this.YukarıTaşı.Dock = System.Windows.Forms.DockStyle.Right;
+            this.YukarıTaşı.Location = new System.Drawing.Point(92, 0);
+            this.YukarıTaşı.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.YukarıTaşı.Name = "YukarıTaşı";
+            this.YukarıTaşı.Size = new System.Drawing.Size(32, 24);
+            this.YukarıTaşı.TabIndex = 10;
+            this.YukarıTaşı.Text = "▲";
+            this.İpucu.SetToolTip(this.YukarıTaşı, "Listede yukarı taşı");
+            this.YukarıTaşı.UseVisualStyleBackColor = false;
+            this.YukarıTaşı.Visible = false;
+            this.YukarıTaşı.Click += new System.EventHandler(this.KonumunuDeğiştir_Click);
             // 
             // Sabit
             // 
-            Sabit.AutoSize = true;
-            Sabit.BackColor = Color.LightGray;
-            Sabit.Dock = DockStyle.Right;
-            Sabit.Location = new Point(212, 0);
-            Sabit.Name = "Sabit";
-            Sabit.Size = new Size(23, 30);
-            Sabit.TabIndex = 11;
-            Sabit.Text = "!";
-            İpucu.SetToolTip(Sabit, "Seçilen kayıt uygulamanın düzgün\r\nçalışabilmesi için gereklidir");
-            Sabit.UseVisualStyleBackColor = false;
-            Sabit.Visible = false;
+            this.Sabit.AutoSize = true;
+            this.Sabit.BackColor = System.Drawing.Color.LightGray;
+            this.Sabit.Dock = System.Windows.Forms.DockStyle.Right;
+            this.Sabit.Location = new System.Drawing.Point(212, 0);
+            this.Sabit.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Sabit.Name = "Sabit";
+            this.Sabit.Size = new System.Drawing.Size(23, 24);
+            this.Sabit.TabIndex = 11;
+            this.Sabit.Text = "!";
+            this.İpucu.SetToolTip(this.Sabit, "Seçilen kayıt uygulamanın düzgün\r\nçalışabilmesi için gereklidir");
+            this.Sabit.UseVisualStyleBackColor = false;
+            this.Sabit.Visible = false;
             // 
             // Tabla_ÜstTuşlar
             // 
-            Tabla_ÜstTuşlar.Controls.Add(AramaÇubuğunuTemizle);
-            Tabla_ÜstTuşlar.Controls.Add(AramaÇubuğu);
-            Tabla_ÜstTuşlar.Controls.Add(SeçimKutusu_TümünüSeç);
-            Tabla_ÜstTuşlar.Controls.Add(YukarıTaşı);
-            Tabla_ÜstTuşlar.Controls.Add(AşağıTaşı);
-            Tabla_ÜstTuşlar.Controls.Add(Göster);
-            Tabla_ÜstTuşlar.Controls.Add(Gizle);
-            Tabla_ÜstTuşlar.Controls.Add(Sabit);
-            Tabla_ÜstTuşlar.Dock = DockStyle.Top;
-            Tabla_ÜstTuşlar.Location = new Point(0, 0);
-            Tabla_ÜstTuşlar.Name = "Tabla_ÜstTuşlar";
-            Tabla_ÜstTuşlar.Size = new Size(235, 30);
-            Tabla_ÜstTuşlar.TabIndex = 7;
+            this.Tabla_ÜstTuşlar.Controls.Add(this.AramaÇubuğu);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.AramaÇubuğunuTemizle);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.SeçimKutusu_TümünüSeç);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.YukarıTaşı);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.AşağıTaşı);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.Göster);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.Gizle);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.Sabit);
+            this.Tabla_ÜstTuşlar.Dock = System.Windows.Forms.DockStyle.Top;
+            this.Tabla_ÜstTuşlar.Location = new System.Drawing.Point(0, 0);
+            this.Tabla_ÜstTuşlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Tabla_ÜstTuşlar.Name = "Tabla_ÜstTuşlar";
+            this.Tabla_ÜstTuşlar.Size = new System.Drawing.Size(235, 24);
+            this.Tabla_ÜstTuşlar.TabIndex = 7;
             // 
             // ListeKutusu
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(SeçimKutusu);
-            Controls.Add(Tabla_ÜstTuşlar);
-            Controls.Add(Tabla_AltTuşlar);
-            Name = "ListeKutusu";
-            Size = new Size(235, 235);
-            ParentChanged += ListeKutusu_ParentChanged;
-            Tabla_AltTuşlar.ResumeLayout(false);
-            Tabla_AltTuşlar.PerformLayout();
-            Tabla_ÜstTuşlar.ResumeLayout(false);
-            Tabla_ÜstTuşlar.PerformLayout();
-            ResumeLayout(false);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.SeçimKutusu);
+            this.Controls.Add(this.Tabla_ÜstTuşlar);
+            this.Controls.Add(this.Tabla_AltTuşlar);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Name = "ListeKutusu";
+            this.Size = new System.Drawing.Size(235, 188);
+            this.ParentChanged += new System.EventHandler(this.ListeKutusu_ParentChanged);
+            this.Tabla_AltTuşlar.ResumeLayout(false);
+            this.Tabla_AltTuşlar.PerformLayout();
+            this.Tabla_ÜstTuşlar.ResumeLayout(false);
+            this.Tabla_ÜstTuşlar.PerformLayout();
+            this.ResumeLayout(false);
+
         }
         #endregion
 

@@ -44,9 +44,11 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.İpucu = new System.Windows.Forms.ToolTip(this.components);
             this.SeçimKutusu_TümünüSeç = new System.Windows.Forms.Button();
             this.AramaÇubuğunuTemizle = new System.Windows.Forms.Button();
-            this.AşağıTaşı = new System.Windows.Forms.Button();
-            this.YukarıTaşı = new System.Windows.Forms.Button();
+            this.KonumunuDeğiştir_Aşağı = new System.Windows.Forms.Button();
+            this.KonumunuDeğiştir_Yukarı = new System.Windows.Forms.Button();
             this.Sabit = new System.Windows.Forms.Button();
+            this.KonumunuDeğiştir_Kaydet = new System.Windows.Forms.Button();
+            this.KonumunuDeğiştir_İptal = new System.Windows.Forms.Button();
             this.Tabla_ÜstTuşlar = new System.Windows.Forms.Panel();
             this.Tabla_AltTuşlar.SuspendLayout();
             this.Tabla_ÜstTuşlar.SuspendLayout();
@@ -60,9 +62,10 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.SeçimKutusu.Location = new System.Drawing.Point(0, 24);
             this.SeçimKutusu.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.SeçimKutusu.Name = "SeçimKutusu";
-            this.SeçimKutusu.Size = new System.Drawing.Size(235, 140);
+            this.SeçimKutusu.Size = new System.Drawing.Size(348, 140);
             this.SeçimKutusu.TabIndex = 0;
             this.SeçimKutusu.SelectedIndexChanged += new System.EventHandler(this.SeçimKutusu_SelectedIndexChanged);
+            this.SeçimKutusu.DoubleClick += new System.EventHandler(this.SeçimKutusu_DoubleClick);
             this.SeçimKutusu.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SeçimKutusu_KeyPress);
             // 
             // AramaÇubuğu
@@ -72,7 +75,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.AramaÇubuğu.Location = new System.Drawing.Point(0, 0);
             this.AramaÇubuğu.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.AramaÇubuğu.Name = "AramaÇubuğu";
-            this.AramaÇubuğu.Size = new System.Drawing.Size(34, 22);
+            this.AramaÇubuğu.Size = new System.Drawing.Size(46, 22);
             this.AramaÇubuğu.TabIndex = 1;
             this.İpucu.SetToolTip(this.AramaÇubuğu, "Arama Kutusu");
             this.AramaÇubuğu.TextChanged += new System.EventHandler(this.AramaÇubuğu_TextChanged);
@@ -85,7 +88,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.Adı.Location = new System.Drawing.Point(0, 0);
             this.Adı.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Adı.Name = "Adı";
-            this.Adı.Size = new System.Drawing.Size(83, 22);
+            this.Adı.Size = new System.Drawing.Size(196, 22);
             this.Adı.TabIndex = 2;
             this.İpucu.SetToolTip(this.Adı, "Adı");
             this.Adı.TextChanged += new System.EventHandler(this.Adı_TextChanged);
@@ -95,7 +98,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.Ekle.AutoSize = true;
             this.Ekle.BackColor = System.Drawing.Color.YellowGreen;
             this.Ekle.Dock = System.Windows.Forms.DockStyle.Right;
-            this.Ekle.Location = new System.Drawing.Point(83, 0);
+            this.Ekle.Location = new System.Drawing.Point(196, 0);
             this.Ekle.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Ekle.Name = "Ekle";
             this.Ekle.Size = new System.Drawing.Size(46, 24);
@@ -110,7 +113,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.AdıDeğiştir.AutoSize = true;
             this.AdıDeğiştir.BackColor = System.Drawing.Color.Orange;
             this.AdıDeğiştir.Dock = System.Windows.Forms.DockStyle.Right;
-            this.AdıDeğiştir.Location = new System.Drawing.Point(129, 0);
+            this.AdıDeğiştir.Location = new System.Drawing.Point(242, 0);
             this.AdıDeğiştir.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.AdıDeğiştir.Name = "AdıDeğiştir";
             this.AdıDeğiştir.Size = new System.Drawing.Size(71, 24);
@@ -125,7 +128,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.Sil.AutoSize = true;
             this.Sil.BackColor = System.Drawing.Color.Salmon;
             this.Sil.Dock = System.Windows.Forms.DockStyle.Right;
-            this.Sil.Location = new System.Drawing.Point(200, 0);
+            this.Sil.Location = new System.Drawing.Point(313, 0);
             this.Sil.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Sil.Name = "Sil";
             this.Sil.Size = new System.Drawing.Size(35, 24);
@@ -145,7 +148,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.Tabla_AltTuşlar.Location = new System.Drawing.Point(0, 164);
             this.Tabla_AltTuşlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Tabla_AltTuşlar.Name = "Tabla_AltTuşlar";
-            this.Tabla_AltTuşlar.Size = new System.Drawing.Size(235, 24);
+            this.Tabla_AltTuşlar.Size = new System.Drawing.Size(348, 24);
             this.Tabla_AltTuşlar.TabIndex = 6;
             // 
             // Göster
@@ -153,7 +156,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.Göster.AutoSize = true;
             this.Göster.BackColor = System.Drawing.Color.Khaki;
             this.Göster.Dock = System.Windows.Forms.DockStyle.Right;
-            this.Göster.Location = new System.Drawing.Point(156, 0);
+            this.Göster.Location = new System.Drawing.Point(104, 0);
             this.Göster.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Göster.Name = "Göster";
             this.Göster.Size = new System.Drawing.Size(28, 24);
@@ -169,7 +172,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.Gizle.AutoSize = true;
             this.Gizle.BackColor = System.Drawing.Color.Khaki;
             this.Gizle.Dock = System.Windows.Forms.DockStyle.Right;
-            this.Gizle.Location = new System.Drawing.Point(184, 0);
+            this.Gizle.Location = new System.Drawing.Point(132, 0);
             this.Gizle.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Gizle.Name = "Gizle";
             this.Gizle.Size = new System.Drawing.Size(28, 24);
@@ -195,7 +198,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.SeçimKutusu_TümünüSeç.AutoSize = true;
             this.SeçimKutusu_TümünüSeç.BackColor = System.Drawing.Color.LightBlue;
             this.SeçimKutusu_TümünüSeç.Dock = System.Windows.Forms.DockStyle.Right;
-            this.SeçimKutusu_TümünüSeç.Location = new System.Drawing.Point(62, 0);
+            this.SeçimKutusu_TümünüSeç.Location = new System.Drawing.Point(74, 0);
             this.SeçimKutusu_TümünüSeç.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.SeçimKutusu_TümünüSeç.Name = "SeçimKutusu_TümünüSeç";
             this.SeçimKutusu_TümünüSeç.Size = new System.Drawing.Size(30, 24);
@@ -211,7 +214,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.AramaÇubuğunuTemizle.AutoSize = true;
             this.AramaÇubuğunuTemizle.BackColor = System.Drawing.Color.Wheat;
             this.AramaÇubuğunuTemizle.Dock = System.Windows.Forms.DockStyle.Right;
-            this.AramaÇubuğunuTemizle.Location = new System.Drawing.Point(34, 0);
+            this.AramaÇubuğunuTemizle.Location = new System.Drawing.Point(46, 0);
             this.AramaÇubuğunuTemizle.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.AramaÇubuğunuTemizle.Name = "AramaÇubuğunuTemizle";
             this.AramaÇubuğunuTemizle.Size = new System.Drawing.Size(28, 24);
@@ -222,44 +225,44 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.AramaÇubuğunuTemizle.Visible = false;
             this.AramaÇubuğunuTemizle.Click += new System.EventHandler(this.AramaÇubuğunuTemizle_Click);
             // 
-            // AşağıTaşı
+            // KonumunuDeğiştir_Aşağı
             // 
-            this.AşağıTaşı.AutoSize = true;
-            this.AşağıTaşı.BackColor = System.Drawing.Color.Thistle;
-            this.AşağıTaşı.Dock = System.Windows.Forms.DockStyle.Right;
-            this.AşağıTaşı.Location = new System.Drawing.Point(124, 0);
-            this.AşağıTaşı.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.AşağıTaşı.Name = "AşağıTaşı";
-            this.AşağıTaşı.Size = new System.Drawing.Size(32, 24);
-            this.AşağıTaşı.TabIndex = 9;
-            this.AşağıTaşı.Text = "▼";
-            this.İpucu.SetToolTip(this.AşağıTaşı, "Listede aşağı taşı");
-            this.AşağıTaşı.UseVisualStyleBackColor = false;
-            this.AşağıTaşı.Visible = false;
-            this.AşağıTaşı.Click += new System.EventHandler(this.KonumunuDeğiştir_Click);
+            this.KonumunuDeğiştir_Aşağı.AutoSize = true;
+            this.KonumunuDeğiştir_Aşağı.BackColor = System.Drawing.Color.Thistle;
+            this.KonumunuDeğiştir_Aşağı.Dock = System.Windows.Forms.DockStyle.Right;
+            this.KonumunuDeğiştir_Aşağı.Location = new System.Drawing.Point(293, 0);
+            this.KonumunuDeğiştir_Aşağı.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.KonumunuDeğiştir_Aşağı.Name = "KonumunuDeğiştir_Aşağı";
+            this.KonumunuDeğiştir_Aşağı.Size = new System.Drawing.Size(32, 24);
+            this.KonumunuDeğiştir_Aşağı.TabIndex = 9;
+            this.KonumunuDeğiştir_Aşağı.Text = "▼";
+            this.İpucu.SetToolTip(this.KonumunuDeğiştir_Aşağı, "Listede aşağı taşı");
+            this.KonumunuDeğiştir_Aşağı.UseVisualStyleBackColor = false;
+            this.KonumunuDeğiştir_Aşağı.Visible = false;
+            this.KonumunuDeğiştir_Aşağı.Click += new System.EventHandler(this.KonumunuDeğiştir_Click);
             // 
-            // YukarıTaşı
+            // KonumunuDeğiştir_Yukarı
             // 
-            this.YukarıTaşı.AutoSize = true;
-            this.YukarıTaşı.BackColor = System.Drawing.Color.Thistle;
-            this.YukarıTaşı.Dock = System.Windows.Forms.DockStyle.Right;
-            this.YukarıTaşı.Location = new System.Drawing.Point(92, 0);
-            this.YukarıTaşı.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.YukarıTaşı.Name = "YukarıTaşı";
-            this.YukarıTaşı.Size = new System.Drawing.Size(32, 24);
-            this.YukarıTaşı.TabIndex = 10;
-            this.YukarıTaşı.Text = "▲";
-            this.İpucu.SetToolTip(this.YukarıTaşı, "Listede yukarı taşı");
-            this.YukarıTaşı.UseVisualStyleBackColor = false;
-            this.YukarıTaşı.Visible = false;
-            this.YukarıTaşı.Click += new System.EventHandler(this.KonumunuDeğiştir_Click);
+            this.KonumunuDeğiştir_Yukarı.AutoSize = true;
+            this.KonumunuDeğiştir_Yukarı.BackColor = System.Drawing.Color.Thistle;
+            this.KonumunuDeğiştir_Yukarı.Dock = System.Windows.Forms.DockStyle.Right;
+            this.KonumunuDeğiştir_Yukarı.Location = new System.Drawing.Point(261, 0);
+            this.KonumunuDeğiştir_Yukarı.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.KonumunuDeğiştir_Yukarı.Name = "KonumunuDeğiştir_Yukarı";
+            this.KonumunuDeğiştir_Yukarı.Size = new System.Drawing.Size(32, 24);
+            this.KonumunuDeğiştir_Yukarı.TabIndex = 10;
+            this.KonumunuDeğiştir_Yukarı.Text = "▲";
+            this.İpucu.SetToolTip(this.KonumunuDeğiştir_Yukarı, "Listede yukarı taşı");
+            this.KonumunuDeğiştir_Yukarı.UseVisualStyleBackColor = false;
+            this.KonumunuDeğiştir_Yukarı.Visible = false;
+            this.KonumunuDeğiştir_Yukarı.Click += new System.EventHandler(this.KonumunuDeğiştir_Click);
             // 
             // Sabit
             // 
             this.Sabit.AutoSize = true;
             this.Sabit.BackColor = System.Drawing.Color.LightGray;
             this.Sabit.Dock = System.Windows.Forms.DockStyle.Right;
-            this.Sabit.Location = new System.Drawing.Point(212, 0);
+            this.Sabit.Location = new System.Drawing.Point(325, 0);
             this.Sabit.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Sabit.Name = "Sabit";
             this.Sabit.Size = new System.Drawing.Size(23, 24);
@@ -269,21 +272,55 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.Sabit.UseVisualStyleBackColor = false;
             this.Sabit.Visible = false;
             // 
+            // KonumunuDeğiştir_Kaydet
+            // 
+            this.KonumunuDeğiştir_Kaydet.AutoSize = true;
+            this.KonumunuDeğiştir_Kaydet.BackColor = System.Drawing.Color.Thistle;
+            this.KonumunuDeğiştir_Kaydet.Dock = System.Windows.Forms.DockStyle.Right;
+            this.KonumunuDeğiştir_Kaydet.Location = new System.Drawing.Point(160, 0);
+            this.KonumunuDeğiştir_Kaydet.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.KonumunuDeğiştir_Kaydet.Name = "KonumunuDeğiştir_Kaydet";
+            this.KonumunuDeğiştir_Kaydet.Size = new System.Drawing.Size(59, 24);
+            this.KonumunuDeğiştir_Kaydet.TabIndex = 12;
+            this.KonumunuDeğiştir_Kaydet.Text = "Kaydet";
+            this.İpucu.SetToolTip(this.KonumunuDeğiştir_Kaydet, "Listenin son halini kaydeder");
+            this.KonumunuDeğiştir_Kaydet.UseVisualStyleBackColor = false;
+            this.KonumunuDeğiştir_Kaydet.Visible = false;
+            this.KonumunuDeğiştir_Kaydet.Click += new System.EventHandler(this.KonumunuDeğiştir_Kaydet_Click);
+            // 
+            // KonumunuDeğiştir_İptal
+            // 
+            this.KonumunuDeğiştir_İptal.AutoSize = true;
+            this.KonumunuDeğiştir_İptal.BackColor = System.Drawing.Color.Thistle;
+            this.KonumunuDeğiştir_İptal.Dock = System.Windows.Forms.DockStyle.Right;
+            this.KonumunuDeğiştir_İptal.Location = new System.Drawing.Point(219, 0);
+            this.KonumunuDeğiştir_İptal.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.KonumunuDeğiştir_İptal.Name = "KonumunuDeğiştir_İptal";
+            this.KonumunuDeğiştir_İptal.Size = new System.Drawing.Size(42, 24);
+            this.KonumunuDeğiştir_İptal.TabIndex = 13;
+            this.KonumunuDeğiştir_İptal.Text = "İptal";
+            this.İpucu.SetToolTip(this.KonumunuDeğiştir_İptal, "Listeyi ilk haline döndürür");
+            this.KonumunuDeğiştir_İptal.UseVisualStyleBackColor = false;
+            this.KonumunuDeğiştir_İptal.Visible = false;
+            this.KonumunuDeğiştir_İptal.Click += new System.EventHandler(this.KonumunuDeğiştir_İptal_Click);
+            // 
             // Tabla_ÜstTuşlar
             // 
             this.Tabla_ÜstTuşlar.Controls.Add(this.AramaÇubuğu);
             this.Tabla_ÜstTuşlar.Controls.Add(this.AramaÇubuğunuTemizle);
             this.Tabla_ÜstTuşlar.Controls.Add(this.SeçimKutusu_TümünüSeç);
-            this.Tabla_ÜstTuşlar.Controls.Add(this.YukarıTaşı);
-            this.Tabla_ÜstTuşlar.Controls.Add(this.AşağıTaşı);
             this.Tabla_ÜstTuşlar.Controls.Add(this.Göster);
             this.Tabla_ÜstTuşlar.Controls.Add(this.Gizle);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.KonumunuDeğiştir_Kaydet);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.KonumunuDeğiştir_İptal);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.KonumunuDeğiştir_Yukarı);
+            this.Tabla_ÜstTuşlar.Controls.Add(this.KonumunuDeğiştir_Aşağı);
             this.Tabla_ÜstTuşlar.Controls.Add(this.Sabit);
             this.Tabla_ÜstTuşlar.Dock = System.Windows.Forms.DockStyle.Top;
             this.Tabla_ÜstTuşlar.Location = new System.Drawing.Point(0, 0);
             this.Tabla_ÜstTuşlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Tabla_ÜstTuşlar.Name = "Tabla_ÜstTuşlar";
-            this.Tabla_ÜstTuşlar.Size = new System.Drawing.Size(235, 24);
+            this.Tabla_ÜstTuşlar.Size = new System.Drawing.Size(348, 24);
             this.Tabla_ÜstTuşlar.TabIndex = 7;
             // 
             // ListeKutusu
@@ -295,7 +332,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             this.Controls.Add(this.Tabla_AltTuşlar);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "ListeKutusu";
-            this.Size = new System.Drawing.Size(235, 188);
+            this.Size = new System.Drawing.Size(348, 188);
             this.ParentChanged += new System.EventHandler(this.ListeKutusu_ParentChanged);
             this.Tabla_AltTuşlar.ResumeLayout(false);
             this.Tabla_AltTuşlar.PerformLayout();
@@ -319,8 +356,10 @@ namespace ArgeMup.HazirKod.Ekranlar
         private Panel Tabla_ÜstTuşlar;
         private Button AramaÇubuğunuTemizle;
         private Button SeçimKutusu_TümünüSeç;
-        private Button YukarıTaşı;
-        private Button AşağıTaşı;
+        private Button KonumunuDeğiştir_Yukarı;
+        private Button KonumunuDeğiştir_Aşağı;
         private Button Sabit;
+        private Button KonumunuDeğiştir_Kaydet;
+        private Button KonumunuDeğiştir_İptal;
     }
 }

@@ -18,33 +18,32 @@ namespace ArgeMup.HazirKod.Ekranlar
             public bool
                 Eklenebilir = true,
                 AdıDeğiştirilebilir = true,
-                KonumuDeğiştirilebilir = true,
                 Silinebilir = true,
                 Gizlenebilir = true,
                 GizliOlanlarıGöster = true,
                 İşlemYaptıktanSonraSeç = true,
-                İşlemYapmadanÖnceSor = true,
-                İşlemYapmadanÖnceSor_KonumDeğiştirme = false;
+                İşlemYapmadanÖnceSor = true;
             public string GizliElemanBaşlangıcı = ".:Gizli:. ";
             public string[] Yasakİçerik = null;
+            public enum ElemanKonumu_ { Değiştirilebilir, AdanZyeSıralanmış, OlduğuGibi };
+            public ElemanKonumu_ ElemanKonumu = ElemanKonumu_.Değiştirilebilir;
             public enum ÇokluSeçim_ { Kapalı, SolFareTuşuİle, CtrlTuşuİle };
             public ÇokluSeçim_ ÇokluSeçim = ÇokluSeçim_.Kapalı;
 			
-            public Ayarlar_(bool Eklenebilir = true, bool AdıDeğiştirilebilir = true, bool KonumuDeğiştirilebilir = true, bool Silinebilir = true,
+            public Ayarlar_(bool Eklenebilir = true, bool AdıDeğiştirilebilir = true, ElemanKonumu_ ElemanKonumu = ElemanKonumu_.Değiştirilebilir, bool Silinebilir = true,
                 bool Gizlenebilir = true, bool GizliOlanlarıGöster = true, string GizliElemanBaşlangıcı = ".:Gizli:. ",
                 string[] Yasakİçerik = null, ÇokluSeçim_ ÇokluSeçim = ÇokluSeçim_.Kapalı, bool İşlemYaptıktanSonraSeç = true,
-                bool İşlemYapmadanÖnceSor = true, bool İşlemYapmadanÖnceSor_KonumDeğiştirme = false)
+                bool İşlemYapmadanÖnceSor = true)
             {
                 this.Eklenebilir = Eklenebilir;
                 this.AdıDeğiştirilebilir = AdıDeğiştirilebilir;
-                this.KonumuDeğiştirilebilir = KonumuDeğiştirilebilir;
+                this.ElemanKonumu = ElemanKonumu;
                 this.Silinebilir = Silinebilir;
                 this.Gizlenebilir = Gizlenebilir;
                 this.GizliOlanlarıGöster = GizliOlanlarıGöster;
                 this.ÇokluSeçim = ÇokluSeçim;
                 this.İşlemYaptıktanSonraSeç = İşlemYaptıktanSonraSeç;
                 this.İşlemYapmadanÖnceSor = İşlemYapmadanÖnceSor;
-                this.İşlemYapmadanÖnceSor_KonumDeğiştirme = İşlemYapmadanÖnceSor_KonumDeğiştirme;
                 this.GizliElemanBaşlangıcı = GizliElemanBaşlangıcı;
                 this.Yasakİçerik = Yasakİçerik;
             }
@@ -52,7 +51,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             {
                 Eklenebilir = false;
                 AdıDeğiştirilebilir = false;
-                KonumuDeğiştirilebilir = false;
+                ElemanKonumu = ElemanKonumu_.OlduğuGibi;
                 Silinebilir = false;
                 Gizlenebilir = false;
             }
@@ -62,17 +61,18 @@ namespace ArgeMup.HazirKod.Ekranlar
         {
             get
             {
-                if (!SeçimKutusu.Enabled || SeçimKutusu.SelectedIndex < 0 || SeçimKutusu.Text.BoşMu() || SeçimKutusu.SelectedItems.Count != 1) return -1;
+                string adı = SeçilenEleman_Adı;
 
-                return SeçimKutusu.SelectedIndex;
+                return adı == null ? -1 : Tüm_Elemanlar.IndexOf(adı);
             }
         }
         public string SeçilenEleman_Adı
         {
             get
             {
-                int SıraNo = SeçilenEleman_SıraNo;
-                return SıraNo >= 0 ? SeçimKutusu.Items[SıraNo] as string : null;
+                if (!SeçimKutusu.Enabled || SeçimKutusu.SelectedIndex < 0 || SeçimKutusu.Text.BoşMu() || SeçimKutusu.SelectedItems.Count != 1) return null;
+
+                return SeçimKutusu.Text;
             }
             set
             {
@@ -119,20 +119,21 @@ namespace ArgeMup.HazirKod.Ekranlar
             get
             {
                 List<int> l = new List<int>();
-                foreach (int eleman in SeçimKutusu.SelectedIndices)
+                foreach (string eleman in SeçimKutusu.SelectedItems)
                 {
-                    l.Add(eleman);
+                    l.Add(Tüm_Elemanlar.IndexOf(eleman));
                 }
 
                 return l;
             }
         }
         public List<string> Sabit_Elemanlar, Tüm_Elemanlar;
-        public enum İşlemTürü { YeniEklendi, ElemanSeçildi, AdıDeğiştirildi, KonumuDeğiştirildi, Gizlendi, GörünürDurumaGetirildi, Silindi };
+        public enum İşlemTürü { YeniEklendi, ElemanSeçildi, AdıDeğiştirildi, KonumDeğişikliğiKaydedildi, Gizlendi, GörünürDurumaGetirildi, Silindi };
 
         public delegate bool GeriBildirim_İşlemi_(string Adı, İşlemTürü Türü, string YeniAdı = null);
         string ListeninAçıklaması;
         Ayarlar_ Ayarlar;
+        List<string> Tüm_Elemanlar_KonumDeğişikliğindenÖnce;
 
         public ListeKutusu()
         {
@@ -216,6 +217,12 @@ namespace ArgeMup.HazirKod.Ekranlar
         }
         private void SeçimKutusu_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (Tüm_Elemanlar_KonumDeğişikliğindenÖnce != null)
+            {
+                TuşlarıDüzenle();
+                return;
+            }
+
             string adı = SeçilenEleman_Adı;
 
             bool? sonuç = GeriBildirim_İşlemi?.Invoke(adı, İşlemTürü.ElemanSeçildi);
@@ -223,6 +230,10 @@ namespace ArgeMup.HazirKod.Ekranlar
 
             if (Adı.Text == adı) TuşlarıDüzenle();
             else Adı.Text = adı;
+        }
+        private void SeçimKutusu_DoubleClick(object sender, EventArgs e)
+        {
+            base.OnDoubleClick(null);
         }
 
         private void Adı_TextChanged(object sender, EventArgs e)
@@ -248,11 +259,12 @@ namespace ArgeMup.HazirKod.Ekranlar
             if (sonuç != null && !sonuç.Value) return;
 
             Tüm_Elemanlar.Add(Adı.Text);
+
             Sırala();
             Filtrele(SeçimKutusu, Tüm_Elemanlar, AramaÇubuğu.Text);
             TuşlarıDüzenle();
             İpucunuDüzenle();
-            if (Ayarlar.İşlemYaptıktanSonraSeç) SeçimKutusu.SelectedIndex = SeçimKutusu.Items.IndexOf(Adı.Text);
+            if (Ayarlar.İşlemYaptıktanSonraSeç) SeçilenEleman_Adı = Adı.Text;
         }
         private void AdıDeğiştir_Gizle_Göster_Click(object sender, EventArgs e)
         {
@@ -286,51 +298,55 @@ namespace ArgeMup.HazirKod.Ekranlar
             bool? sonuç = GeriBildirim_İşlemi?.Invoke(adı_eski, Türü, adı_yeni);
             if (sonuç != null && !sonuç.Value) return;
 
+            int konumu = Tüm_Elemanlar.IndexOf(adı_eski);
             Tüm_Elemanlar.Remove(adı_eski);
-            Tüm_Elemanlar.Add(adı_yeni);
+            Tüm_Elemanlar.Insert(konumu, adı_yeni);
+
             Sırala();
             Filtrele(SeçimKutusu, Tüm_Elemanlar, AramaÇubuğu.Text);
             TuşlarıDüzenle();
-            if (Ayarlar.İşlemYaptıktanSonraSeç) SeçimKutusu.SelectedIndex = SeçimKutusu.Items.IndexOf(adı_yeni);
+            if (Ayarlar.İşlemYaptıktanSonraSeç) SeçilenEleman_Adı = adı_yeni;
         }
         private void KonumunuDeğiştir_Click(object sender, EventArgs e)
         {
-            string adı = SeçilenEleman_Adı, mesaj;
-            int konumu = SeçilenEleman_SıraNo;
-            if (sender == YukarıTaşı)
-            {
-                mesaj = "Listedeki kayıt yukarı taşınacak.";
-                konumu--;
-            }
-            else
-            {
-                mesaj = "Listedeki kayıt aşağı taşınacak.";
-                konumu++;
-            }
+            string adı = SeçilenEleman_Adı;
+            int konumu = Tüm_Elemanlar.IndexOf(adı);
 
-            if (Ayarlar.İşlemYapmadanÖnceSor_KonumDeğiştirme)
-            {
-                mesaj += " İşleme devam etmek istiyor musunuz?" +
-                Environment.NewLine + Environment.NewLine +
-                adı;
-                if (!OnayAl(mesaj)) return;
-            }
+            if (sender == KonumunuDeğiştir_Yukarı) konumu--;
+            else konumu++;
+            
+            if (Tüm_Elemanlar_KonumDeğişikliğindenÖnce == null) Tüm_Elemanlar_KonumDeğişikliğindenÖnce = new List<string>(Tüm_Elemanlar);
 
-            List<string> kopya_Tüm_Elemanlar = new List<string>(Tüm_Elemanlar);
             Tüm_Elemanlar.Remove(adı);
             Tüm_Elemanlar.Insert(konumu, adı);
 
-            bool? sonuç = GeriBildirim_İşlemi?.Invoke(adı, İşlemTürü.KonumuDeğiştirildi);
-            if (sonuç != null && !sonuç.Value)
-            {
-                Tüm_Elemanlar = kopya_Tüm_Elemanlar;
-                return;
-            }
-
-            Sırala();
             Filtrele(SeçimKutusu, Tüm_Elemanlar, AramaÇubuğu.Text);
             TuşlarıDüzenle();
-            if (Ayarlar.İşlemYaptıktanSonraSeç) SeçimKutusu.SelectedIndex = konumu;
+            if (Ayarlar.İşlemYaptıktanSonraSeç) SeçilenEleman_Adı = adı;
+        }
+        private void KonumunuDeğiştir_Kaydet_Click(object sender, EventArgs e)
+        {
+            string mesaj = "Listenin son hali kaydedilecek. İşleme devam etmek istiyor musunuz?";
+            if (!OnayAl(mesaj)) return;
+
+            bool? sonuç = GeriBildirim_İşlemi?.Invoke(İşlemTürü.KonumDeğişikliğiKaydedildi.ToString(), İşlemTürü.KonumDeğişikliğiKaydedildi);
+            if (sonuç == null || sonuç.Value)
+            {
+                Tüm_Elemanlar_KonumDeğişikliğindenÖnce = null;
+            }
+
+            TuşlarıDüzenle();
+        }
+        private void KonumunuDeğiştir_İptal_Click(object sender, EventArgs e)
+        {
+            string mesaj = "Listedeki değişiklikler geri alınacak. İşleme devam etmek istiyor musunuz?";
+            if (!OnayAl(mesaj)) return;
+
+            Tüm_Elemanlar = Tüm_Elemanlar_KonumDeğişikliğindenÖnce;
+            Tüm_Elemanlar_KonumDeğişikliğindenÖnce = null;
+
+            Filtrele(SeçimKutusu, Tüm_Elemanlar, AramaÇubuğu.Text);
+            TuşlarıDüzenle();
         }
         private void Sil_Click(object sender, EventArgs e)
         {
@@ -344,6 +360,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             if (sonuç != null && !sonuç.Value) return;
 
             Tüm_Elemanlar.Remove(adı);
+
             Filtrele(SeçimKutusu, Tüm_Elemanlar, AramaÇubuğu.Text);
             TuşlarıDüzenle();
             İpucunuDüzenle();
@@ -351,69 +368,74 @@ namespace ArgeMup.HazirKod.Ekranlar
 
         void Sırala()
         {
-            if (!Ayarlar.KonumuDeğiştirilebilir) Tüm_Elemanlar.Sort(new Sıralayıcı(Ayarlar.GizliElemanBaşlangıcı));
-        }
-        class Sıralayıcı : IComparer<string>
-        {
-            string GizliElemanBaşlangıcı;
-            public Sıralayıcı(string GizliElemanBaşlangıcı)
-            {
-                this.GizliElemanBaşlangıcı = GizliElemanBaşlangıcı;
-            }
+            if (Ayarlar.ElemanKonumu == Ayarlar_.ElemanKonumu_.AdanZyeSıralanmış) Tüm_Elemanlar.Sort(); 
 
-            public int Compare(string A, string B)
+            if (Ayarlar.ElemanKonumu != Ayarlar_.ElemanKonumu_.Değiştirilebilir && Ayarlar.GizliOlanlarıGöster)
             {
-                bool sol = A.StartsWith(GizliElemanBaşlangıcı);
-                bool sağ = B.StartsWith(GizliElemanBaşlangıcı);
-                if (sol && sağ) return A.CompareTo(B);
-                else if (sol) return 1;
-                else if (sağ) return -1;
-                else return A.CompareTo(B);
+                //Gizli olanları alta at
+                List<string> GizliOlanlar = Tüm_Elemanlar.Where(x => x.StartsWith(Ayarlar.GizliElemanBaşlangıcı)).ToList();
+                Tüm_Elemanlar.RemoveAll(x => x.StartsWith(Ayarlar.GizliElemanBaşlangıcı));
+                Tüm_Elemanlar.AddRange(GizliOlanlar);
             }
         }
         void TuşlarıDüzenle()
         {
-            bool görülebilir_adı = Ayarlar.Eklenebilir || Ayarlar.AdıDeğiştirilebilir, görülebilir_ekle = false, görülebilir_adı_değiştir = false, görülebilir_konumu_değiştir_yukarı = false, görülebilir_konumu_değiştir_aşağı = false, görülebilir_sil = false, görülebilir_gizle = false, görülebilir_göster = false, SabitMi = false;
+            bool görülebilir_konumu_kaydet = Tüm_Elemanlar_KonumDeğişikliğindenÖnce != null, 
+                görülebilir_adı = !görülebilir_konumu_kaydet && (Ayarlar.Eklenebilir || Ayarlar.AdıDeğiştirilebilir), 
+                görülebilir_ekle = false, görülebilir_adı_değiştir = false,
+                görülebilir_konumu_değiştir_yukarı = false, görülebilir_konumu_değiştir_aşağı = false, 
+                görülebilir_sil = false, görülebilir_gizle = false, görülebilir_göster = false, SabitMi = false;
 
-            if (Adı.Text.DoluMu(true))
+            int SeçiliOlanınKonumu = SeçilenEleman_SıraNo;
+            bool SeçiliMi = SeçiliOlanınKonumu >= 0;
+
+            if (görülebilir_konumu_kaydet)
             {
-                bool MevcutMu = Tüm_Elemanlar.Contains(Adı.Text);
-                int SeçiliOlanınKonumu = SeçilenEleman_SıraNo;
-                string SeçiliOlanınAdı = SeçilenEleman_Adı;
-                int SeçiliElemanSayısı = SeçimKutusu.SelectedItems.Count;
-                bool SeçiliMi = SeçiliOlanınKonumu >= 0;
-                SabitMi = Sabit_Elemanlar == null ? false : Sabit_Elemanlar.Contains(SeçiliOlanınAdı);
-
-                görülebilir_ekle = Ayarlar.Eklenebilir && !MevcutMu;
-
-                if (Ayarlar.KonumuDeğiştirilebilir)
+                görülebilir_konumu_değiştir_yukarı = SeçiliMi && SeçiliOlanınKonumu > 0;
+                görülebilir_konumu_değiştir_aşağı = SeçiliMi && SeçiliOlanınKonumu < (Tüm_Elemanlar.Count - 1);
+            }
+            else
+            {
+                if (Adı.Text.DoluMu(true))
                 {
-                    görülebilir_konumu_değiştir_yukarı = SeçiliMi && SeçiliOlanınKonumu > 0;
-                    görülebilir_konumu_değiştir_aşağı = SeçiliMi && SeçiliOlanınKonumu < (SeçimKutusu.Items.Count - 1);
-                }
+                    bool MevcutMu = Tüm_Elemanlar.Contains(Adı.Text);
+                    string SeçiliOlanınAdı = SeçilenEleman_Adı;
+                    int SeçiliElemanSayısı = SeçimKutusu.SelectedItems.Count;
+                    SabitMi = Sabit_Elemanlar == null ? false : Sabit_Elemanlar.Contains(SeçiliOlanınAdı);
 
-                if (!SabitMi && SeçiliMi && SeçiliElemanSayısı == 1)
-                {
-                    görülebilir_adı_değiştir = Ayarlar.AdıDeğiştirilebilir && !MevcutMu && SeçimKutusu.Text != Adı.Text;
+                    görülebilir_ekle = Ayarlar.Eklenebilir && !MevcutMu;
 
-                    if (MevcutMu)
+                    if (Ayarlar.ElemanKonumu == Ayarlar_.ElemanKonumu_.Değiştirilebilir)
                     {
-                        görülebilir_sil = Ayarlar.Silinebilir;
+                        görülebilir_konumu_değiştir_yukarı = SeçiliMi && SeçiliOlanınKonumu > 0;
+                        görülebilir_konumu_değiştir_aşağı = SeçiliMi && SeçiliOlanınKonumu < (Tüm_Elemanlar.Count - 1);
+                    }
 
-                        if (Ayarlar.Gizlenebilir)
+                    if (!SabitMi && SeçiliMi && SeçiliElemanSayısı == 1)
+                    {
+                        görülebilir_adı_değiştir = Ayarlar.AdıDeğiştirilebilir && !MevcutMu && SeçimKutusu.Text != Adı.Text;
+
+                        if (MevcutMu)
                         {
-                            bool BaşlangıçVarmı = SeçiliOlanınAdı.StartsWith(Ayarlar.GizliElemanBaşlangıcı);
-                            görülebilir_göster = BaşlangıçVarmı && !Tüm_Elemanlar.Contains(SeçiliOlanınAdı.Substring(Ayarlar.GizliElemanBaşlangıcı.Length));
-                            görülebilir_gizle = !BaşlangıçVarmı && !Tüm_Elemanlar.Contains(Ayarlar.GizliElemanBaşlangıcı + SeçiliOlanınAdı);
+                            görülebilir_sil = Ayarlar.Silinebilir;
+
+                            if (Ayarlar.Gizlenebilir)
+                            {
+                                bool BaşlangıçVarmı = SeçiliOlanınAdı.StartsWith(Ayarlar.GizliElemanBaşlangıcı);
+                                görülebilir_göster = BaşlangıçVarmı && !Tüm_Elemanlar.Contains(SeçiliOlanınAdı.Substring(Ayarlar.GizliElemanBaşlangıcı.Length));
+                                görülebilir_gizle = !BaşlangıçVarmı && !Tüm_Elemanlar.Contains(Ayarlar.GizliElemanBaşlangıcı + SeçiliOlanınAdı);
+                            }
                         }
                     }
                 }
             }
-
+            
             Ekle.Visible = görülebilir_ekle;
             AdıDeğiştir.Visible = görülebilir_adı_değiştir;
-            YukarıTaşı.Visible = görülebilir_konumu_değiştir_yukarı;
-            AşağıTaşı.Visible = görülebilir_konumu_değiştir_aşağı;
+            KonumunuDeğiştir_Kaydet.Visible = görülebilir_konumu_kaydet;
+            KonumunuDeğiştir_İptal.Visible = görülebilir_konumu_kaydet;
+            KonumunuDeğiştir_Yukarı.Visible = görülebilir_konumu_değiştir_yukarı;
+            KonumunuDeğiştir_Aşağı.Visible = görülebilir_konumu_değiştir_aşağı;
             Sil.Visible = görülebilir_sil;
             Gizle.Visible = görülebilir_gizle;
             Göster.Visible = görülebilir_göster;

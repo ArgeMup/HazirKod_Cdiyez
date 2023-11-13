@@ -37,14 +37,14 @@ namespace ArgeMup.HazirKod.Ekranlar
         public void Başlat(İşlemTürü_ İşlemTürü, List<string> İzinler, Kullanıcılar_Ayarlar_ Kullanıcılar)
         {
             Ayarlar_Kullanıcılar = Kullanıcılar;
-
             List<string> Kişiler_Yazı = new List<string>();
-            Kullanıcılar.Kişiler.ForEach(x => Kişiler_Yazı.Add(x.Adı));
 
             switch (İşlemTürü)
             {
                 default:
                 case İşlemTürü_.Giriş:
+                    Kullanıcılar.Kişiler.Where(x => x.Parolası.DoluMu() && x.RolAdı.DoluMu()).ToList().ForEach(x => Kişiler_Yazı.Add(x.Adı));
+
                     Ayarlar_Kullanıcılar.GeçerliKullanıcı = null;
                     Ekran_Giriş_Kullanıcı.Items.AddRange(Kişiler_Yazı.ToArray());
 
@@ -77,7 +77,8 @@ namespace ArgeMup.HazirKod.Ekranlar
                     break;
 
                 case İşlemTürü_.Ayarlar:
-                    ListeKutusu.Ayarlar_ ListeKutusu_Ayarlar = new ListeKutusu.Ayarlar_(true, true, false, true, false, true);
+                    Kullanıcılar.Kişiler.ForEach(x => Kişiler_Yazı.Add(x.Adı));
+                    ListeKutusu.Ayarlar_ ListeKutusu_Ayarlar = new ListeKutusu.Ayarlar_(true, true, ListeKutusu.Ayarlar_.ElemanKonumu_.OlduğuGibi, true, false, true);
                     Kullanıcılar_Liste.Başlat(null, Kişiler_Yazı, "Kullamıcılar", ListeKutusu_Ayarlar);
                     Kullanıcılar_Liste.GeriBildirim_İşlemi += Kullanıcılar_Liste_GeriBildirim_İşlemi;
 
@@ -142,7 +143,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                         Kullanıcı = Bul_Kullanıcı(Adı);
 
                         Kullanıcılar_Parola.Text = Kullanıcı.Parolası;
-                        Kullanıcılar_Rol.Text = Kullanıcı.RolAdı;
+                        Kullanıcılar_Rol.Text = Kullanıcı.RolAdı.DoluMu() ? Kullanıcı.RolAdı : null;
                         ÖnYüzler_Kaydet_Kullanıcılar.Enabled = false;
                         return true;
 
@@ -362,7 +363,7 @@ namespace ArgeMup.HazirKod.Ekranlar
         {
             GeçerliKullanıcı = null;
             if (!ParolaKontrolüGerekiyorMu) return true;
-            else if (Parola.BoşMu()) return false;
+            else if (KullanıcıAdı.BoşMu() || Parola.BoşMu()) return false;
 
             if (HatalıGirişDenemesi_Sayısı >= HatalıGirişDenemesi_Sabiti)
             {

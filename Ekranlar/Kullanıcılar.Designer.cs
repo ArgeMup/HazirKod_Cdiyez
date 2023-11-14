@@ -139,6 +139,7 @@
             this.Kullanıcılar_Rol.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Kullanıcılar_Rol.Name = "Kullanıcılar_Rol";
             this.Kullanıcılar_Rol.Size = new System.Drawing.Size(228, 24);
+            this.Kullanıcılar_Rol.Sorted = true;
             this.Kullanıcılar_Rol.TabIndex = 2;
             this.Kullanıcılar_Rol.SelectedIndexChanged += new System.EventHandler(this.Kullanıcılar_AyarDeğişti);
             // 

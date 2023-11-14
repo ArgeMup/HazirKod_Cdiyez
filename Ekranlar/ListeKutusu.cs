@@ -172,6 +172,17 @@ namespace ArgeMup.HazirKod.Ekranlar
 
             AramaÇubuğu_TextChanged(null, null);
         }
+        public void Yenile()
+        {
+            Sırala();
+            Filtrele(SeçimKutusu, Tüm_Elemanlar, AramaÇubuğu.Text);
+            TuşlarıDüzenle();
+            İpucunuDüzenle();
+        }
+        public void Odaklan()
+        {
+            AramaÇubuğu.Focus();
+        }
 
         private void AramaÇubuğu_KeyPress(object sender, KeyPressEventArgs e)
         {

@@ -78,7 +78,7 @@ namespace ArgeMup.HazirKod.Ekranlar
 
                 case İşlemTürü_.Ayarlar:
                     Kullanıcılar.Kişiler.ForEach(x => Kişiler_Yazı.Add(x.Adı));
-                    ListeKutusu.Ayarlar_ ListeKutusu_Ayarlar = new ListeKutusu.Ayarlar_(true, true, ListeKutusu.Ayarlar_.ElemanKonumu_.OlduğuGibi, true, false, true);
+                    ListeKutusu.Ayarlar_ ListeKutusu_Ayarlar = new ListeKutusu.Ayarlar_(true, true, ListeKutusu.Ayarlar_.ElemanKonumu_.AdanZyeSıralanmış, true, false, true);
                     Kullanıcılar_Liste.Başlat(null, Kişiler_Yazı, "Kullamıcılar", ListeKutusu_Ayarlar);
                     Kullanıcılar_Liste.GeriBildirim_İşlemi += Kullanıcılar_Liste_GeriBildirim_İşlemi;
 

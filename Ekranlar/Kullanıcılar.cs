@@ -25,14 +25,6 @@ namespace ArgeMup.HazirKod.Ekranlar
         public Kullanıcılar()
         {
             InitializeComponent();
-
-            Kullanıcılar_Liste = new ListeKutusu();
-            Kullanıcılar_Liste.Dock = DockStyle.Fill;
-            splitContainer2.Panel1.Controls.Add(Kullanıcılar_Liste);
-
-            Roller_Liste = new ListeKutusu();
-            Roller_Liste.Dock = DockStyle.Fill;
-            splitContainer1.Panel1.Controls.Add(Roller_Liste);
         }
         public void Başlat(İşlemTürü_ İşlemTürü, List<string> İzinler, Kullanıcılar_Ayarlar_ Kullanıcılar)
         {
@@ -43,8 +35,9 @@ namespace ArgeMup.HazirKod.Ekranlar
             {
                 default:
                 case İşlemTürü_.Giriş:
-                    Kullanıcılar.Kişiler.Where(x => x.Parolası.DoluMu() && x.RolAdı.DoluMu()).ToList().ForEach(x => Kişiler_Yazı.Add(x.Adı));
+                    Ekran_Ayarlar.Visible = false;
 
+                    Kullanıcılar.Kişiler.Where(x => x.Parolası.DoluMu()).ToList().ForEach(x => Kişiler_Yazı.Add(x.Adı));
                     Ayarlar_Kullanıcılar.GeçerliKullanıcı = null;
                     Ekran_Giriş_Kullanıcı.Items.AddRange(Kişiler_Yazı.ToArray());
 
@@ -52,11 +45,11 @@ namespace ArgeMup.HazirKod.Ekranlar
                     Ekran_Giriş.Left = (Width - Ekran_Giriş.Width) / 2;
                     Ekran_Giriş.Top = (Height - Ekran_Giriş_Tamam.Top - Ekran_Giriş_Tamam.Height - 50) / 2;
                     Ekran_Giriş_Parola.KeyDown += Ekran_Giriş_Parola_KeyDown;
-
-                    Ekran_Ayarlar.Visible = false;
                     break;
 
                 case İşlemTürü_.ParolaDeğiştirme:
+                    Ekran_Ayarlar.Visible = false;
+
                     Ekran_Giriş_Kullanıcı.Items.Add(Ayarlar_Kullanıcılar.GeçerliKullanıcı.Adı);
                     Ekran_Giriş_Kullanıcı.SelectedIndex = 0;
                     Ekran_Giriş_Kullanıcı.Enabled = false;
@@ -72,16 +65,25 @@ namespace ArgeMup.HazirKod.Ekranlar
                     Ekran_Giriş.Left = (Width - Ekran_Giriş.Width) / 2;
                     Ekran_Giriş.Top = (Height - Ekran_Giriş_Tamam.Top - Ekran_Giriş_Tamam.Height - 50) / 2;
                     Ekran_Giriş_YeniParolaTekrar.KeyDown += Ekran_Giriş_Parola_KeyDown;
-
-                    Ekran_Ayarlar.Visible = false;
                     break;
 
                 case İşlemTürü_.Ayarlar:
+                    Ekran_Ayarlar.Dock = DockStyle.Fill;
+                    Ekran_Giriş.Visible = false;
+
+                    Kullanıcılar_Liste = new ListeKutusu();
+                    Kullanıcılar_Liste.Dock = DockStyle.Fill;
+                    Kullanıcılar_Ayraç.Panel1.Controls.Add(Kullanıcılar_Liste);
+                    Kullanıcılar_Ayraç.SplitterDistance = Kullanıcılar_Ayraç.Width / 2;
                     Kullanıcılar.Kişiler.ForEach(x => Kişiler_Yazı.Add(x.Adı));
                     ListeKutusu.Ayarlar_ ListeKutusu_Ayarlar = new ListeKutusu.Ayarlar_(true, true, ListeKutusu.Ayarlar_.ElemanKonumu_.AdanZyeSıralanmış, true, false, true);
                     Kullanıcılar_Liste.Başlat(null, Kişiler_Yazı, "Kullamıcılar", ListeKutusu_Ayarlar);
                     Kullanıcılar_Liste.GeriBildirim_İşlemi += Kullanıcılar_Liste_GeriBildirim_İşlemi;
 
+                    Roller_Liste = new ListeKutusu();
+                    Roller_Liste.Dock = DockStyle.Fill;
+                    Roller_Ayraç.Panel1.Controls.Add(Roller_Liste);
+                    Roller_Ayraç.SplitterDistance = Roller_Ayraç.Width / 3;
                     Roller_Liste.Başlat(null, Kullanıcılar.Roller.Keys.ToList(), "Roller", ListeKutusu_Ayarlar);
                     Roller_Liste.GeriBildirim_İşlemi += Roller_Liste_GeriBildirim_İşlemi;
                     Kullanıcılar_Rol.Items.Clear();
@@ -91,18 +93,32 @@ namespace ArgeMup.HazirKod.Ekranlar
                     for (int i = 0; i < İzinler.Count; i++)
                     {
                         string İzin = İzinler[i];
-                        if (İzin.BoşMu() || İzin == "Boşta") continue;
+                        if (İzin.EndsWith(" ")) continue;
 
                         int SatırNo = Roller_Tablo.Rows.Add(new object[] { İzin, false });
                         Roller_Tablo.Rows[SatırNo].Tag = i;
                     }
 
                     Uyarı.Visible = !Kullanıcılar.ParolaKontrolüGerekiyorMu;
-
-                    Ekran_Ayarlar.Dock = DockStyle.Fill;
-                    Ekran_Giriş.Visible = false;
                     break;
             }
+        }
+        public void Yenile(Kullanıcılar_Ayarlar_ Kullanıcılar)
+        {
+            Ayarlar_Kullanıcılar = Kullanıcılar;
+            List<string> Kişiler_Yazı = new List<string>();
+            Kullanıcılar.Kişiler.ForEach(x => Kişiler_Yazı.Add(x.Adı));
+
+            Kullanıcılar_Liste.Tüm_Elemanlar = Kişiler_Yazı;
+            Kullanıcılar_Liste.Yenile();
+
+            Roller_Liste.Tüm_Elemanlar = Kullanıcılar.Roller.Keys.ToList();
+            Roller_Liste.Yenile();
+
+            Kullanıcılar_Rol.Items.Clear();
+            Kullanıcılar_Rol.Items.AddRange(Kullanıcılar.Roller.Keys.ToArray());
+
+            Uyarı.Visible = !Kullanıcılar.ParolaKontrolüGerekiyorMu;
         }
         Ayarlar_Kullanıcı_ Bul_Kullanıcı(string Adı)
         {
@@ -141,9 +157,11 @@ namespace ArgeMup.HazirKod.Ekranlar
                 {
                     case ListeKutusu.İşlemTürü.ElemanSeçildi:
                         Kullanıcı = Bul_Kullanıcı(Adı);
-
-                        Kullanıcılar_Parola.Text = Kullanıcı.Parolası;
                         Kullanıcılar_Rol.Text = Kullanıcı.RolAdı.DoluMu() ? Kullanıcı.RolAdı : null;
+
+                        Kullanıcılar_Parola.Text = Kullanıcı.Parolası.DoluMu() ? "*" : null;
+                        Kullanıcılar_Parola.Tag = null;
+
                         ÖnYüzler_Kaydet_Kullanıcılar.Enabled = false;
                         return true;
 
@@ -168,6 +186,11 @@ namespace ArgeMup.HazirKod.Ekranlar
 
             return false;
         }
+        private void Kullanıcılar_Parola_TextChanged(object sender, EventArgs e)
+        {
+            Kullanıcılar_Parola.Tag = "*";
+            Kullanıcılar_AyarDeğişti(sender, e);
+        }
         private void Kullanıcılar_AyarDeğişti(object sender, EventArgs e)
         {
             ÖnYüzler_Kaydet_Kullanıcılar.Enabled = true;
@@ -175,8 +198,6 @@ namespace ArgeMup.HazirKod.Ekranlar
         private void ÖnYüzler_Kaydet_Kullanıcılar_Click(object sender, EventArgs e)
         {
             if (Kullanıcılar_Liste.SeçilenEleman_Adı.BoşMu()) return;
-
-            if (Kullanıcılar_Parola.Text.BoşMu(true)) Kullanıcılar_Parola.Text = null;
 
             Ayarlar_Kullanıcı_ Kullanıcı = Bul_Kullanıcı(Kullanıcılar_Liste.SeçilenEleman_Adı);
             if (Kullanıcı == null)
@@ -187,10 +208,14 @@ namespace ArgeMup.HazirKod.Ekranlar
                 Ayarlar_Kullanıcılar.Kişiler.Add(Kullanıcı);
             }
 
-            Kullanıcı.Parolası = Kullanıcılar_Parola.Text;
+            if (Kullanıcılar_Parola.Text.BoşMu(true)) Kullanıcı.Parolası = null;
+            else if (Kullanıcılar_Parola.Tag != null) Kullanıcı.Parolası = Ayarlar_Kullanıcılar.Karıştır(Kullanıcılar_Parola.Text);
+            //else değişikik yapılmadı, önceki parolayı koru
+
             Kullanıcı.RolAdı = Kullanıcılar_Rol.Text;
 
             Ayarlar_Kaydet();
+            Kullanıcılar_Liste_GeriBildirim_İşlemi(Kullanıcılar_Liste.SeçilenEleman_Adı, ListeKutusu.İşlemTürü.ElemanSeçildi);
         }
         #endregion
 
@@ -222,6 +247,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                         Rol_Dizisi = Bul_Rol(Adı);
                         Ayarlar_Kullanıcılar.Roller.Remove(Adı);
                         Ayarlar_Kullanıcılar.Roller.Add(YeniAdı, Rol_Dizisi);
+                        Ayarlar_Kullanıcılar.Kişiler.Where(x => x.RolAdı == Adı).ToList().ForEach(x => x.RolAdı = YeniAdı);
                         Ayarlar_Kaydet(true);
                         return true;
 
@@ -242,10 +268,7 @@ namespace ArgeMup.HazirKod.Ekranlar
         {
             if (Roller_Liste.SeçilenEleman_Adı.BoşMu()) return;
 
-            if (!Ayarlar_Kullanıcılar.Roller.TryGetValue(Roller_Liste.SeçilenEleman_Adı, out bool[] Rol_Dizisi))
-            {
-                Rol_Dizisi = new bool[Ayarlar_Kullanıcılar.İzinDizisiElemanSayısı];
-            }
+            bool[] Rol_Dizisi = new bool[Ayarlar_Kullanıcılar.İzinDizisiElemanSayısı];
 
             foreach (DataGridViewRow satır in Roller_Tablo.Rows)
             {
@@ -253,6 +276,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             }
 
             Ayarlar_Kullanıcılar.Roller[Roller_Liste.SeçilenEleman_Adı] = Rol_Dizisi;
+
             Ayarlar_Kaydet();
         }
         #endregion
@@ -282,14 +306,15 @@ namespace ArgeMup.HazirKod.Ekranlar
                 //Parola değiştirme
                 if (Ekran_Giriş_YeniParola.Text.BoşMu(true)) Ekran_Giriş_YeniParola.Text = null;
 
-                if (Ekran_Giriş_YeniParola.Text.Length < 4 ||
+                if (Ekran_Giriş_YeniParola.Text.Length < 6 ||
                     Ekran_Giriş_YeniParola.Text != Ekran_Giriş_YeniParolaTekrar.Text ||
-                    Ekran_Giriş_Parola.Text != Ayarlar_Kullanıcılar.GeçerliKullanıcı.Parolası)
+                    Ekran_Giriş_Parola.Text.BoşMu() ||
+                    Ayarlar_Kullanıcılar.Karıştır(Ekran_Giriş_Parola.Text) != Ayarlar_Kullanıcılar.GeçerliKullanıcı.Parolası)
                 {
                     MessageBox.Show(
                         "Alttaki kuralları sağladığınızı kontrol ediniz." + Environment.NewLine + Environment.NewLine +
                         "Mevcut parolanızı giriniz" + Environment.NewLine +
-                        "En az 4 karakterden oluşan yeni bir parola belirleyiniz" + Environment.NewLine +
+                        "En az 6 karakterden oluşan yeni bir parola belirleyiniz" + Environment.NewLine +
                         "Yeni parolanızın başlangıç ve bitişinde boşluk karakterini kullanmayınız" + Environment.NewLine +
                         "Yeni parola ve tekrar parolasının birbirinin aynısı olduğudan emin olunuz",
                         "Parola Değiştirme Ekranı");
@@ -297,11 +322,10 @@ namespace ArgeMup.HazirKod.Ekranlar
                 }
 
                 Ayarlar_Kullanıcı_ Kullancı = Bul_Kullanıcı(Ekran_Giriş_Kullanıcı.Text);
-                Kullancı.Parolası = Ekran_Giriş_YeniParola.Text;
+                Kullancı.Parolası = Ayarlar_Kullanıcılar.Karıştır(Ekran_Giriş_YeniParola.Text);
                 GeriBildirim_Değişiklikleri_Kaydet?.Invoke();
             }
         }
-
         #endregion
     }
 
@@ -318,14 +342,15 @@ namespace ArgeMup.HazirKod.Ekranlar
         [Değişken_.Niteliği.Adını_Değiştir("K")] public List<Ayarlar_Kullanıcı_> Kişiler = new List<Ayarlar_Kullanıcı_>();
         [Değişken_.Niteliği.Adını_Değiştir("R")] public Dictionary<string, bool[]> Roller = new Dictionary<string, bool[]>();
 
-        [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public int İzinDizisiElemanSayısı;
+        [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public string SihirliKelime = "ArGeMuP Kullanıcılar_Ayarlar_";
+        [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public int İzinDizisiElemanSayısı; //anlamlı eleman / enum -> "abc_def" / enum.Yazdır -> "abc def" ve anlamsız eleman / enum -> "abc_def_" / enum.Yazdır -> "abc def "
         [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public Ayarlar_Kullanıcı_ GeçerliKullanıcı;
         [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public bool ParolaKontrolüGerekiyorMu;
 
         [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sabiti = Rastgele.Sayı(4, 8);
         [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sayısı = 0;
 
-        public void Başlat(int İzinDizisiElemanSayısı = 0, bool TamKontrol = false)
+        public void Başlat(int İzinDizisiElemanSayısı = 0, bool TamKontrol = false, string SihirliKelime = null)
         {
             if (İzinDizisiElemanSayısı > 0) this.İzinDizisiElemanSayısı = İzinDizisiElemanSayısı;
 
@@ -343,6 +368,8 @@ namespace ArgeMup.HazirKod.Ekranlar
                     }
                 }
             }
+
+            if (SihirliKelime != null) this.SihirliKelime = SihirliKelime;
 
             foreach (Ayarlar_Kullanıcı_ Kullanıcı in Kişiler)
             {
@@ -371,6 +398,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             }
             else
             {
+                Parola = Karıştır(Parola);
                 GeçerliKullanıcı = Kişiler.FirstOrDefault(x => x.Adı == KullanıcıAdı && x.Parolası == Parola);
 
                 if (GeçerliKullanıcı == null)
@@ -416,6 +444,10 @@ namespace ArgeMup.HazirKod.Ekranlar
 
                 return null;
             }
+        }
+        public string Karıştır(string Girdi)
+        {
+            return DoğrulamaKodu.Üret.Yazıdan(Girdi + SihirliKelime);
         }
     }
     public class Ayarlar_Kullanıcı_

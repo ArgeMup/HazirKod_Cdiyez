@@ -31,14 +31,14 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.Kullanıcılar_Ayraç = new System.Windows.Forms.SplitContainer();
             this.ÖnYüzler_Kaydet_Kullanıcılar = new System.Windows.Forms.Button();
             this.Kullanıcılar_Rol = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.Kullanıcılar_Parola = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.Roller_Ayraç = new System.Windows.Forms.SplitContainer();
             this.Roller_Tablo = new System.Windows.Forms.DataGridView();
             this.Roller_Tablo_İzinAdı = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Roller_Tablo_Etkin = new System.Windows.Forms.DataGridViewCheckBoxColumn();
@@ -57,13 +57,13 @@
             this.label3 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.Panel2.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Kullanıcılar_Ayraç)).BeginInit();
+            this.Kullanıcılar_Ayraç.Panel2.SuspendLayout();
+            this.Kullanıcılar_Ayraç.SuspendLayout();
             this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Roller_Ayraç)).BeginInit();
+            this.Roller_Ayraç.Panel2.SuspendLayout();
+            this.Roller_Ayraç.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Roller_Tablo)).BeginInit();
             this.Ekran_Ayarlar.SuspendLayout();
             this.Ekran_Giriş.SuspendLayout();
@@ -78,44 +78,44 @@
             this.tabControl1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(427, 180);
+            this.tabControl1.Size = new System.Drawing.Size(396, 180);
             this.tabControl1.TabIndex = 1;
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.splitContainer2);
+            this.tabPage1.Controls.Add(this.Kullanıcılar_Ayraç);
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage1.Size = new System.Drawing.Size(419, 151);
+            this.tabPage1.Size = new System.Drawing.Size(388, 151);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Kullanıcılar";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // splitContainer2
+            // Kullanıcılar_Ayraç
             // 
-            this.splitContainer2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(3, 2);
-            this.splitContainer2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.splitContainer2.Name = "splitContainer2";
+            this.Kullanıcılar_Ayraç.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.Kullanıcılar_Ayraç.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Kullanıcılar_Ayraç.Location = new System.Drawing.Point(3, 2);
+            this.Kullanıcılar_Ayraç.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Kullanıcılar_Ayraç.Name = "Kullanıcılar_Ayraç";
             // 
-            // splitContainer2.Panel1
+            // Kullanıcılar_Ayraç.Panel1
             // 
-            this.splitContainer2.Panel1.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.Kullanıcılar_Ayraç.Panel1.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
             // 
-            // splitContainer2.Panel2
+            // Kullanıcılar_Ayraç.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.ÖnYüzler_Kaydet_Kullanıcılar);
-            this.splitContainer2.Panel2.Controls.Add(this.Kullanıcılar_Rol);
-            this.splitContainer2.Panel2.Controls.Add(this.label2);
-            this.splitContainer2.Panel2.Controls.Add(this.Kullanıcılar_Parola);
-            this.splitContainer2.Panel2.Controls.Add(this.label1);
-            this.splitContainer2.Panel2.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
-            this.splitContainer2.Size = new System.Drawing.Size(413, 147);
-            this.splitContainer2.SplitterDistance = 167;
-            this.splitContainer2.TabIndex = 0;
+            this.Kullanıcılar_Ayraç.Panel2.Controls.Add(this.ÖnYüzler_Kaydet_Kullanıcılar);
+            this.Kullanıcılar_Ayraç.Panel2.Controls.Add(this.Kullanıcılar_Rol);
+            this.Kullanıcılar_Ayraç.Panel2.Controls.Add(this.label2);
+            this.Kullanıcılar_Ayraç.Panel2.Controls.Add(this.Kullanıcılar_Parola);
+            this.Kullanıcılar_Ayraç.Panel2.Controls.Add(this.label1);
+            this.Kullanıcılar_Ayraç.Panel2.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.Kullanıcılar_Ayraç.Size = new System.Drawing.Size(382, 147);
+            this.Kullanıcılar_Ayraç.SplitterDistance = 191;
+            this.Kullanıcılar_Ayraç.TabIndex = 0;
             // 
             // ÖnYüzler_Kaydet_Kullanıcılar
             // 
@@ -124,7 +124,7 @@
             this.ÖnYüzler_Kaydet_Kullanıcılar.Location = new System.Drawing.Point(5, 106);
             this.ÖnYüzler_Kaydet_Kullanıcılar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ÖnYüzler_Kaydet_Kullanıcılar.Name = "ÖnYüzler_Kaydet_Kullanıcılar";
-            this.ÖnYüzler_Kaydet_Kullanıcılar.Size = new System.Drawing.Size(228, 33);
+            this.ÖnYüzler_Kaydet_Kullanıcılar.Size = new System.Drawing.Size(173, 33);
             this.ÖnYüzler_Kaydet_Kullanıcılar.TabIndex = 3;
             this.ÖnYüzler_Kaydet_Kullanıcılar.Text = "Kaydet";
             this.ÖnYüzler_Kaydet_Kullanıcılar.UseVisualStyleBackColor = true;
@@ -138,7 +138,7 @@
             this.Kullanıcılar_Rol.Location = new System.Drawing.Point(5, 58);
             this.Kullanıcılar_Rol.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Kullanıcılar_Rol.Name = "Kullanıcılar_Rol";
-            this.Kullanıcılar_Rol.Size = new System.Drawing.Size(228, 24);
+            this.Kullanıcılar_Rol.Size = new System.Drawing.Size(173, 24);
             this.Kullanıcılar_Rol.Sorted = true;
             this.Kullanıcılar_Rol.TabIndex = 2;
             this.Kullanıcılar_Rol.SelectedIndexChanged += new System.EventHandler(this.Kullanıcılar_AyarDeğişti);
@@ -159,10 +159,9 @@
             this.Kullanıcılar_Parola.Location = new System.Drawing.Point(5, 20);
             this.Kullanıcılar_Parola.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Kullanıcılar_Parola.Name = "Kullanıcılar_Parola";
-            this.Kullanıcılar_Parola.PasswordChar = '*';
-            this.Kullanıcılar_Parola.Size = new System.Drawing.Size(228, 22);
+            this.Kullanıcılar_Parola.Size = new System.Drawing.Size(173, 22);
             this.Kullanıcılar_Parola.TabIndex = 1;
-            this.Kullanıcılar_Parola.TextChanged += new System.EventHandler(this.Kullanıcılar_AyarDeğişti);
+            this.Kullanıcılar_Parola.TextChanged += new System.EventHandler(this.Kullanıcılar_Parola_TextChanged);
             // 
             // label1
             // 
@@ -176,36 +175,36 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.splitContainer1);
+            this.tabPage2.Controls.Add(this.Roller_Ayraç);
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.tabPage2.Size = new System.Drawing.Size(419, 151);
+            this.tabPage2.Size = new System.Drawing.Size(388, 151);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Roller";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // splitContainer1
+            // Roller_Ayraç
             // 
-            this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(3, 2);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.splitContainer1.Name = "splitContainer1";
+            this.Roller_Ayraç.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.Roller_Ayraç.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Roller_Ayraç.Location = new System.Drawing.Point(3, 2);
+            this.Roller_Ayraç.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Roller_Ayraç.Name = "Roller_Ayraç";
             // 
-            // splitContainer1.Panel1
+            // Roller_Ayraç.Panel1
             // 
-            this.splitContainer1.Panel1.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.Roller_Ayraç.Panel1.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
             // 
-            // splitContainer1.Panel2
+            // Roller_Ayraç.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.Roller_Tablo);
-            this.splitContainer1.Panel2.Controls.Add(this.ÖnYüzler_Kaydet_Roller);
-            this.splitContainer1.Panel2.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
-            this.splitContainer1.Size = new System.Drawing.Size(413, 147);
-            this.splitContainer1.SplitterDistance = 167;
-            this.splitContainer1.TabIndex = 0;
+            this.Roller_Ayraç.Panel2.Controls.Add(this.Roller_Tablo);
+            this.Roller_Ayraç.Panel2.Controls.Add(this.ÖnYüzler_Kaydet_Roller);
+            this.Roller_Ayraç.Panel2.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.Roller_Ayraç.Size = new System.Drawing.Size(382, 147);
+            this.Roller_Ayraç.SplitterDistance = 127;
+            this.Roller_Ayraç.TabIndex = 0;
             // 
             // Roller_Tablo
             // 
@@ -236,7 +235,7 @@
             this.Roller_Tablo.RowHeadersWidth = 51;
             this.Roller_Tablo.RowTemplate.Height = 29;
             this.Roller_Tablo.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.Roller_Tablo.Size = new System.Drawing.Size(228, 102);
+            this.Roller_Tablo.Size = new System.Drawing.Size(237, 102);
             this.Roller_Tablo.TabIndex = 0;
             this.Roller_Tablo.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.Roller_Tablo_AyarDeğişti);
             // 
@@ -264,7 +263,7 @@
             this.ÖnYüzler_Kaydet_Roller.Location = new System.Drawing.Point(5, 106);
             this.ÖnYüzler_Kaydet_Roller.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.ÖnYüzler_Kaydet_Roller.Name = "ÖnYüzler_Kaydet_Roller";
-            this.ÖnYüzler_Kaydet_Roller.Size = new System.Drawing.Size(228, 33);
+            this.ÖnYüzler_Kaydet_Roller.Size = new System.Drawing.Size(237, 33);
             this.ÖnYüzler_Kaydet_Roller.TabIndex = 1;
             this.ÖnYüzler_Kaydet_Roller.Text = "Kaydet";
             this.ÖnYüzler_Kaydet_Roller.UseVisualStyleBackColor = true;
@@ -276,7 +275,7 @@
             this.Uyarı.ForeColor = System.Drawing.Color.Red;
             this.Uyarı.Location = new System.Drawing.Point(0, 0);
             this.Uyarı.Name = "Uyarı";
-            this.Uyarı.Size = new System.Drawing.Size(427, 46);
+            this.Uyarı.Size = new System.Drawing.Size(396, 46);
             this.Uyarı.TabIndex = 1;
             this.Uyarı.Text = "Hiç parola kaydedilmediğinden PAROLA SORULMAYACAKTIR ve tüm sayfalar erişilebilir" +
     " olacaktır.";
@@ -289,7 +288,7 @@
             this.Ekran_Ayarlar.Location = new System.Drawing.Point(12, 10);
             this.Ekran_Ayarlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Ekran_Ayarlar.Name = "Ekran_Ayarlar";
-            this.Ekran_Ayarlar.Size = new System.Drawing.Size(427, 226);
+            this.Ekran_Ayarlar.Size = new System.Drawing.Size(396, 226);
             this.Ekran_Ayarlar.TabIndex = 0;
             // 
             // Ekran_Giriş
@@ -304,7 +303,7 @@
             this.Ekran_Giriş.Controls.Add(this.label4);
             this.Ekran_Giriş.Controls.Add(this.Ekran_Giriş_Kullanıcı);
             this.Ekran_Giriş.Controls.Add(this.label3);
-            this.Ekran_Giriş.Location = new System.Drawing.Point(459, 18);
+            this.Ekran_Giriş.Location = new System.Drawing.Point(418, 18);
             this.Ekran_Giriş.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Ekran_Giriş.Name = "Ekran_Giriş";
             this.Ekran_Giriş.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
@@ -425,17 +424,17 @@
             this.Controls.Add(this.Ekran_Ayarlar);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Kullanıcılar";
-            this.Size = new System.Drawing.Size(665, 251);
+            this.Size = new System.Drawing.Size(623, 251);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
-            this.splitContainer2.Panel2.ResumeLayout(false);
-            this.splitContainer2.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
+            this.Kullanıcılar_Ayraç.Panel2.ResumeLayout(false);
+            this.Kullanıcılar_Ayraç.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Kullanıcılar_Ayraç)).EndInit();
+            this.Kullanıcılar_Ayraç.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
+            this.Roller_Ayraç.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.Roller_Ayraç)).EndInit();
+            this.Roller_Ayraç.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Roller_Tablo)).EndInit();
             this.Ekran_Ayarlar.ResumeLayout(false);
             this.Ekran_Giriş.ResumeLayout(false);
@@ -448,14 +447,14 @@
 
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.SplitContainer splitContainer2;
+        private System.Windows.Forms.SplitContainer Kullanıcılar_Ayraç;
         private System.Windows.Forms.Button ÖnYüzler_Kaydet_Kullanıcılar;
         private System.Windows.Forms.ComboBox Kullanıcılar_Rol;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox Kullanıcılar_Parola;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.SplitContainer Roller_Ayraç;
         private System.Windows.Forms.DataGridView Roller_Tablo;
         private System.Windows.Forms.Button ÖnYüzler_Kaydet_Roller;
         private System.Windows.Forms.DataGridViewTextBoxColumn Roller_Tablo_İzinAdı;

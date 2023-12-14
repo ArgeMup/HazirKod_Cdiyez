@@ -49,6 +49,23 @@ namespace ArgeMup.HazirKod
 
             return ( ( ( Bilgi - BilgiDizisi_EnDüşükDeğeri) / Fark_Bilgi) * Fark_Sınır) + AltSınır;
         }
+
+        public static double EnBüyük(double A, double B) 
+        {
+            return A >= B ? A : B;
+        }
+        public static double EnBüyük(double A, double B, double C)
+        {
+            return A >= B && A >= C ? A : B >= A && B >= C ? B : C;
+        }
+        public static int EnBüyük(int A, int B)
+        {
+            return A >= B ? A : B;
+        }
+        public static int EnBüyük(int A, int B, int C)
+        {
+            return A >= B && A >= C ? A : B >= A && B >= C ? B : C;
+        }
     }
 
     public class Rastgele

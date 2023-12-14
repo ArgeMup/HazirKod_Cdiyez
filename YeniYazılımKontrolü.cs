@@ -1,10 +1,8 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 
 namespace ArgeMup.HazirKod
 {

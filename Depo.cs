@@ -904,15 +904,12 @@ namespace ArgeMup.HazirKod
                 Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
                 if (bulunan == null || bulunan._Elemanları == null || bulunan._Elemanları.Length == 0 || ElemanAdıSıralaması == null || ElemanAdıSıralaması.Count == 0) return;
 
-                ElemanAdıSıralaması = new List<string>(ElemanAdıSıralaması); //kaynak listeyi bozmamak için
                 List<Eleman_> YeniElamanListesi = new List<Eleman_>();
                 List<Eleman_> EskiElamanListesi = bulunan._Elemanları.ToList();
 
                 //Verilen sıralamaya göre yeni listeyi oluştur
-                while (ElemanAdıSıralaması.Count > 0)
+                foreach (string SıradakiElamanAdı in ElemanAdıSıralaması)
                 {
-                    string SıradakiElamanAdı = ElemanAdıSıralaması[0];
-                    ElemanAdıSıralaması.RemoveAt(0);
                     if (string.IsNullOrEmpty(SıradakiElamanAdı)) continue;
 
                     Eleman_ bulunan_alt_eleman = EskiElamanListesi.FirstOrDefault(x => x._Adı == SıradakiElamanAdı);

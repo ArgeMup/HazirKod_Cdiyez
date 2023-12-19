@@ -258,6 +258,59 @@ namespace ArgeMup.HazirKod.Ekİşlemler
         }
     }
 
+    public static class _Ekİşlemler_Liste
+    {
+        public const string Sürüm = "V1.0";
+
+        public static System.Collections.IList Sırala(System.Collections.IList Girdi, string SıralanacakListeİçindeki_Değişkeninİçindeki_KontrolEdilecek_DeğişkeninAdı, System.Collections.IEnumerable YeniSıralama)
+        {
+            if (Girdi == null || Girdi.Count == 0 || SıralanacakListeİçindeki_Değişkeninİçindeki_KontrolEdilecek_DeğişkeninAdı.BoşMu() || YeniSıralama == null) return Girdi;
+
+            System.Collections.Generic.Dictionary<string, object> YeniSözlük = new System.Collections.Generic.Dictionary<string, object>();
+            foreach (object Eleman in Girdi)
+            {
+                System.Reflection.FieldInfo Eleman_AlanBilgisi = Eleman.GetType().GetField(SıralanacakListeİçindeki_Değişkeninİçindeki_KontrolEdilecek_DeğişkeninAdı, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                if (Eleman_AlanBilgisi == null) continue;
+
+                string Eleman_İçeriği = Eleman_AlanBilgisi.GetValue(Eleman) as string;
+                if (Eleman_İçeriği.BoşMu()) continue;
+
+                YeniSözlük.Add(Eleman_İçeriği, Eleman);
+            }
+
+            System.Collections.IList YeniListe = (System.Collections.IList)System.Activator.CreateInstance(Girdi.GetType());
+            foreach (string SıradakiElamanAdı in YeniSıralama)
+            {
+                if (SıradakiElamanAdı.BoşMu() || !YeniSözlük.TryGetValue(SıradakiElamanAdı, out object İçerik)) continue;
+
+                YeniListe.Add(İçerik);
+            }
+
+            return YeniListe;
+        }
+    }
+
+    public static class _Ekİşlemler_Sözlük
+    {
+        public const string Sürüm = "V1.0";
+
+        public static System.Collections.IDictionary Sırala(System.Collections.IDictionary Girdi, System.Collections.IEnumerable YeniSıralama)
+        {
+            if (Girdi == null || Girdi.Count == 0 || YeniSıralama == null) return Girdi;
+
+            System.Collections.IDictionary YeniSözlük = (System.Collections.IDictionary)System.Activator.CreateInstance(Girdi.GetType());
+
+            foreach (string SıradakiElamanAdı in YeniSıralama)
+            {
+                if (SıradakiElamanAdı.BoşMu() || !Girdi.Contains(SıradakiElamanAdı)) continue;
+
+                YeniSözlük.Add(SıradakiElamanAdı, Girdi[SıradakiElamanAdı]);
+            }
+
+            return YeniSözlük;
+        }
+    }
+
     public static class _Ekİşlemler_TarihSaat
     {
         public const string Sürüm = "V1.0";

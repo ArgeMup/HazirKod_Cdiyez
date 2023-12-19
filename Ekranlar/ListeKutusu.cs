@@ -161,8 +161,8 @@ namespace ArgeMup.HazirKod.Ekranlar
             Adı.Visible = this.Ayarlar.Eklenebilir || this.Ayarlar.AdıDeğiştirilebilir;
 
             Tüm_Elemanlar = new List<string>();
-            if (this.Sabit_Elemanlar != null) { this.Sabit_Elemanlar = this.Sabit_Elemanlar.Distinct().ToList(); Tüm_Elemanlar.AddRange(this.Sabit_Elemanlar); }
             if (Diğer_Elemanlar != null) Tüm_Elemanlar.AddRange(Diğer_Elemanlar);
+            if (this.Sabit_Elemanlar != null) { this.Sabit_Elemanlar = this.Sabit_Elemanlar.Distinct().ToList(); Tüm_Elemanlar.AddRange(this.Sabit_Elemanlar); }
             Tüm_Elemanlar = Tüm_Elemanlar.Distinct().ToList();
             if (!this.Ayarlar.GizliOlanlarıGöster) Tüm_Elemanlar = Tüm_Elemanlar.Where(x => !x.StartsWith(this.Ayarlar.GizliElemanBaşlangıcı)).ToList();
 
@@ -443,10 +443,10 @@ namespace ArgeMup.HazirKod.Ekranlar
             
             Ekle.Visible = görülebilir_ekle;
             AdıDeğiştir.Visible = görülebilir_adı_değiştir;
+            KonumunuDeğiştir_Aşağı.Visible = görülebilir_konumu_değiştir_aşağı;
             KonumunuDeğiştir_Kaydet.Visible = görülebilir_konumu_kaydet;
             KonumunuDeğiştir_İptal.Visible = görülebilir_konumu_kaydet;
             KonumunuDeğiştir_Yukarı.Visible = görülebilir_konumu_değiştir_yukarı;
-            KonumunuDeğiştir_Aşağı.Visible = görülebilir_konumu_değiştir_aşağı;
             Sil.Visible = görülebilir_sil;
             Gizle.Visible = görülebilir_gizle;
             Göster.Visible = görülebilir_göster;

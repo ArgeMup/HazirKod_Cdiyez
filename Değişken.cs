@@ -405,47 +405,5 @@ namespace ArgeMup.HazirKod
             public class Bunu_Kesinlikle_KullanmaAttribute : Attribute { }
         }
         #endregion
-
-        public static IDictionary Sırala(IDictionary SıralanacakSözlük, List<string> YeniSıralama)
-        {
-            if (SıralanacakSözlük == null || SıralanacakSözlük.Count == 0 || YeniSıralama == null || YeniSıralama.Count == 0) return SıralanacakSözlük;
-
-            IDictionary YeniSözlük = (IDictionary)Activator.CreateInstance(SıralanacakSözlük.GetType());
-            
-            foreach (string SıradakiElamanAdı in YeniSıralama)
-            {
-                if (SıradakiElamanAdı.BoşMu() || !SıralanacakSözlük.Contains(SıradakiElamanAdı)) continue;
-
-                YeniSözlük.Add(SıradakiElamanAdı, SıralanacakSözlük[SıradakiElamanAdı]);
-            }
-
-            return YeniSözlük;
-        }
-        public static IList Sırala(IList SıralanacakListe, string SıralanacakListeİçindeki_Değişkeninİçindeki_KontrolEdilecek_DeğişkeninAdı, List<string> YeniSıralama)
-        {
-            if (SıralanacakListe == null || SıralanacakListe.Count == 0 || SıralanacakListeİçindeki_Değişkeninİçindeki_KontrolEdilecek_DeğişkeninAdı.BoşMu() || YeniSıralama == null || YeniSıralama.Count == 0) return SıralanacakListe;
-
-            Dictionary<string, object> YeniSözlük = new Dictionary<string, object>();
-            foreach (object Eleman in SıralanacakListe)
-            {
-                FieldInfo Eleman_AlanBilgisi = Eleman.GetType().GetField(SıralanacakListeİçindeki_Değişkeninİçindeki_KontrolEdilecek_DeğişkeninAdı, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-                if (Eleman_AlanBilgisi == null) continue;
-
-                string Eleman_Adı = Eleman_AlanBilgisi.GetValue(Eleman) as string;
-                if (Eleman_Adı.BoşMu()) continue;
-
-                YeniSözlük.Add(Eleman_Adı, Eleman);
-            }
-
-            IList YeniListe = (IList)Activator.CreateInstance(SıralanacakListe.GetType());
-            foreach (string SıradakiElamanAdı in YeniSıralama)
-            {
-                if (SıradakiElamanAdı.BoşMu() || !YeniSözlük.TryGetValue(SıradakiElamanAdı, out object İçerik)) continue;
-                
-                YeniListe.Add(İçerik);
-            }
-
-            return YeniListe;
-        }
     }
 }

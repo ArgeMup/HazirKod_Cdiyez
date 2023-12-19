@@ -262,7 +262,7 @@ namespace ArgeMup.HazirKod.Ekİşlemler
     {
         public const string Sürüm = "V1.0";
 
-        public static System.Collections.IList Sırala(System.Collections.IList Girdi, string SıralanacakListeİçindeki_Değişkeninİçindeki_KontrolEdilecek_DeğişkeninAdı, System.Collections.IEnumerable YeniSıralama)
+        public static System.Collections.IList Sırala(this System.Collections.IList Girdi, string SıralanacakListeİçindeki_Değişkeninİçindeki_KontrolEdilecek_DeğişkeninAdı, System.Collections.IEnumerable YeniSıralama)
         {
             if (Girdi == null || Girdi.Count == 0 || SıralanacakListeİçindeki_Değişkeninİçindeki_KontrolEdilecek_DeğişkeninAdı.BoşMu() || YeniSıralama == null) return Girdi;
 
@@ -294,7 +294,7 @@ namespace ArgeMup.HazirKod.Ekİşlemler
     {
         public const string Sürüm = "V1.0";
 
-        public static System.Collections.IDictionary Sırala(System.Collections.IDictionary Girdi, System.Collections.IEnumerable YeniSıralama)
+        public static System.Collections.IDictionary Sırala(this System.Collections.IDictionary Girdi, System.Collections.IEnumerable YeniSıralama)
         {
             if (Girdi == null || Girdi.Count == 0 || YeniSıralama == null) return Girdi;
 

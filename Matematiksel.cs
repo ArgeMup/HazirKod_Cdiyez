@@ -66,6 +66,23 @@ namespace ArgeMup.HazirKod
         {
             return A >= B && A >= C ? A : B >= A && B >= C ? B : C;
         }
+
+        public static double EnKüçük(double A, double B)
+        {
+            return A <= B ? A : B;
+        }
+        public static double EnKüçük(double A, double B, double C)
+        {
+            return A <= B && A <= C ? A : B <= A && B <= C ? B : C;
+        }
+        public static int EnKüçük(int A, int B)
+        {
+            return A <= B ? A : B;
+        }
+        public static int EnKüçük(int A, int B, int C)
+        {
+            return A <= B && A <= C ? A : B <= A && B <= C ? B : C;
+        }
     }
 
     public class Rastgele

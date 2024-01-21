@@ -189,11 +189,11 @@ namespace ArgeMup.HazirKod.Ekranlar
             // 
             // İpucu
             // 
-            this.İpucu.AutomaticDelay = 100;
+            this.İpucu.AutomaticDelay = 1500;
             this.İpucu.AutoPopDelay = 10000;
-            this.İpucu.InitialDelay = 100;
+            this.İpucu.InitialDelay = 1500;
             this.İpucu.IsBalloon = true;
-            this.İpucu.ReshowDelay = 20;
+            this.İpucu.ReshowDelay = 300;
             this.İpucu.UseAnimation = false;
             this.İpucu.UseFading = false;
             // 

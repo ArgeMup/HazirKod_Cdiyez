@@ -15,6 +15,18 @@ namespace ArgeMup.HazirKod
         public const string Sürüm = "V1.3";
         public const int EşZamanlıİşlemSayısı_Sabiti = 10;
 
+        public static string[] Listele_Dosya(string Yolu, string Filtre = "*.*", SearchOption Kapsam = SearchOption.AllDirectories)
+        {
+            if (!Directory.Exists(Yolu)) return new string[0];
+
+            return Directory.GetFiles(Yolu, Filtre, Kapsam);
+        }
+        public static string[] Listele_Klasör(string Yolu, string Filtre = "*", SearchOption Kapsam = SearchOption.AllDirectories)
+        {
+            if (!Directory.Exists(Yolu)) return new string[0];
+
+            return Directory.GetDirectories(Yolu, Filtre, Kapsam);
+        }
         public static bool Oluştur(string Yolu, bool Düzelt = true)
         {
             try

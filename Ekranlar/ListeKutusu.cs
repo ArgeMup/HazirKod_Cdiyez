@@ -179,8 +179,9 @@ namespace ArgeMup.HazirKod.Ekranlar
             TuşlarıDüzenle();
             İpucunuDüzenle();
         }
-        public void Odaklan()
+        public void Odaklan(bool YazıyıSeç = false)
         {
+            if (YazıyıSeç) AramaÇubuğu.SelectAll();
             AramaÇubuğu.Focus();
         }
 

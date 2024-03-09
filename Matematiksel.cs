@@ -1,39 +1,42 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
-using System.Linq;
-
 namespace ArgeMup.HazirKod
 {
     public class Ortalama_
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
 
-        double[] Tampon = null;
-        int Kapasite = 0;
-        double Toplam = 0;
-        int Konum = 0;
-        public double Ortalaması = 0;
-
-        public Ortalama_(int Kapasite)
+        public double Ortalaması;
+        double[] Tampon;
+        double Toplam;
+        int TutulacakÖrnekSayısı, TampondakiÖrnekSayısı, Konum;
+        
+        public Ortalama_(int TutulacakÖrnekSayısı = 0)
         {
-            this.Kapasite = Kapasite;
+            this.TutulacakÖrnekSayısı = TutulacakÖrnekSayısı;
+
+            if (TutulacakÖrnekSayısı > 0)
+            {
+                Tampon = new double[TutulacakÖrnekSayısı];
+            }
         }
 
         public double Güncelle(double Girdi)
         {
-            if (Tampon == null)
+            Toplam += Girdi;
+
+            if (Tampon != null)
             {
-                Tampon = Enumerable.Repeat(Girdi, Kapasite).ToArray();
-                Toplam = Girdi * Kapasite;
-                return Girdi;
+                Toplam -= Tampon[Konum];
+                Tampon[Konum] = Girdi;
+
+                if (++Konum >= TutulacakÖrnekSayısı) Konum = 0;
+
+                if (TampondakiÖrnekSayısı < TutulacakÖrnekSayısı) TampondakiÖrnekSayısı++;
             }
+            else TampondakiÖrnekSayısı++;
 
-            Toplam = Toplam - Tampon[Konum] + Girdi;
-            Tampon[Konum] = Girdi;
-
-            if (++Konum >= Kapasite) Konum = 0;
-
-            Ortalaması = Toplam / Kapasite;
+            Ortalaması = Toplam / TampondakiÖrnekSayısı;
             return Ortalaması;
         }
     }

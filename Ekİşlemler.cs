@@ -44,6 +44,15 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return ArgeMup.HazirKod.Dönüştürme.D_SadeceSaat.SadeceSaate(Girdi, Şablon, Kültür, Tip);
         }
 #endif
+        public static object Nesneye(this string Girdi, System.Type Tipi, Değişken_.DönüştürmeHatasıOldu_YeniTipiBelirle_ DönüştürmeHatasıOldu_YeniTipiBelirle = null)
+        {
+            Değişken_ Değişken = new Değişken_();
+            Değişken.NitelikKontrolü_Ve_Filtreleme_Yap = false;
+            Değişken.DönüştürmeHatasıOldu_YeniTipiBelirle = DönüştürmeHatasıOldu_YeniTipiBelirle;
+
+            Depo_ Depo = new Depo_(Girdi);
+            return Değişken.Üret(Tipi, Depo["ArGeMuP"]);
+        }
 
         static ArgeMup.HazirKod.DahaCokKarmasiklastirma_ DaÇoKa = new ArgeMup.HazirKod.DahaCokKarmasiklastirma_();
         public static string Karıştır(this string Girdi, string Şifre)
@@ -379,6 +388,24 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             }
 
             return false;
+        }
+        
+        public static string Yazıya(this object Girdi)
+        {
+            Değişken_ Değişken = new Değişken_();
+            Değişken.NitelikKontrolü_Ve_Filtreleme_Yap = false;
+
+            Depo_ Depo = new Depo_();
+            Değişken.Depola(Girdi, Depo["ArGeMuP"]);
+            return Depo.YazıyaDönüştür();
+        }
+        
+        public static object Kopyala(this object Girdi, Değişken_.DönüştürmeHatasıOldu_YeniTipiBelirle_ DönüştürmeHatasıOldu_YeniTipiBelirle = null, bool KontrolEt = true)
+        {
+            string İçerik = Girdi.Yazıya();
+            object Çıktı = İçerik.Nesneye(Girdi.GetType(), DönüştürmeHatasıOldu_YeniTipiBelirle);
+            if (KontrolEt && İçerik != Çıktı.Yazıya()) throw new System.Exception("Kopyalama başarısız");
+            return Çıktı;
         }
 
         public static object Günlük(this object Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0, bool Hemen = false)

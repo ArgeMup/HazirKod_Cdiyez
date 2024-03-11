@@ -7,7 +7,7 @@ namespace ArgeMup.HazirKod
 {
     public class Ayarlar_ 
     {
-        public const string Sürüm = "V5.1";
+        public const string Sürüm = "V5.2";
         public string AyarlarDosyasıYolu
         {
             get
@@ -162,6 +162,10 @@ namespace ArgeMup.HazirKod
         {
             Depo_Ayarlar.Yaz(ElemanAdıDizisi, Sayı, SıraNo);
         }
+        public void Yaz(string ElemanAdıDizisi, decimal HassasSayı, int SıraNo = 0)
+        {
+            Depo_Ayarlar.Yaz(ElemanAdıDizisi, HassasSayı, SıraNo);
+        }
         public void Yaz(string ElemanAdıDizisi, int TamSayı, int SıraNo = 0)
         {
             Depo_Ayarlar.Yaz(ElemanAdıDizisi, TamSayı, SıraNo);
@@ -186,6 +190,10 @@ namespace ArgeMup.HazirKod
         public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
         {
             return Depo_Ayarlar.Oku_Sayı(ElemanAdıDizisi, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+        }
+        public decimal Oku_HassasSayı(string ElemanAdıDizisi, decimal BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
+        {
+            return Depo_Ayarlar.Oku_HassasSayı(ElemanAdıDizisi, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
         }
         public int Oku_TamSayı(string ElemanAdıDizisi, int BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
         {

@@ -127,7 +127,7 @@ namespace ArgeMup.HazirKod
 
     public class DahaCokKarmasiklastirma_Asimetrik_ : IDisposable
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
         public static void AnahtarÜret(out string SadeceAçıkAnahtar, out string AçıkVeGizliAnahtarBirlikte, int AnahtarUzunluğu_Bit = 2048)
         {
             RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(AnahtarUzunluğu_Bit);
@@ -143,7 +143,6 @@ namespace ArgeMup.HazirKod
         const int RsaPKCSKarakterSayısı = 11; //https://www.rfc-editor.org/rfc/rfc3447#section-7.2.1
 
         RSACryptoServiceProvider rsa = null;
-        RandomNumberGenerator rnd = null;
         DahaCokKarmasiklastirma_ dçk = null;
 
         /// <summary>
@@ -172,7 +171,7 @@ namespace ArgeMup.HazirKod
             if (Girdi.Length <= AzamiKarakterSayısı) return rsa.Encrypt(Girdi, false);
             else
             {
-                byte[] şifre = ParolaÜret();
+                byte[] şifre = Rastgele.BaytDizisi(AesParolaKarakterSayısı);
 
                 if (dçk == null) dçk = new DahaCokKarmasiklastirma_();
                 byte[] şifreli = dçk.Karıştır(Girdi, şifre);
@@ -213,16 +212,6 @@ namespace ArgeMup.HazirKod
                 byte[] çıktı = dçk.Düzelt(şifreli, şifre);
                 return çıktı;
             }
-        }
-
-        public byte[] ParolaÜret(int KarakterSayısı_Bayt = AesParolaKarakterSayısı)
-        {
-            byte[] Parola = new byte[KarakterSayısı_Bayt];
-
-            if (rnd == null) rnd = RNGCryptoServiceProvider.Create();
-            rnd.GetNonZeroBytes(Parola);
-
-            return Parola;
         }
 
         public byte[] İmzala(byte[] Belge)
@@ -269,7 +258,6 @@ namespace ArgeMup.HazirKod
                 {
                     // TODO: dispose managed state (managed objects)
                     rsa?.Dispose();
-                    rnd?.Dispose();
                     dçk?.Dispose();
                 }
 

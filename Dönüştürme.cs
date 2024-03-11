@@ -7,7 +7,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
 {
     public static class D_Yazı
     {
-        public const string Sürüm = "V1.2";
+        public const string Sürüm = "V1.3";
 
         public static byte[] BaytDizisine(string Girdi)
         {
@@ -25,6 +25,8 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
         public static byte[] Taban64ten(string Girdi)
         {
+            if (Girdi == null) return null;
+
             return Convert.FromBase64String(Girdi);
         }
     }
@@ -694,7 +696,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
     public static class D_BaytDizisi
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         public static byte[] TümünüDeğiştir(byte[] Kaynak, byte[] Aranan, byte[] YeniBilgi)
         {
@@ -710,6 +712,8 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
         public static string Taban64e(byte[] Girdi)
         {
+            if (Girdi == null || Girdi.Length == 0) return null;
+
             return Convert.ToBase64String(Girdi);
         }
     }

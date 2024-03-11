@@ -45,6 +45,7 @@ namespace ArgeMup.HazirKod
         /// <param name="SıraNo">Aynı eleman adı ile birden fazla içerik tutmak için kullanılabilir</param>
         void Yaz(string ElemanAdıDizisi, string İçeriği, int SıraNo = 0);
         void Yaz(string ElemanAdıDizisi, double Sayı, int SıraNo = 0);
+        void Yaz(string ElemanAdıDizisi, decimal HassasSayı, int SıraNo = 0);
         void Yaz(string ElemanAdıDizisi, int TamSayı, int SıraNo = 0);
         void Yaz(string ElemanAdıDizisi, byte[] BaytDizisi, int SıraNo = 0);
         void Yaz(string ElemanAdıDizisi, DateTime TarihSaat, int SıraNo = 0);
@@ -52,6 +53,7 @@ namespace ArgeMup.HazirKod
 
         string Oku(string ElemanAdıDizisi, string BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null, int SıraNo = 0);
         double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
+        decimal Oku_HassasSayı(string ElemanAdıDizisi, decimal BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
         int Oku_TamSayı(string ElemanAdıDizisi, int BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
         byte[] Oku_BaytDizisi(string ElemanAdıDizisi, byte[] BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = null, int SıraNo = 0);
         DateTime Oku_TarihSaat(string ElemanAdıDizisi, DateTime BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
@@ -126,7 +128,7 @@ namespace ArgeMup.HazirKod
 
     public class Depo_
     {
-        public const string Sürüm = "V1.2";
+        public const string Sürüm = "V1.3";
         public bool EnAzBir_ElemanAdıVeyaİçeriği_Değişti
         {
             get
@@ -191,6 +193,7 @@ namespace ArgeMup.HazirKod
             {
                 if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) return Oku(ElemanAdıDizisi, (string)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                 else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) return Oku_Sayı(ElemanAdıDizisi, (double)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is decimal) return Oku_HassasSayı(ElemanAdıDizisi, (decimal)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                 else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) return Oku_TamSayı(ElemanAdıDizisi, (int)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                 else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) return Oku_Bit(ElemanAdıDizisi, (bool)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                 else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) return Oku_TarihSaat(ElemanAdıDizisi, (DateTime)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
@@ -201,6 +204,7 @@ namespace ArgeMup.HazirKod
             {
                 if (value is string) Yaz(ElemanAdıDizisi, (string)value, SıraNo);
                 else if (value is double) Yaz(ElemanAdıDizisi, (double)value, SıraNo);
+                else if (value is decimal) Yaz(ElemanAdıDizisi, (decimal)value, SıraNo);
                 else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
                 else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
                 else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
@@ -386,6 +390,11 @@ namespace ArgeMup.HazirKod
                 if (double.TryParse(İçerik, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double dönüştürülen)) return dönüştürülen;
                 else return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
             }
+            decimal Dönüştür(string İçerik, decimal BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği)
+            {
+                if (decimal.TryParse(İçerik, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out decimal dönüştürülen)) return dönüştürülen;
+                else return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+            }
             int Dönüştür(string İçerik, int BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği)
             {
                 if (int.TryParse(İçerik, out int dönüştürülen)) return dönüştürülen;
@@ -413,7 +422,7 @@ namespace ArgeMup.HazirKod
                 bool Tersten;
                 Eleman_ Eleman;
 
-                enum Tür_ { Yazı, Sayı, TamSayı, Bit, TarihSaat };
+                enum Tür_ { Yazı, Sayı, HassasSayı, TamSayı, Bit, TarihSaat };
                 Tür_ Tür;
 
                 public _Sıralayıcı_Yazı_(object BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, bool Tersten, Eleman_ Eleman)
@@ -424,6 +433,7 @@ namespace ArgeMup.HazirKod
 
                     if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) Tür = Tür_.Yazı;
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) Tür = Tür_.Sayı;
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is decimal) Tür = Tür_.HassasSayı;
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) Tür = Tür_.TamSayı;
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) Tür = Tür_.Bit;
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) Tür = Tür_.TarihSaat;
@@ -446,6 +456,14 @@ namespace ArgeMup.HazirKod
 
                             if (Sayı_A > Sayı_B) sonuç = 1;
                             else if (Sayı_A < Sayı_B) sonuç = -1;
+                            break;
+
+                        case Tür_.HassasSayı:
+                            decimal HassasSayı_A = Eleman.Dönüştür(A, (decimal)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği);
+                            decimal HassasSayı_B = Eleman.Dönüştür(B, (decimal)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği);
+
+                            if (HassasSayı_A > HassasSayı_B) sonuç = 1;
+                            else if (HassasSayı_A < HassasSayı_B) sonuç = -1;
                             break;
 
                         case Tür_.TamSayı:
@@ -483,7 +501,7 @@ namespace ArgeMup.HazirKod
                 object BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
                 bool Tersten;
 
-                enum Tür_ { Yazı, Sayı, TamSayı, Bit, TarihSaat };
+                enum Tür_ { Yazı, Sayı, HassasSayı, TamSayı, Bit, TarihSaat };
                 Tür_ Tür;
 
                 public _Sıralayıcı_Eleman_(int SıraNo, object BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, bool Tersten)
@@ -494,6 +512,7 @@ namespace ArgeMup.HazirKod
 
                     if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) Tür = Tür_.Yazı;
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) Tür = Tür_.Sayı;
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is decimal) Tür = Tür_.HassasSayı;
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) Tür = Tür_.TamSayı;
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) Tür = Tür_.Bit;
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) Tür = Tür_.TarihSaat;
@@ -519,6 +538,14 @@ namespace ArgeMup.HazirKod
 
                             if (Sayı_A > Sayı_B) sonuç = 1;
                             else if (Sayı_A < Sayı_B) sonuç = -1;
+                            break;
+
+                        case Tür_.HassasSayı:
+                            decimal HassasSayı_A = SıraNo < 0 ? A.Dönüştür(A.Adı, (decimal)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği) : A.Oku_HassasSayı(null, (decimal)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                            decimal HassasSayı_B = SıraNo < 0 ? B.Dönüştür(B.Adı, (decimal)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği) : B.Oku_HassasSayı(null, (decimal)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+
+                            if (HassasSayı_A > HassasSayı_B) sonuç = 1;
+                            else if (HassasSayı_A < HassasSayı_B) sonuç = -1;
                             break;
 
                         case Tür_.TamSayı:
@@ -646,6 +673,7 @@ namespace ArgeMup.HazirKod
                 {
                     if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) return Oku(ElemanAdıDizisi, (string)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) return Oku_Sayı(ElemanAdıDizisi, (double)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is decimal) return Oku_HassasSayı(ElemanAdıDizisi, (decimal)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) return Oku_TamSayı(ElemanAdıDizisi, (int)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) return Oku_Bit(ElemanAdıDizisi, (bool)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) return Oku_TarihSaat(ElemanAdıDizisi, (DateTime)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
@@ -656,6 +684,7 @@ namespace ArgeMup.HazirKod
                 {
                     if (value is string) Yaz(ElemanAdıDizisi, (string)value, SıraNo);
                     else if (value is double) Yaz(ElemanAdıDizisi, (double)value, SıraNo);
+                    else if (value is decimal) Yaz(ElemanAdıDizisi, (decimal)value, SıraNo);
                     else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
                     else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
                     else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
@@ -702,6 +731,10 @@ namespace ArgeMup.HazirKod
             {
                 Yaz(ElemanAdıDizisi, Sayı.ToString(System.Globalization.CultureInfo.InvariantCulture), SıraNo);
             }
+            public void Yaz(string ElemanAdıDizisi, decimal HassasSayı, int SıraNo)
+            {
+                Yaz(ElemanAdıDizisi, HassasSayı.ToString(System.Globalization.CultureInfo.InvariantCulture), SıraNo);
+            }
             public void Yaz(string ElemanAdıDizisi, int TamSayı, int SıraNo)
             {
                 Yaz(ElemanAdıDizisi, TamSayı.ToString(), SıraNo);
@@ -730,6 +763,11 @@ namespace ArgeMup.HazirKod
                 return okunan;
             }
             public double Oku_Sayı(string ElemanAdıDizisi, double BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
+            {
+                string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
+                return Dönüştür(içerik, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği);
+            }
+            public decimal Oku_HassasSayı(string ElemanAdıDizisi, decimal BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
             {
                 string içerik = Oku(ElemanAdıDizisi, null, SıraNo);
                 return Dönüştür(içerik, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği);
@@ -999,6 +1037,10 @@ namespace ArgeMup.HazirKod
         {
             Bul(ElemanAdıDizisi, true, false).Yaz(null, Sayı, SıraNo);
         }
+        public void Yaz(string ElemanAdıDizisi, decimal HassasSayı, int SıraNo = 0)
+        {
+            Bul(ElemanAdıDizisi, true, false).Yaz(null, HassasSayı, SıraNo);
+        }
         public void Yaz(string ElemanAdıDizisi, int TamSayı, int SıraNo = 0)
         {
             Bul(ElemanAdıDizisi, true, false).Yaz(null, TamSayı, SıraNo);
@@ -1034,6 +1076,13 @@ namespace ArgeMup.HazirKod
             if (bulunan == null) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
 
             return bulunan.Oku_Sayı(null, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+        }
+        public decimal Oku_HassasSayı(string ElemanAdıDizisi, decimal BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
+        {
+            IDepo_Eleman bulunan = Bul(ElemanAdıDizisi);
+            if (bulunan == null) return BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği;
+
+            return bulunan.Oku_HassasSayı(null, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
         }
         public int Oku_TamSayı(string ElemanAdıDizisi, int BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
         {
@@ -1256,6 +1305,7 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
             {
                 if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) return Oku(ElemanAdıDizisi, (string)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                 else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) return Oku_Sayı(ElemanAdıDizisi, (double)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is decimal) return Oku_HassasSayı(ElemanAdıDizisi, (decimal)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                 else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) return Oku_TamSayı(ElemanAdıDizisi, (int)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                 else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) return Oku_Bit(ElemanAdıDizisi, (bool)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                 else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) return Oku_TarihSaat(ElemanAdıDizisi, (DateTime)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
@@ -1266,6 +1316,7 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
             {
                 if (value is string) Yaz(ElemanAdıDizisi, (string)value, SıraNo);
                 else if (value is double) Yaz(ElemanAdıDizisi, (double)value, SıraNo);
+                else if (value is decimal) Yaz(ElemanAdıDizisi, (decimal)value, SıraNo);
                 else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
                 else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
                 else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
@@ -1407,6 +1458,7 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                 {
                     if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is string) return Oku(ElemanAdıDizisi, (string)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is double) return Oku_Sayı(ElemanAdıDizisi, (double)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+                    else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is decimal) return Oku_HassasSayı(ElemanAdıDizisi, (decimal)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is int) return Oku_TamSayı(ElemanAdıDizisi, (int)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is bool) return Oku_Bit(ElemanAdıDizisi, (bool)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
                     else if (BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği is DateTime) return Oku_TarihSaat(ElemanAdıDizisi, (DateTime)BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
@@ -1417,6 +1469,7 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                 {
                     if (value is string) Yaz(ElemanAdıDizisi, (string)value, SıraNo);
                     else if (value is double) Yaz(ElemanAdıDizisi, (double)value, SıraNo);
+                    else if (value is decimal) Yaz(ElemanAdıDizisi, (decimal)value, SıraNo);
                     else if (value is int) Yaz(ElemanAdıDizisi, (int)value, SıraNo);
                     else if (value is bool) Yaz(ElemanAdıDizisi, (bool)value, SıraNo);
                     else if (value is DateTime) Yaz(ElemanAdıDizisi, (DateTime)value, SıraNo);
@@ -1452,6 +1505,15 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                 if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
                 AsılEleman.Yaz(ElemanAdıDizisi, Sayı, SıraNo);
+                Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+
+                Depo.Kilit.ReleaseMutex();
+            }
+            public void Yaz(string ElemanAdıDizisi, decimal HassasSayı, int SıraNo)
+            {
+                if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+                AsılEleman.Yaz(ElemanAdıDizisi, HassasSayı, SıraNo);
                 Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
 
                 Depo.Kilit.ReleaseMutex();
@@ -1508,6 +1570,16 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
                 if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
                 double okunan = AsılEleman.Oku_Sayı(ElemanAdıDizisi, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+
+                Depo.Kilit.ReleaseMutex();
+
+                return okunan;
+            }
+            public decimal Oku_HassasSayı(string ElemanAdıDizisi, decimal BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, int SıraNo)
+            {
+                if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+                decimal okunan = AsılEleman.Oku_HassasSayı(ElemanAdıDizisi, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
 
                 Depo.Kilit.ReleaseMutex();
 
@@ -1658,6 +1730,15 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
 
             Kilit.ReleaseMutex();
         }
+        public void Yaz(string ElemanAdıDizisi, decimal HassasSayı, int SıraNo = 0)
+        {
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+            Depo.Yaz(ElemanAdıDizisi, HassasSayı, SıraNo);
+            EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
+
+            Kilit.ReleaseMutex();
+        }
         public void Yaz(string ElemanAdıDizisi, int TamSayı, int SıraNo = 0)
         {
             if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
@@ -1710,6 +1791,16 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
             if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
             double okunan = Depo.Oku_Sayı(ElemanAdıDizisi, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
+
+            Kilit.ReleaseMutex();
+
+            return okunan;
+        }
+        public decimal Oku_HassasSayı(string ElemanAdıDizisi, decimal BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0)
+        {
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+            decimal okunan = Depo.Oku_HassasSayı(ElemanAdıDizisi, BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği, SıraNo);
 
             Kilit.ReleaseMutex();
 

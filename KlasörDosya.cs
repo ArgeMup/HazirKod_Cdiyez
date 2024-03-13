@@ -284,41 +284,52 @@ namespace ArgeMup.HazirKod
 
         public class AğÜzerinde_ : IDisposable
         {
-            public const string Sürüm = "V1.0";
+            public const string Sürüm = "V1.1";
             public Uri Url;
-            public string HedefDosyaYolu;
+            public object HedefDosyaYolu_Veya_İçeriği;
             public bool KontrolTamamlandı = false;
             public bool Sonuç = false;
 
             System.Net.Http.HttpClient İstemci = null;
 
-            //                                                           Sonuç İndirilenDosya_url İndirilenDosya_Adı
-            public AğÜzerinde_(Uri Url, string HedefDosyaYolu, Action<bool, Uri, string> GeriBildirim_Tamamlandı = null, int ZamanAşımı_msn = 15000)
+            /// <param name="HedefDosyaYolu">Boş ise içerik bayt dizisi olarak döndürülür</param>
+            /// <param name="GeriBildirim_Tamamlandı">Sonuç İndirilenDosya_url İndirilenDosya_Adı_Veya_İçeriği/param>                                                   
+            public AğÜzerinde_(Uri Url, string HedefDosyaYolu, Action<bool, Uri, object> GeriBildirim_Tamamlandı = null, int ZamanAşımı_msn = 15000)
             {
                 this.Url = Url;
-                this.HedefDosyaYolu = HedefDosyaYolu;
+                HedefDosyaYolu_Veya_İçeriği = HedefDosyaYolu;
 
                 System.Threading.Tasks.Task.Run(async () =>
                 {
                     await System.Threading.Tasks.Task.Delay(1); //eşzamanlı çalışma için
 
-                    if (!BaşkaBirYerdeAçıkMı(HedefDosyaYolu, ZamanAşımı_msn))
+                    if (HedefDosyaYolu.DoluMu(true))
                     {
+                        if (BaşkaBirYerdeAçıkMı(HedefDosyaYolu, ZamanAşımı_msn)) return;
+                        
                         string kls = Path.GetDirectoryName(HedefDosyaYolu);
-                        if (kls.DoluMu(true)) Klasör.Oluştur(Path.GetDirectoryName(HedefDosyaYolu));
+                        if (kls.DoluMu(true) && !Klasör.Oluştur(kls)) return;
+                    }
 
-                        using (İstemci = new System.Net.Http.HttpClient())
+                    using (İstemci = new System.Net.Http.HttpClient())
+                    {
+                        İstemci.Timeout = TimeSpan.FromMilliseconds(ZamanAşımı_msn);
+
+                        using (System.Net.Http.HttpResponseMessage cevap = await İstemci.GetAsync(Url))
                         {
-                            İstemci.Timeout = TimeSpan.FromMilliseconds(ZamanAşımı_msn);
-
-                            using (System.Net.Http.HttpResponseMessage cevap = await İstemci.GetAsync(Url))
+                            if (cevap.IsSuccessStatusCode)
                             {
-                                if (cevap.IsSuccessStatusCode)
-                                {
-                                    byte[] içerik = await cevap.Content.ReadAsByteArrayAsync();
-                                    File.WriteAllBytes(HedefDosyaYolu, içerik);
+                                byte[] içerik = await cevap.Content.ReadAsByteArrayAsync();
 
+                                if (HedefDosyaYolu.DoluMu(true))
+                                {
+                                    File.WriteAllBytes(HedefDosyaYolu, içerik);
                                     Sonuç = File.Exists(HedefDosyaYolu);
+                                }
+                                else
+                                {
+                                    HedefDosyaYolu_Veya_İçeriği = içerik;
+                                    Sonuç = içerik != null;
                                 }
                             }
                         }
@@ -327,7 +338,7 @@ namespace ArgeMup.HazirKod
                 {
                     Durdur();
 
-                    GeriBildirim_Tamamlandı?.Invoke(Sonuç, Url, HedefDosyaYolu);
+                    GeriBildirim_Tamamlandı?.Invoke(Sonuç, Url, HedefDosyaYolu_Veya_İçeriği);
                 });
             }
             void Durdur()
@@ -401,7 +412,7 @@ namespace ArgeMup.HazirKod
                         System.Threading.Tasks.Task.Delay(100).Wait();
                     }
 
-                    void GeriBildirim_İşlemi(bool Onay, Uri uri, string Hedef)
+                    void GeriBildirim_İşlemi(bool Onay, Uri uri, object Hedef)
                     {
                         Interlocked.Increment(ref Sayac_Tamamlandı);
                     }

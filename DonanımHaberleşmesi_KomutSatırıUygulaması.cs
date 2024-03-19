@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 {
-    public class KomutSatırıUygulaması_ : IDisposable, IDonanımHaberlleşmesi
+    public class KomutSatırıUygulaması_ : IDisposable, IDonanımHaberleşmesi
     {
         public const string Sürüm = "V1.1";
 
@@ -120,22 +120,22 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
 
         #region IDonanımHaberlleşmesi
-        bool IDonanımHaberlleşmesi.BağlantıKurulduMu()
+        bool IDonanımHaberleşmesi.BağlantıKurulduMu()
         {
             return Uygulama == null ? false : !Uygulama.HasExited;
         }
-        void IDonanımHaberlleşmesi.Durdur()
+        void IDonanımHaberleşmesi.Durdur()
         {
             Durdur(true);
         }
-        void IDonanımHaberlleşmesi.Gönder(byte[] Bilgi, string Alıcı)
+        void IDonanımHaberleşmesi.Gönder(byte[] Bilgi, string Alıcı)
         {
             if (Uygulama == null || Uygulama.HasExited) throw new Exception("Bağlantı Kurulmadı");
 
             Uygulama.StandardInput.Write(Bilgi);
             Uygulama.StandardInput.Flush();
         }
-        void IDonanımHaberlleşmesi.Gönder(string Bilgi, string Alıcı)
+        void IDonanımHaberleşmesi.Gönder(string Bilgi, string Alıcı)
         {
             if (Uygulama == null || Uygulama.HasExited) throw new Exception("Bağlantı Kurulmadı");
 

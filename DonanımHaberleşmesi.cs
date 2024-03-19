@@ -5,7 +5,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
     public enum GeriBildirim_Türü_ { BağlantıKurulmasıTekrarDenecek, BağlantıKuruldu, BilgiGeldi, BağlantıKoptu, Durduruldu };
     public delegate void GeriBildirim_Islemi_(string Kaynak, GeriBildirim_Türü_ Tür, object İçerik, object Hatırlatıcı);
 
-    public interface IDonanımHaberlleşmesi
+    public interface IDonanımHaberleşmesi
     {
         bool BağlantıKurulduMu();
         void Durdur();

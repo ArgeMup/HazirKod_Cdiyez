@@ -8,7 +8,7 @@
 
     namespace ArgeMup.HazirKod.DonanımHaberleşmesi
     {
-        public class SeriPort_ : IDisposable, IDonanımHaberlleşmesi
+        public class SeriPort_ : IDisposable, IDonanımHaberleşmesi
         {
             public const string Sürüm = "V1.1";
 
@@ -146,21 +146,21 @@
             }
 
             #region IDonanımHaberlleşmesi
-            bool IDonanımHaberlleşmesi.BağlantıKurulduMu()
+            bool IDonanımHaberleşmesi.BağlantıKurulduMu()
             {
                 return SeriPort == null ? false : SeriPort.IsOpen;
             }
-            void IDonanımHaberlleşmesi.Durdur()
+            void IDonanımHaberleşmesi.Durdur()
             {
                 Durdur(true);
             }
-            void IDonanımHaberlleşmesi.Gönder(byte[] Bilgi, string Alıcı)
+            void IDonanımHaberleşmesi.Gönder(byte[] Bilgi, string Alıcı)
             {
                 if (SeriPort == null || !SeriPort.IsOpen) throw new Exception("Bağlantı Kurulmadı");
 
                 SeriPort.Write(Bilgi, 0, Bilgi.Length);
             }
-            void IDonanımHaberlleşmesi.Gönder(string Bilgi, string Alıcı)
+            void IDonanımHaberleşmesi.Gönder(string Bilgi, string Alıcı)
             {
                 if (SeriPort == null || !SeriPort.IsOpen) throw new Exception("Bağlantı Kurulmadı");
 

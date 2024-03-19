@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 {
-    public class UdpDinleyici_ : IDisposable, IDonanımHaberlleşmesi
+    public class UdpDinleyici_ : IDisposable, IDonanımHaberleşmesi
     {
         public const string Sürüm = "V1.2";
 
@@ -124,19 +124,19 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
 
         #region IDonanımHaberlleşmesi
-        bool IDonanımHaberlleşmesi.BağlantıKurulduMu()
+        bool IDonanımHaberleşmesi.BağlantıKurulduMu()
         {
             throw new Exception("Udp için Kullanılamaz");
         }
-        void IDonanımHaberlleşmesi.Durdur()
+        void IDonanımHaberleşmesi.Durdur()
         {
             Durdur(true);
         }
-        void IDonanımHaberlleşmesi.Gönder(byte[] Bilgi, string Alıcı)
+        void IDonanımHaberleşmesi.Gönder(byte[] Bilgi, string Alıcı)
         {
             Gönder(Bilgi, Alıcı);
         }
-        void IDonanımHaberlleşmesi.Gönder(string Bilgi, string Alıcı)
+        void IDonanımHaberleşmesi.Gönder(string Bilgi, string Alıcı)
         {
             byte[] dizi = Dönüştürme.D_Yazı.BaytDizisine(Bilgi + SatırSonu.Karakteri);
             Gönder(dizi, Alıcı);

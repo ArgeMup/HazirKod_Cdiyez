@@ -281,6 +281,27 @@ namespace ArgeMup.HazirKod
 
             return true;
         }
+        public static bool GüncelMi(string DosyaYolu, string Sürüm)
+        {
+            if (!File.Exists(DosyaYolu)) return false;
+            if (Sürüm == "0.0") return true;
+            
+            string[] Sürümler = Sürüm.Split('.');
+            if (Sürümler.Length != 2) throw new Exception("Sürüm 0.0 şeklinde olmalı");
+
+            System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(DosyaYolu);
+
+            int Sürüm_Y = Sürümler[0].TamSayıya(), Sürüm_D = Sürümler[1].TamSayıya();
+
+            if (fvi.FileMajorPart < Sürüm_Y) return false;
+
+            if (fvi.FileMajorPart == Sürüm_Y)
+            {
+                if (fvi.FileMinorPart < Sürüm_D) return false;
+            }
+
+            return true;
+        }
 
         public class AğÜzerinde_ : IDisposable
         {

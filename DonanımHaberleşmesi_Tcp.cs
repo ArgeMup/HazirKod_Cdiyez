@@ -489,7 +489,14 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
         public void Durdur(string Alıcı)
         {
-            if (İstemciler.ContainsKey(Alıcı)) İstemciler[Alıcı].Durdur();
+            if (string.IsNullOrEmpty(Alıcı))
+            {
+                foreach (IDonanımHaberleşmesi istemci in İstemciler.Values)
+                {
+                    istemci.Durdur();
+                }
+            }
+            else if (İstemciler.ContainsKey(Alıcı)) İstemciler[Alıcı].Durdur();
         }
 
         void Görev_İşlemi_TcpSunucu()

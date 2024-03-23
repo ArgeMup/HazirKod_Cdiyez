@@ -1,6 +1,6 @@
 ﻿namespace ArgeMup.HazirKod.Ekranlar
 {
-    partial class Kullanıcılar_ÖnYüz_
+    partial class Kullanıcılar2
     {
         /// <summary> 
         /// Required designer variable.
@@ -285,7 +285,7 @@
             // 
             this.Ekran_Ayarlar.Controls.Add(this.tabControl1);
             this.Ekran_Ayarlar.Controls.Add(this.Uyarı);
-            this.Ekran_Ayarlar.Location = new System.Drawing.Point(68, 39);
+            this.Ekran_Ayarlar.Location = new System.Drawing.Point(12, 10);
             this.Ekran_Ayarlar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Ekran_Ayarlar.Name = "Ekran_Ayarlar";
             this.Ekran_Ayarlar.Size = new System.Drawing.Size(396, 226);
@@ -303,11 +303,11 @@
             this.Ekran_Giriş.Controls.Add(this.label4);
             this.Ekran_Giriş.Controls.Add(this.Ekran_Giriş_Kullanıcı);
             this.Ekran_Giriş.Controls.Add(this.label3);
-            this.Ekran_Giriş.Location = new System.Drawing.Point(470, 39);
+            this.Ekran_Giriş.Location = new System.Drawing.Point(418, 18);
             this.Ekran_Giriş.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Ekran_Giriş.Name = "Ekran_Giriş";
             this.Ekran_Giriş.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
-            this.Ekran_Giriş.Size = new System.Drawing.Size(189, 222);
+            this.Ekran_Giriş.Size = new System.Drawing.Size(189, 218);
             this.Ekran_Giriş.TabIndex = 2;
             // 
             // Ekran_Giriş_Tamam
@@ -415,19 +415,16 @@
             this.label3.TabIndex = 0;
             this.label3.Text = "Kullanıcı";
             // 
-            // Kullanıcılar_ÖnYüz_
+            // Kullanıcılar
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(732, 303);
             this.Controls.Add(this.Ekran_Giriş);
             this.Controls.Add(this.Ekran_Ayarlar);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.Name = "Kullanıcılar_ÖnYüz_";
-            this.ShowIcon = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Kullanıcılar";
+            this.Name = "Kullanıcılar";
+            this.Size = new System.Drawing.Size(623, 251);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.Kullanıcılar_Ayraç.Panel2.ResumeLayout(false);
@@ -440,7 +437,6 @@
             this.Roller_Ayraç.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Roller_Tablo)).EndInit();
             this.Ekran_Ayarlar.ResumeLayout(false);
-            this.Ekran_Ayarlar.PerformLayout();
             this.Ekran_Giriş.ResumeLayout(false);
             this.Ekran_Giriş.PerformLayout();
             this.ResumeLayout(false);

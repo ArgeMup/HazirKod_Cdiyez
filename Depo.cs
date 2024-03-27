@@ -1172,6 +1172,7 @@ namespace ArgeMup.HazirKod
 
             if (!string.IsNullOrEmpty(YazıOlarakElemanlar))
             {
+                YazıOlarakElemanlar = YazıOlarakElemanlar.Replace(Depo_Ayraçlar.Eleman2.ToString(), null);
                 string[] dizi = YazıOlarakElemanlar.Split(Depo_Ayraçlar.Eleman);
                 if (dizi != null && dizi.Length > 0)
                 {

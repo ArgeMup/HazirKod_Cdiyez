@@ -315,7 +315,7 @@ namespace ArgeMup.HazirKod
 
             /// <param name="HedefDosyaYolu">Boş ise içerik bayt dizisi olarak döndürülür</param>
             /// <param name="GeriBildirim_Tamamlandı">Sonuç İndirilenDosya_url İndirilenDosya_Adı_Veya_İçeriği/param>                                                   
-            public AğÜzerinde_(Uri Url, string HedefDosyaYolu, Action<bool, Uri, object> GeriBildirim_Tamamlandı = null, int ZamanAşımı_msn = 15000)
+            public AğÜzerinde_(Uri Url, string HedefDosyaYolu, Action<bool, Uri, object> GeriBildirim_Tamamlandı = null, int ZamanAşımı_msn = 15000, Dictionary<string, string> İstekBaşlıkları = null)
             {
                 this.Url = Url;
                 HedefDosyaYolu_Veya_İçeriği = HedefDosyaYolu;
@@ -335,6 +335,15 @@ namespace ArgeMup.HazirKod
                     using (İstemci = new System.Net.Http.HttpClient())
                     {
                         İstemci.Timeout = TimeSpan.FromMilliseconds(ZamanAşımı_msn);
+                        if (İstekBaşlıkları != null)
+                        {
+                            foreach (KeyValuePair<string, string> İstekBaşlığı in İstekBaşlıkları)
+                            {
+                                if (İstekBaşlığı.Key.BoşMu(true) || İstekBaşlığı.Value.BoşMu(true)) continue;
+
+                                İstemci.DefaultRequestHeaders.Add(İstekBaşlığı.Key, İstekBaşlığı.Value);
+                            }
+                        }
 
                         using (System.Net.Http.HttpResponseMessage cevap = await İstemci.GetAsync(Url))
                         {

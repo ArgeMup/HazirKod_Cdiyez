@@ -428,7 +428,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 !Tümİzinler.Contains(İzin_AyarlardaDeğişiklikYapabilir) ||
                 GeriBildirimİşlemi_Ayarlar_Değişti == null) throw new ArgumentException("Girdileri kontrol ediniz");
 
-            AyarlarDosyaYolu = AyarlarDosyaYolu ?? Kendi.Klasörü + @"\ArgeMup.HazirKod.Ekranlar.Kullanıcılar.Ayarlar";
+            AyarlarDosyaYolu = AyarlarDosyaYolu ?? Kendi.Klasörü + @"\ArgeMup.HazirKod_Cdiyez.Ekranlar.Kullanıcılar.Ayarlar";
             if (!System.IO.File.Exists(AyarlarDosyaYolu)) _Ayarlar_Üst_ = new Ayarlar_Üst_();
             else _Ayarlar_Üst_ = Ayarlar_Üst_.Sınıf_Oluştur(typeof(Ayarlar_Üst_), AyarlarDosyaYolu.DosyaYolu_Oku_Yazı()) as Ayarlar_Üst_;
 

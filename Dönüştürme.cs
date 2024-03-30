@@ -378,7 +378,13 @@ namespace ArgeMup.HazirKod.Dönüştürme
             if (Boyut > Girdi.Length) Boyut = (int)Girdi.Length;
 
             byte[] Çıktı = new byte[Boyut];
-            Girdi.Read(Çıktı, 0, Boyut);
+			#if NET7_0_OR_GREATER
+            	Girdi.ReadExactly(Çıktı, 0, Boyut);
+			#else
+	            int adt = Girdi.Read(Çıktı, 0, Boyut);
+	            if (adt != Boyut) throw new Exception("adt != Boyut");
+			#endif
+
             return Çıktı;
         }
         public static void BaytDizisinden(byte[] Girdi, ref System.IO.MemoryStream Çıktı, int Adet = int.MinValue, int BaşlangıçKonumu = 0)

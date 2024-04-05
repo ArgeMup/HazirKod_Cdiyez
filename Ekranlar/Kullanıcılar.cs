@@ -35,9 +35,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                     Ekran_Giriş_Kullanıcı.Items.AddRange(Kullanıcılar._Ayarlar_Üst_.KullanıcılarVeParolalar.Keys.ToArray());
 
                     Width = Ekran_Giriş_YeniParola_2.Width * 2;
-                    Left = (Width - Ekran_Giriş.Width) / 2;
                     Height = Ekran_Giriş_Tamam.Top + Ekran_Giriş_Tamam.Height + 50;
-                    Top = (Height - Ekran_Giriş_Tamam.Top - Ekran_Giriş_Tamam.Height - 50) / 2;
                     Ekran_Giriş.Dock = DockStyle.Fill;
                     Ekran_Giriş_Parola.KeyDown += Ekran_Giriş_Parola_KeyDown;
                     break;
@@ -57,9 +55,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                     Ekran_Giriş_Tamam.Text = "Kaydet";
 
                     Width = Ekran_Giriş_YeniParola_2.Width * 2;
-                    Left = (Width - Ekran_Giriş.Width) / 2;
                     Height = Ekran_Giriş_Tamam.Top + Ekran_Giriş_Tamam.Height + 50;
-                    Top = (Height - Ekran_Giriş_Tamam.Top - Ekran_Giriş_Tamam.Height - 50) / 2;
                     Ekran_Giriş.Dock = DockStyle.Fill;
                     Ekran_Giriş_YeniParolaTekrar.KeyDown += Ekran_Giriş_Parola_KeyDown;
                     break;
@@ -102,6 +98,9 @@ namespace ArgeMup.HazirKod.Ekranlar
                     Uyarı.Visible = !Kullanıcılar._Ayarlar_Üst_.ParolaKontrolüGerekiyorMu;
                     break;
             }
+
+            System.Drawing.Size pencere = Screen.PrimaryScreen.WorkingArea.Size;
+            Location = new System.Drawing.Point(pencere.Width / 2 - Width / 2, pencere.Height / 2 - Height / 2); ;
         }
 
         Kullanıcılar.Ayarlar_Üst_ Sınıf_Kopyala(Kullanıcılar.Ayarlar_Üst_ Kaynak)
@@ -237,7 +236,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 Hide();
                 while (Kullanıcılar._Ayarlar_Üst_.GeçerliKullanıcı == null)
                 {
-                    MessageBox.Show("İlk kez bir parola girildiğinden, kullanıcı girişi yapınız", Text);
+                    MessageBox.Show("İlk kez bir parola girildiğinden, kullanıcı girişi yapılması gerekmektedir.", Text);
 
                     #region Kullanıcınn giriş yapması
                     bool Bitti = false;
@@ -289,7 +288,14 @@ namespace ArgeMup.HazirKod.Ekranlar
                         return Ayarlar_Kaydet(Kullanıcılar._Ayarlar_Üst_.KökParola, true);
 
                     case ListeKutusu.İşlemTürü.Silindi:
-                        Kullanıcılar._Ayarlar_Üst_.Rol_Sil(Adı);
+                        if (!Kullanıcılar._Ayarlar_Üst_.Rol_Sil(Adı))
+                        {
+                            MessageBox.Show("Kullanımda olan bir rolü silmek istiyorsunuz." + Environment.NewLine + Environment.NewLine +
+                                "Öncelikle ilgili rolü kullanan kişileri düzenleyiniz.",
+                                "İşlem iptal edildi");
+                            return false;
+                        }
+
                         return Ayarlar_Kaydet(Kullanıcılar._Ayarlar_Üst_.KökParola, true);
                 }
             }
@@ -385,6 +391,13 @@ namespace ArgeMup.HazirKod.Ekranlar
                 return _Ayarlar_Üst_.KökParola;
             }
         }
+        public static byte[] KökParola_Dizi
+        {
+            get
+            {
+                return _Ayarlar_Üst_.KökParola_Dizi;
+            }
+        }
         public static bool ParolaKontrolüGerekiyorMu
         {
             get
@@ -419,7 +432,8 @@ namespace ArgeMup.HazirKod.Ekranlar
         /// <br>AyarlarDosyaYolu ile belirtilen dosya içeriği DEĞİŞTİRİLMEMELİDİR.</br>
         /// </summary>
         /// <param name="AyarlarDosyaYolu">Mevcut kullanıcı bilgilerinin kaydedildiği dosyanın adı</param>
-        public delegate void GeriBildirimİşlemi_Önyüz_Ayarlar_Değişti(string AyarlarDosyaYolu, string Mevcut_KökParola, string Eski_KökParola);
+        /// <param name="AyarlarDosyaYolu_İçeriği">Kaydedilecek olan içerik, bu bilgiler AyarlarDosyaYolu içerisine KAYDEDİLMELİDİR</param>
+        public delegate void GeriBildirimİşlemi_Önyüz_Ayarlar_Değişti(string AyarlarDosyaYolu, string AyarlarDosyaYolu_İçeriği, string Mevcut_KökParola, string Eski_KökParola);
 
         public static void Başlat(IEnumerable<Enum> Tümİzinler, Enum İzin_AyarlardaDeğişiklikYapabilir, GeriBildirimİşlemi_Önyüz_Ayarlar_Değişti GeriBildirimİşlemi_Ayarlar_Değişti, string AyarlarDosyaYolu = null, string SihirliKelime = null)
         {
@@ -445,10 +459,12 @@ namespace ArgeMup.HazirKod.Ekranlar
         }
         public static Form Önyüz_Giriş(GeriBildirimİşlemi_Önyüz_Giriş GeriBildirimİşlemi, bool Küçültülmüş = false, float KarakterKümesi_Büyüklüğü = 0)
         {
+            _Ayarlar_Üst_.KökParola = null;
+            _Ayarlar_Üst_.KökParola_Dizi = null;
+
             if (GeriBildirimİşlemi == null) throw new ArgumentException("GeriBildirimİşlemi_Başarılı == null");
             if (_Ayarlar_Üst_ == null) throw new Exception("Ayarlar_Üst == null");
 
-            _Ayarlar_Üst_.KökParola = null;
             if (!_Ayarlar_Üst_.ParolaKontrolüGerekiyorMu) { GeriBildirimİşlemi(true); return null; }
             _Ayarlar_Üst_.Ayarlar_Alt = null;
 
@@ -507,6 +523,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             [Değişken_.Niteliği.Adını_Değiştir("A")] public string Ayarlar_Alt_Yazı;
 
             [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public string KökParola = null;
+            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public byte[] KökParola_Dizi = null;
             [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public bool ParolaKontrolüGerekiyorMu = true;
             [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public string SihirliKelime;
             [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public string AyarlarDosyaYolu;
@@ -648,9 +665,8 @@ namespace ArgeMup.HazirKod.Ekranlar
                 if (KökParola.DoluMu(true)) Ayarlar_Alt_Yazı = Ayarlar_Alt_Yazı.Karıştır(KökParola);
                 Ayarlar_Alt_Yazı = Ayarlar_Alt_Yazı.BaytDizisine().Taban64e();
                 string içerik_ayarlar_üst = Sınıf_Kaydet(this);
-                AyarlarDosyaYolu.DosyaYolu_Yaz(içerik_ayarlar_üst);
 
-                GeriBildirimİşlemi_Ayarlar_Değişti(AyarlarDosyaYolu, KökParola, Eski_KökParola);
+                GeriBildirimİşlemi_Ayarlar_Değişti(AyarlarDosyaYolu, içerik_ayarlar_üst, KökParola, Eski_KökParola);
                 return true;
             }
             
@@ -692,12 +708,15 @@ namespace ArgeMup.HazirKod.Ekranlar
                 
                 Ayarlar_Alt.Kişiler.Where(x => x.RolAdı == Eski_RolAdı).ToList().ForEach(x => x.RolAdı = Yeni_RolAdı);
             }
-            public void Rol_Sil(string RolAdı)
+            public bool Rol_Sil(string RolAdı)
             {
                 if (Ayarlar_Alt == null || RolAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || RolAdı.BoşMu(true) " + RolAdı);
 
+                var bulunanlar = Ayarlar_Alt.Kişiler.Where(x => x.RolAdı == RolAdı);
+                if (bulunanlar.Count() > 0) return false;
+
                 Ayarlar_Alt.Roller.Remove(RolAdı);
-                Ayarlar_Alt.Kişiler.Where(x => x.RolAdı == RolAdı).ToList().ForEach(x => x.RolAdı = null);
+                return true;
             }
             public void Parola_EkleDeğiştirSil(string KullanıcıAdı, string Parola)
             {
@@ -708,12 +727,20 @@ namespace ArgeMup.HazirKod.Ekranlar
                     //sil
                     KullanıcılarVeParolalar.Remove(KullanıcıAdı);
 
-                    if (KullanıcılarVeParolalar.Count() <= 0) KökParola = null;
+                    if (KullanıcılarVeParolalar.Count() <= 0) 
+                    { 
+                        KökParola = null;
+                        KökParola_Dizi = null;
+                    }
                 }
                 else
                 {
                     //ekle değiştir
-                    if (KökParola.BoşMu(true)) KökParola = Rastgele.Yazı(64);
+                    if (KökParola.BoşMu(true))
+                    {
+                        KökParola_Dizi = Rastgele.BaytDizisi(32);
+                        KökParola = Dönüştürme.D_HexYazı.BaytDizisinden( KökParola_Dizi );
+                    }
 
                     string kullanıcı_parolası = ArgeMup.HazirKod.Dönüştürme.D_GeriDönülemezKarmaşıklaştırmaMetodu.Yazıdan(Parola, 32);
                     kullanıcı_parolası = KullanıcıAdı + kullanıcı_parolası + SihirliKelime;
@@ -742,15 +769,17 @@ namespace ArgeMup.HazirKod.Ekranlar
                         if (GeçerliKullanıcı != null)
                         {
                             KökParola = oluşturulan_kök_parola;
+                            KökParola_Dizi = Dönüştürme.D_HexYazı.BaytDizisine( KökParola );
                             HatalıGirişDenemesi_Sayısı = 0;
                             return true;
                         }
                     }
                 }
 
-#if DEBUG
-                System.Threading.Thread.Sleep(Rastgele.Sayı(500, 5500));
-#endif
+				#if !DEBUG
+                	System.Threading.Thread.Sleep(Rastgele.Sayı(500, 5500));
+				#endif
+				
                 HatalıGirişDenemesi_Sayısı++;
                 return false;
             }

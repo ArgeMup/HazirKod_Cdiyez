@@ -426,8 +426,8 @@
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Kullanıcılar_ÖnYüz_";
             this.ShowIcon = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Kullanıcılar";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+            this.Text = "Kullanıcı İşlemleri";
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.Kullanıcılar_Ayraç.Panel2.ResumeLayout(false);
@@ -440,7 +440,6 @@
             this.Roller_Ayraç.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Roller_Tablo)).EndInit();
             this.Ekran_Ayarlar.ResumeLayout(false);
-            this.Ekran_Ayarlar.PerformLayout();
             this.Ekran_Giriş.ResumeLayout(false);
             this.Ekran_Giriş.PerformLayout();
             this.ResumeLayout(false);

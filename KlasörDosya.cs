@@ -74,13 +74,30 @@ namespace ArgeMup.HazirKod
                 if (dsy_lar.Length == 0 && kls_ler.Length == 0) Sil(_Yolu_);
             }
         }
-        public static bool Kopyala(string Kaynak, string Hedef, bool HedeftekiFazlaKlasörVeDosyalarıSil = false, bool DoğrulamaKodunuKontrolEt_Yavaşlatır = true, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti)
+        public static bool Kopyala(string Kaynak, string Hedef, bool HedeftekiFazlaKlasörVeDosyalarıSil = false, bool DoğrulamaKodunuKontrolEt_Yavaşlatır = true, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti, bool AynıDoğrulamaKodunaSahipİse_DiğerFarklılıklarıGörmezdenGel = false)
         {
+            if (AynıDoğrulamaKodunaSahipİse_DiğerFarklılıklarıGörmezdenGel) DoğrulamaKodunuKontrolEt_Yavaşlatır = true;
+
             Klasör_ Kaynaktakiler = new Klasör_(Kaynak, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false, DoğrulamaKodunuÜret: DoğrulamaKodunuKontrolEt_Yavaşlatır);
             Klasör_ Hedeftekiler = new Klasör_(Hedef, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı, BitmesiniBekle: false, DoğrulamaKodunuÜret: DoğrulamaKodunuKontrolEt_Yavaşlatır);
             while (ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın && (Kaynaktakiler.Dosyalar == null || Hedeftekiler.Dosyalar == null)) Thread.Sleep(5);
 
             Klasör_.Farklılık_ Farklar = Hedeftekiler.AslınaUygunHaleGetir(Kaynaktakiler, HedeftekiFazlaKlasörVeDosyalarıSil);
+
+            if (AynıDoğrulamaKodunaSahipİse_DiğerFarklılıklarıGörmezdenGel && Farklar.Dosyalar.Count != 0)
+            {
+                List<Klasör_.Fark_Dosya_> Silinecekler = new List<Klasör_.Fark_Dosya_>();
+
+                foreach (Klasör_.Fark_Dosya_ Farklılık in Farklar.Dosyalar)
+                {
+                    if (Farklılık.Aynı_Doğrulama_Kodu) Silinecekler.Add(Farklılık);
+                }
+
+                foreach (Klasör_.Fark_Dosya_ Farklılık in Silinecekler)
+                {
+                    Farklar.Dosyalar.Remove(Farklılık);
+                }
+            }
 
             return Kaynaktakiler.FizikselOlarakMevcut && (Farklar.Klasörler.Count == 0) && (Farklar.Dosyalar.Count == 0);
         }

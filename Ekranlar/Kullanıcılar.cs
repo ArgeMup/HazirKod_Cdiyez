@@ -12,6 +12,7 @@ namespace ArgeMup.HazirKod.Ekranlar
     partial class Kullanıcılar_ÖnYüz_ : Form
     {
         public enum İşlemTürü_ { Boşta, Giriş, ParolaDeğiştirme, Ayarlar };
+        public Kullanıcılar.GirişİşlemiSonucu_ GirişİşlemiSonucu;
 
         Kullanıcılar.Ayarlar_Üst_ Ayarlar_Üst_Kopya;
         ListeKutusu Kullanıcılar_Liste;
@@ -38,6 +39,8 @@ namespace ArgeMup.HazirKod.Ekranlar
                     Height = Ekran_Giriş_Tamam.Top + Ekran_Giriş_Tamam.Height + 50;
                     Ekran_Giriş.Dock = DockStyle.Fill;
                     Ekran_Giriş_Parola.KeyDown += Ekran_Giriş_Parola_KeyDown;
+                    
+                    FormClosing += (a, b) => { if (GirişİşlemiSonucu == Kullanıcılar.GirişİşlemiSonucu_.Boşta) GirişİşlemiSonucu = Kullanıcılar.GirişİşlemiSonucu_.Kapatıldı; };
                     break;
 
                 case İşlemTürü_.ParolaDeğiştirme:
@@ -243,7 +246,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                     Kullanıcılar.Önyüz_Giriş(GeriBildirimİşlemi_Önyüz_Giriş, false, Font.Size);
                     while (!Bitti && ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın) { System.Threading.Thread.Sleep(35); Application.DoEvents(); }
 
-                    void GeriBildirimİşlemi_Önyüz_Giriş(bool Başarılı)
+                    void GeriBildirimİşlemi_Önyüz_Giriş(Kullanıcılar.GirişİşlemiSonucu_ GirişİşlemiSonucu)
                     {
                         Bitti = true;
                     }
@@ -338,7 +341,13 @@ namespace ArgeMup.HazirKod.Ekranlar
             if (Ekran_Giriş_Tamam.Text == "Tamam")
             {
                 //Giriş
-                if (!Kullanıcılar._Ayarlar_Üst_.Parola_Kontrol(Ekran_Giriş_Kullanıcı.Text, Ekran_Giriş_Parola.Text)) return;
+                if (!Kullanıcılar._Ayarlar_Üst_.Parola_Kontrol(Ekran_Giriş_Kullanıcı.Text, Ekran_Giriş_Parola.Text))
+                {
+                    GirişİşlemiSonucu = Kullanıcılar.GirişİşlemiSonucu_.Başarısız;
+                    return;
+                }
+                    
+                GirişİşlemiSonucu = Kullanıcılar.GirişİşlemiSonucu_.Başarılı;
             }
             else
             {
@@ -419,7 +428,8 @@ namespace ArgeMup.HazirKod.Ekranlar
                 return null;
             }
         }
-        public delegate void GeriBildirimİşlemi_Önyüz_Giriş(bool Başarılı);
+        public enum GirişİşlemiSonucu_ { Boşta, Başarısız, Kapatıldı, Başarılı };
+        public delegate void GeriBildirimİşlemi_Önyüz_Giriş(GirişİşlemiSonucu_ GirişİşlemiSonucu);
         /// <summary>
         /// Önyüz_Ayarlar() veya Önyüz_ParolaDeğiştir() ile başlatılan bir işlem ayarlarda değişiklik yaptığında çağırılır.
         /// <br></br>
@@ -465,11 +475,11 @@ namespace ArgeMup.HazirKod.Ekranlar
             if (GeriBildirimİşlemi == null) throw new ArgumentException("GeriBildirimİşlemi_Başarılı == null");
             if (_Ayarlar_Üst_ == null) throw new Exception("Ayarlar_Üst == null");
 
-            if (!_Ayarlar_Üst_.ParolaKontrolüGerekiyorMu) { GeriBildirimİşlemi(true); return null; }
+            if (!_Ayarlar_Üst_.ParolaKontrolüGerekiyorMu) { GeriBildirimİşlemi(GirişİşlemiSonucu_.Başarılı); return null; }
             _Ayarlar_Üst_.Ayarlar_Alt = null;
 
             Kullanıcılar_ÖnYüz_ ÖnYüz = new Kullanıcılar_ÖnYüz_();
-            ÖnYüz.FormClosed += (a,b) => { GeriBildirimİşlemi(_Ayarlar_Üst_.KökParola.DoluMu(true) && _Ayarlar_Üst_.Ayarlar_Alt != null && _Ayarlar_Üst_.GeçerliKullanıcı != null); };
+            ÖnYüz.FormClosed += (a,b) => { GeriBildirimİşlemi(ÖnYüz.GirişİşlemiSonucu); };
             if (Küçültülmüş) ÖnYüz.WindowState = FormWindowState.Minimized;
             if (KarakterKümesi_Büyüklüğü > 0) ÖnYüz.Font = new System.Drawing.Font(ÖnYüz.Font.FontFamily, KarakterKümesi_Büyüklüğü);
             ÖnYüz.Başlat(Kullanıcılar_ÖnYüz_.İşlemTürü_.Giriş);

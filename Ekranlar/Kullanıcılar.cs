@@ -162,6 +162,8 @@ namespace ArgeMup.HazirKod.Ekranlar
 
             if (Adı.DoluMu())
             {
+                string Eski_KökParola = Kullanıcılar._Ayarlar_Üst_.KökParola;
+
                 switch (Türü)
                 {
                     case ListeKutusu.İşlemTürü.ElemanSeçildi:
@@ -176,7 +178,7 @@ namespace ArgeMup.HazirKod.Ekranlar
 
                     case ListeKutusu.İşlemTürü.YeniEklendi:
                         Kullanıcılar._Ayarlar_Üst_.Kullanıcı_Ekle(Adı);
-                        return Ayarlar_Kaydet(Kullanıcılar._Ayarlar_Üst_.KökParola);
+                        return Ayarlar_Kaydet(Eski_KökParola);
 
                     case ListeKutusu.İşlemTürü.AdıDeğiştirildi:
                         string mesaj = "Bu işlem ile kullanıcının parolası silinecek. Parolayı tekrar belirlemeyi unutmayınız." +
@@ -185,12 +187,12 @@ namespace ArgeMup.HazirKod.Ekranlar
                         if (Dr == DialogResult.No) return false;
 
                         Kullanıcılar._Ayarlar_Üst_.Kullanıcı_AdınıDeğiştir(Adı, YeniAdı);
-                        bool sonuç = Ayarlar_Kaydet(Kullanıcılar._Ayarlar_Üst_.KökParola);
+                        bool sonuç = Ayarlar_Kaydet(Eski_KökParola);
                         return sonuç;
 
                     case ListeKutusu.İşlemTürü.Silindi:
                         Kullanıcılar._Ayarlar_Üst_.Kullanıcı_Sil(Adı);
-                        return Ayarlar_Kaydet(Kullanıcılar._Ayarlar_Üst_.KökParola);
+                        return Ayarlar_Kaydet(Eski_KökParola);
                 }
             }
 
@@ -271,6 +273,8 @@ namespace ArgeMup.HazirKod.Ekranlar
 
             if (Adı.DoluMu())
             {
+                string Eski_KökParola = Kullanıcılar._Ayarlar_Üst_.KökParola;
+
                 switch (Türü)
                 {
                     case ListeKutusu.İşlemTürü.ElemanSeçildi:
@@ -285,11 +289,11 @@ namespace ArgeMup.HazirKod.Ekranlar
 
                     case ListeKutusu.İşlemTürü.YeniEklendi:
                         Kullanıcılar._Ayarlar_Üst_.Rol_Ekle(Adı);
-                        return Ayarlar_Kaydet(Kullanıcılar._Ayarlar_Üst_.KökParola, true);
+                        return Ayarlar_Kaydet(Eski_KökParola, true);
 
                     case ListeKutusu.İşlemTürü.AdıDeğiştirildi:
                         Kullanıcılar._Ayarlar_Üst_.Rol_AdınıDeğiştir(Adı, YeniAdı);
-                        return Ayarlar_Kaydet(Kullanıcılar._Ayarlar_Üst_.KökParola, true);
+                        return Ayarlar_Kaydet(Eski_KökParola, true);
 
                     case ListeKutusu.İşlemTürü.Silindi:
                         if (!Kullanıcılar._Ayarlar_Üst_.Rol_Sil(Adı))
@@ -300,7 +304,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                             return false;
                         }
 
-                        return Ayarlar_Kaydet(Kullanıcılar._Ayarlar_Üst_.KökParola, true);
+                        return Ayarlar_Kaydet(Eski_KökParola, true);
                 }
             }
 
@@ -692,10 +696,8 @@ namespace ArgeMup.HazirKod.Ekranlar
             }
             public void Kullanıcı_AdınıDeğiştir(string Eski_KullanıcıAdı, string Yeni_KullanıcıAdı)
             {
-                if (Ayarlar_Alt == null || Eski_KullanıcıAdı.BoşMu(true) || Yeni_KullanıcıAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || Eski_KullanıcıAdı.BoşMu(true) " + Eski_KullanıcıAdı + " || Yeni_KullanıcıAdı.BoşMu(true) " + Yeni_KullanıcıAdı);
-
-                Ayarlar_Alt.Kişiler.Where(x => x.Adı == Eski_KullanıcıAdı).ToList().ForEach(x => x.Adı = Yeni_KullanıcıAdı);
                 Kullanıcı_Sil(Eski_KullanıcıAdı);
+                Kullanıcı_Ekle(Yeni_KullanıcıAdı);
             }
             public void Kullanıcı_Sil(string KullanıcıAdı)
             {

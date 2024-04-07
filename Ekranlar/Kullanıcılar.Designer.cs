@@ -427,7 +427,7 @@
             this.Name = "Kullanıcılar_ÖnYüz_";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Kullanıcı İşlemleri";
+            this.Text = " Kullanıcı İşlemleri";
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.Kullanıcılar_Ayraç.Panel2.ResumeLayout(false);

@@ -102,6 +102,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                     break;
             }
 
+            Text = Kullanıcılar._Ayarlar_Üst_.ÖnyüzBaşlığı + Text;
             System.Drawing.Size pencere = Screen.PrimaryScreen.WorkingArea.Size;
             Location = new System.Drawing.Point(pencere.Width / 2 - Width / 2, pencere.Height / 2 - Height / 2); ;
         }
@@ -346,7 +347,8 @@ namespace ArgeMup.HazirKod.Ekranlar
                     GirişİşlemiSonucu = Kullanıcılar.GirişİşlemiSonucu_.Başarısız;
                     return;
                 }
-                    
+
+                Ekran_Giriş_Tamam.Enabled = false;
                 GirişİşlemiSonucu = Kullanıcılar.GirişİşlemiSonucu_.Başarılı;
             }
             else
@@ -445,7 +447,7 @@ namespace ArgeMup.HazirKod.Ekranlar
         /// <param name="AyarlarDosyaYolu_İçeriği">Kaydedilecek olan içerik, bu bilgiler AyarlarDosyaYolu içerisine KAYDEDİLMELİDİR</param>
         public delegate void GeriBildirimİşlemi_Önyüz_Ayarlar_Değişti(string AyarlarDosyaYolu, string AyarlarDosyaYolu_İçeriği, string Mevcut_KökParola, string Eski_KökParola);
 
-        public static void Başlat(IEnumerable<Enum> Tümİzinler, Enum İzin_AyarlardaDeğişiklikYapabilir, GeriBildirimİşlemi_Önyüz_Ayarlar_Değişti GeriBildirimİşlemi_Ayarlar_Değişti, string AyarlarDosyaYolu = null, string SihirliKelime = null)
+        public static void Başlat(IEnumerable<Enum> Tümİzinler, Enum İzin_AyarlardaDeğişiklikYapabilir, GeriBildirimİşlemi_Önyüz_Ayarlar_Değişti GeriBildirimİşlemi_Ayarlar_Değişti, string AyarlarDosyaYolu = null, string ÖnyüzBaşlığı = null, string SihirliKelime = null)
         {
             if (Tümİzinler == null || Tümİzinler.Where(x => x.GeçerliMi()).Count() == 0 ||
                 İzin_AyarlardaDeğişiklikYapabilir == null ||
@@ -464,6 +466,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             _Ayarlar_Üst_.SihirliKelime = SihirliKelime ?? "ArGeMuP Kullanıcılar_Ayarlar_";
             _Ayarlar_Üst_.GeriBildirimİşlemi_Ayarlar_Değişti = GeriBildirimİşlemi_Ayarlar_Değişti;
             _Ayarlar_Üst_.ParolaKontrolüGerekiyorMu = _Ayarlar_Üst_.KullanıcılarVeParolalar.Count > 0;
+            _Ayarlar_Üst_.ÖnyüzBaşlığı = ÖnyüzBaşlığı;
 
             if (!_Ayarlar_Üst_.ParolaKontrolüGerekiyorMu) _Ayarlar_Üst_.Ayarlar_Alt_Araİşlemler(null);
         }
@@ -542,6 +545,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public Enum İzin_AyarlardaDeğişiklikYapabilir;
             [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public Ayarlar_Alt_ Ayarlar_Alt;
             [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public GeriBildirimİşlemi_Önyüz_Ayarlar_Değişti GeriBildirimİşlemi_Ayarlar_Değişti;
+            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public string ÖnyüzBaşlığı;
             [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sabiti = Rastgele.Sayı(4, 8);
             [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sayısı;
 

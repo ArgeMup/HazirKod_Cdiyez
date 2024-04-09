@@ -32,7 +32,6 @@ namespace ArgeMup.HazirKod.Ekranlar
                 case İşlemTürü_.Giriş:
                     Ekran_Ayarlar.Visible = false;
 
-                    Kullanıcılar._Ayarlar_Üst_.GeçerliKullanıcı = null;
                     Ekran_Giriş_Kullanıcı.Items.AddRange(Kullanıcılar._Ayarlar_Üst_.KullanıcılarVeParolalar.Keys.ToArray());
 
                     Width = Ekran_Giriş_YeniParola_2.Width * 2;
@@ -123,14 +122,6 @@ namespace ArgeMup.HazirKod.Ekranlar
                 throw new Exception("DönüştürmeHatasıOldu_YeniTipiBelirle " + DeğişkeninAdı + " " + DenenenTip.ToString());
             }
         }
-        Kullanıcılar.Ayarlar_Üst_.Ayarlar_Kullanıcı_ Bul_Kullanıcı(string Adı)
-        {
-            return Kullanıcılar._Ayarlar_Üst_.Ayarlar_Alt.Kişiler.FirstOrDefault(x => x.Adı == Adı);
-        }
-        bool[] Bul_Rol(string Adı)
-        {
-            return Kullanıcılar._Ayarlar_Üst_.Ayarlar_Alt.Roller.FirstOrDefault(x => x.Key == Adı).Value;
-        }
 
         #region Ekran Ayarlar
         bool Ayarlar_Kaydet(string Eski_KökParola, bool RollerGüncellendi = false)
@@ -167,7 +158,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 switch (Türü)
                 {
                     case ListeKutusu.İşlemTürü.ElemanSeçildi:
-                        Kullanıcı = Bul_Kullanıcı(Adı);
+                        Kullanıcı = Kullanıcılar._Ayarlar_Üst_.Kullanıcı_Bul(Adı);
                         Kullanıcılar_Rol.Text = Kullanıcı.RolAdı.DoluMu() ? Kullanıcı.RolAdı : null;
 
                         Kullanıcılar_Parola.Text = Kullanıcılar._Ayarlar_Üst_.KullanıcılarVeParolalar.ContainsKey(Kullanıcı.Adı) ? "*" : null;
@@ -177,7 +168,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                         return true;
 
                     case ListeKutusu.İşlemTürü.YeniEklendi:
-                        Kullanıcılar._Ayarlar_Üst_.Kullanıcı_Ekle(Adı);
+                        Kullanıcılar._Ayarlar_Üst_.Kullanıcı_Bul(Adı, true);
                         return Ayarlar_Kaydet(Eski_KökParola);
 
                     case ListeKutusu.İşlemTürü.AdıDeğiştirildi:
@@ -211,16 +202,7 @@ namespace ArgeMup.HazirKod.Ekranlar
         {
             if (Kullanıcılar_Liste.SeçilenEleman_Adı.BoşMu()) return;
 
-            Kullanıcılar.Ayarlar_Üst_.Ayarlar_Kullanıcı_ Kullanıcı = Bul_Kullanıcı(Kullanıcılar_Liste.SeçilenEleman_Adı);
-            if (Kullanıcı == null)
-            {
-                Kullanıcı = new Kullanıcılar.Ayarlar_Üst_.Ayarlar_Kullanıcı_
-                {
-                    Adı = Kullanıcılar_Liste.SeçilenEleman_Adı
-                };
-
-                Kullanıcılar._Ayarlar_Üst_.Ayarlar_Alt.Kişiler.Add(Kullanıcı);
-            }
+            Kullanıcılar.Ayarlar_Üst_.Ayarlar_Kullanıcı_ Kullanıcı = Kullanıcılar._Ayarlar_Üst_.Kullanıcı_Bul(Kullanıcılar_Liste.SeçilenEleman_Adı, true);
 
             string Eski_KökParola = Kullanıcılar._Ayarlar_Üst_.KökParola;
             if (Kullanıcılar_Parola.Text.BoşMu(true) || Kullanıcılar_Rol.Text.BoşMu(true))
@@ -237,12 +219,12 @@ namespace ArgeMup.HazirKod.Ekranlar
             Kullanıcılar._Ayarlar_Üst_.Ayarlar_Alt_Araİşlemler(Kullanıcılar._Ayarlar_Üst_.KökParola);
             if (!Ayarlar_Kaydet(Eski_KökParola)) return;
 
-            if (Eski_KökParola.BoşMu(true) && Kullanıcılar._Ayarlar_Üst_.KökParola.DoluMu(true))
+            if (Kullanıcılar.ParolaKontrolüGerekiyorMu && Kullanıcılar._Ayarlar_Üst_.GeçerliKullanıcı == null)
             {
                 Hide();
                 while (Kullanıcılar._Ayarlar_Üst_.GeçerliKullanıcı == null)
                 {
-                    MessageBox.Show("İlk kez bir parola girildiğinden, kullanıcı girişi yapılması gerekmektedir.", Text);
+                    MessageBox.Show("Kullanıcı girişi yapılması gerekmektedir.", Text);
 
                     #region Kullanıcınn giriş yapması
                     bool Bitti = false;
@@ -256,10 +238,6 @@ namespace ArgeMup.HazirKod.Ekranlar
                 }
                 Show();
                 #endregion
-            }
-            else if (Kullanıcılar._Ayarlar_Üst_.KökParola.BoşMu(true))
-            {
-                Kullanıcılar._Ayarlar_Üst_.GeçerliKullanıcı = null;
             }
 
             Kullanıcılar_Liste_GeriBildirim_İşlemi(Kullanıcılar_Liste.SeçilenEleman_Adı, ListeKutusu.İşlemTürü.ElemanSeçildi);
@@ -278,7 +256,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 switch (Türü)
                 {
                     case ListeKutusu.İşlemTürü.ElemanSeçildi:
-                        Rol_Dizisi = Bul_Rol(Adı);
+                        Rol_Dizisi = Kullanıcılar._Ayarlar_Üst_.Rol_Bul(Adı);
                         foreach (DataGridViewRow satır in Roller_Tablo.Rows)
                         {
                             satır.Cells[Roller_Tablo_Etkin.Index].Value = Rol_Dizisi[(int)satır.Tag];
@@ -288,7 +266,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                         return true;
 
                     case ListeKutusu.İşlemTürü.YeniEklendi:
-                        Kullanıcılar._Ayarlar_Üst_.Rol_Ekle(Adı);
+                        Kullanıcılar._Ayarlar_Üst_.Rol_Bul(Adı, true);
                         return Ayarlar_Kaydet(Eski_KökParola, true);
 
                     case ListeKutusu.İşlemTürü.AdıDeğiştirildi:
@@ -325,7 +303,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 Rol_Dizisi[(int)satır.Tag] = (bool)satır.Cells[Roller_Tablo_Etkin.Index].Value;
             }
 
-            Kullanıcılar._Ayarlar_Üst_.Ayarlar_Alt.Roller[Roller_Liste.SeçilenEleman_Adı] = Rol_Dizisi;
+            Kullanıcılar._Ayarlar_Üst_.Rol_TanımınıDeğiştir(Roller_Liste.SeçilenEleman_Adı, Rol_Dizisi);
 
             Ayarlar_Kaydet(Kullanıcılar._Ayarlar_Üst_.KökParola);
         }
@@ -478,6 +456,7 @@ namespace ArgeMup.HazirKod.Ekranlar
         {
             _Ayarlar_Üst_.KökParola = null;
             _Ayarlar_Üst_.KökParola_Dizi = null;
+            _Ayarlar_Üst_.GeçerliKullanıcı = null;
 
             if (GeriBildirimİşlemi == null) throw new ArgumentException("GeriBildirimİşlemi_Başarılı == null");
             if (_Ayarlar_Üst_ == null) throw new Exception("Ayarlar_Üst == null");
@@ -688,16 +667,24 @@ namespace ArgeMup.HazirKod.Ekranlar
                 return true;
             }
             
-            public void Kullanıcı_Ekle(string KullanıcıAdı)
+            public Ayarlar_Kullanıcı_ Kullanıcı_Bul(string KullanıcıAdı, bool YoksaOluştur = false)
             {
                 if (Ayarlar_Alt == null || KullanıcıAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || KullanıcıAdı.BoşMu(true) " + KullanıcıAdı);
 
-                Ayarlar_Alt.Kişiler.Add(new Ayarlar_Kullanıcı_() { Adı = KullanıcıAdı });
+                Ayarlar_Kullanıcı_ Kullanıcı = Ayarlar_Alt.Kişiler.FirstOrDefault(x => x.Adı == KullanıcıAdı);
+
+                if (Kullanıcı == null && YoksaOluştur)
+                {
+                    Kullanıcı = new Ayarlar_Kullanıcı_() { Adı = KullanıcıAdı };
+                    Ayarlar_Alt.Kişiler.Add(Kullanıcı);
+                }
+
+                return Kullanıcı;
             }
             public void Kullanıcı_AdınıDeğiştir(string Eski_KullanıcıAdı, string Yeni_KullanıcıAdı)
             {
                 Kullanıcı_Sil(Eski_KullanıcıAdı);
-                Kullanıcı_Ekle(Yeni_KullanıcıAdı);
+                Kullanıcı_Bul(Yeni_KullanıcıAdı, true);
             }
             public void Kullanıcı_Sil(string KullanıcıAdı)
             {
@@ -708,11 +695,19 @@ namespace ArgeMup.HazirKod.Ekranlar
 
                 Parola_EkleDeğiştirSil(KullanıcıAdı, null);
             }
-            public void Rol_Ekle(string RolAdı)
+            public bool[] Rol_Bul(string RolAdı, bool YoksaOluştur = false)
             {
                 if (Ayarlar_Alt == null || RolAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || RolAdı.BoşMu(true) " + RolAdı);
 
-                Ayarlar_Alt.Roller.Add(RolAdı, new bool[Tümİzinler.Count()]);
+                bool[] Rol_tanımı = Ayarlar_Alt.Roller.FirstOrDefault(x => x.Key == RolAdı).Value;
+                
+                if (Rol_tanımı == null && YoksaOluştur)
+                {
+                    Rol_tanımı = new bool[Tümİzinler.Count()];
+                    Ayarlar_Alt.Roller.Add(RolAdı, Rol_tanımı);
+                }
+
+                return Rol_tanımı;
             }
             public void Rol_AdınıDeğiştir(string Eski_RolAdı, string Yeni_RolAdı)
             {
@@ -723,6 +718,12 @@ namespace ArgeMup.HazirKod.Ekranlar
                 Ayarlar_Alt.Roller.Add(Yeni_RolAdı, içerik);
                 
                 Ayarlar_Alt.Kişiler.Where(x => x.RolAdı == Eski_RolAdı).ToList().ForEach(x => x.RolAdı = Yeni_RolAdı);
+            }
+            public void Rol_TanımınıDeğiştir(string RolAdı, bool[] Tanımı)
+            {
+                if (Ayarlar_Alt == null || Tanımı == null || Tanımı.Length != Tümİzinler.Count() || !Ayarlar_Alt.Roller.ContainsKey(RolAdı)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || Tanımı(" + (Tanımı == null) + ") == null || Tanımı.Length(" + Tanımı.Length + ") != Tümİzinler.Count() || !Ayarlar_Alt.Roller.ContainsKey(RolAdı) " + Ayarlar_Alt.Roller.ContainsKey(RolAdı));
+
+                Ayarlar_Alt.Roller[RolAdı] = Tanımı;
             }
             public bool Rol_Sil(string RolAdı)
             {
@@ -747,7 +748,10 @@ namespace ArgeMup.HazirKod.Ekranlar
                     { 
                         KökParola = null;
                         KökParola_Dizi = null;
+                        GeçerliKullanıcı = null;
                     }
+                    
+                    if (GeçerliKullanıcı != null && GeçerliKullanıcı.Adı == KullanıcıAdı) GeçerliKullanıcı = null;
                 }
                 else
                 {

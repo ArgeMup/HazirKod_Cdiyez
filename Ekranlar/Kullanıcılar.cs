@@ -669,7 +669,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             
             public Ayarlar_Kullanıcı_ Kullanıcı_Bul(string KullanıcıAdı, bool YoksaOluştur = false)
             {
-                if (Ayarlar_Alt == null || KullanıcıAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || KullanıcıAdı.BoşMu(true) " + KullanıcıAdı);
+                if (Ayarlar_Alt == null || KullanıcıAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || KullanıcıAdı.BoşMu(" + KullanıcıAdı + ")");
 
                 Ayarlar_Kullanıcı_ Kullanıcı = Ayarlar_Alt.Kişiler.FirstOrDefault(x => x.Adı == KullanıcıAdı);
 
@@ -688,7 +688,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             }
             public void Kullanıcı_Sil(string KullanıcıAdı)
             {
-                if (Ayarlar_Alt == null || KullanıcıAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || KullanıcıAdı.BoşMu(true) " + KullanıcıAdı);
+                if (Ayarlar_Alt == null || KullanıcıAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || KullanıcıAdı.BoşMu(" + KullanıcıAdı + ")");
 
                 Ayarlar_Kullanıcı_ Kullanıcı = Ayarlar_Alt.Kişiler.FirstOrDefault(x => x.Adı == KullanıcıAdı);
                 Ayarlar_Alt.Kişiler.Remove(Kullanıcı);
@@ -697,7 +697,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             }
             public bool[] Rol_Bul(string RolAdı, bool YoksaOluştur = false)
             {
-                if (Ayarlar_Alt == null || RolAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || RolAdı.BoşMu(true) " + RolAdı);
+                if (Ayarlar_Alt == null || RolAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || RolAdı.BoşMu(" + RolAdı + ")");
 
                 bool[] Rol_tanımı = Ayarlar_Alt.Roller.FirstOrDefault(x => x.Key == RolAdı).Value;
                 
@@ -711,7 +711,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             }
             public void Rol_AdınıDeğiştir(string Eski_RolAdı, string Yeni_RolAdı)
             {
-                if (Ayarlar_Alt == null || Eski_RolAdı.BoşMu(true) || Yeni_RolAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || Eski_RolAdı.BoşMu(true) " + Eski_RolAdı + " || Yeni_RolAdı.BoşMu(true) " + Yeni_RolAdı);
+                if (Ayarlar_Alt == null || Eski_RolAdı.BoşMu(true) || Yeni_RolAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || Eski_RolAdı.BoşMu(" + Eski_RolAdı + ")" + " || Yeni_RolAdı.BoşMu(" + Yeni_RolAdı + ")");
 
                 bool[] içerik = Ayarlar_Alt.Roller[Eski_RolAdı];
                 Ayarlar_Alt.Roller.Remove(Eski_RolAdı);
@@ -721,13 +721,13 @@ namespace ArgeMup.HazirKod.Ekranlar
             }
             public void Rol_TanımınıDeğiştir(string RolAdı, bool[] Tanımı)
             {
-                if (Ayarlar_Alt == null || Tanımı == null || Tanımı.Length != Tümİzinler.Count() || !Ayarlar_Alt.Roller.ContainsKey(RolAdı)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || Tanımı(" + (Tanımı == null) + ") == null || Tanımı.Length(" + Tanımı.Length + ") != Tümİzinler.Count() || !Ayarlar_Alt.Roller.ContainsKey(RolAdı) " + Ayarlar_Alt.Roller.ContainsKey(RolAdı));
+                if (Ayarlar_Alt == null || Tanımı == null || Tanımı.Length != Tümİzinler.Count() || !Ayarlar_Alt.Roller.ContainsKey(RolAdı)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || Tanımı(" + (Tanımı == null) + ") == null || Tanımı.Length(" + Tanımı.Length + ") != Tümİzinler.Count() || !Ayarlar_Alt.Roller.ContainsKey(" + RolAdı + ") " + Ayarlar_Alt.Roller.ContainsKey(RolAdı));
 
                 Ayarlar_Alt.Roller[RolAdı] = Tanımı;
             }
             public bool Rol_Sil(string RolAdı)
             {
-                if (Ayarlar_Alt == null || RolAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || RolAdı.BoşMu(true) " + RolAdı);
+                if (Ayarlar_Alt == null || RolAdı.BoşMu(true)) throw new Exception("Ayarlar_Alt(" + (Ayarlar_Alt == null) + ") == null || RolAdı.BoşMu(" + RolAdı + ")");
 
                 var bulunanlar = Ayarlar_Alt.Kişiler.Where(x => x.RolAdı == RolAdı);
                 if (bulunanlar.Count() > 0) return false;
@@ -750,8 +750,6 @@ namespace ArgeMup.HazirKod.Ekranlar
                         KökParola_Dizi = null;
                         GeçerliKullanıcı = null;
                     }
-                    
-                    if (GeçerliKullanıcı != null && GeçerliKullanıcı.Adı == KullanıcıAdı) GeçerliKullanıcı = null;
                 }
                 else
                 {

@@ -326,7 +326,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 //Giriş
                 if (!Kullanıcılar._Ayarlar_Üst_.Parola_Kontrol(Ekran_Giriş_Kullanıcı.Text, Ekran_Giriş_Parola.Text))
                 {
-                    GirişİşlemiSonucu = Kullanıcılar.GirişİşlemiSonucu_.Başarısız;
+                    GirişİşlemiSonucu = Kullanıcılar.GirişİşlemiSonucu_.Hatalı;
                     return;
                 }
 
@@ -412,7 +412,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 return null;
             }
         }
-        public enum GirişİşlemiSonucu_ { Boşta, Başarısız, Kapatıldı, Başarılı };
+        public enum GirişİşlemiSonucu_ { Boşta, Hatalı, Kapatıldı, Başarılı };
         public delegate void GeriBildirimİşlemi_Önyüz_Giriş(GirişİşlemiSonucu_ GirişİşlemiSonucu);
         /// <summary>
         /// Önyüz_Ayarlar() veya Önyüz_ParolaDeğiştir() ile başlatılan bir işlem ayarlarda değişiklik yaptığında çağırılır.

@@ -1767,4 +1767,43 @@ namespace ArgeMup.HazirKod
     }
 }
 
+using System;
+
+namespace ArgeMup.HazirKod.GeriBildirim
+{
+    public class İlerlemeDurumu_
+    {
+        public const string Sürüm = "V1.0";
+        public bool TetiklemeSüresiDolduMu { get => Rapor != null && Environment.TickCount >= Tetikleme_Anı; }
+
+        /// <returns>1:Çalışmaya devam edebilir, 0:Durmasını iste</returns>
+        public delegate bool Rapor_(string Açıklama, int Aşama_İlerleme, int Aşama_Azamiİlerleme, int AşamaNo, int ToplamAşamaSayısı);
+
+        Rapor_ Rapor;
+        int Tetikleme_Süresi_msn, Tetikleme_Anı, ToplamAşamaSayısı;
+
+        public İlerlemeDurumu_(Rapor_ İlerlemeDurumuRaporu, int ToplamAşamaSayısı, int TetiklemeSÜresi_msn = 500)
+        {
+            if (İlerlemeDurumuRaporu == null) return;
+
+            Rapor = İlerlemeDurumuRaporu;
+
+            Tetikleme_Süresi_msn = TetiklemeSÜresi_msn;
+            Tetikleme_Anı = Environment.TickCount + Tetikleme_Süresi_msn;
+
+            this.ToplamAşamaSayısı = ToplamAşamaSayısı;
+        }
+
+        /// <returns>1:Çalışmaya devam edebilir, 0:Durması isteniyor</returns>
+        public bool Raporla(string Açıklama, int Aşama_İlerleme, int Aşama_Azamiİlerleme, int AşamaNo)
+        {
+            bool sonuç = Rapor(Açıklama, Aşama_İlerleme, Aşama_Azamiİlerleme, AşamaNo, ToplamAşamaSayısı);
+                
+            Tetikleme_Anı = Environment.TickCount + Tetikleme_Süresi_msn;
+
+            return sonuç;
+        }
+    }
+}
+
 #endif

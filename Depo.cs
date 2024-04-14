@@ -60,7 +60,7 @@ namespace ArgeMup.HazirKod
         bool Oku_Bit(string ElemanAdıDizisi, bool BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
 
         IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false, bool BağımsızKopyaOluştur = false);
-        string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları = false);
+        string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları = false, bool DoğrulamaKoduEkle = true);
         void Ekle(string ElemanAdıDizisi, string Eleman);
         void Sil(string ElemanAdıDizisi, bool Sadeceİçeriğini = false, bool SadeceElemanlarını = false);
         /// <summary>
@@ -91,9 +91,14 @@ namespace ArgeMup.HazirKod
         public static readonly char Eleman2 = '\r';
         public static readonly char AdıVeİçerik = '>';
 
-        static string Vekil_Eleman = " ?'#{n]$ ";
-        static string Vekil_Eleman2 = " ?'#{r]$ ";
-        static string Vekil_AdıVeİçerik = " ?'#{b]$ ";
+        static readonly string Vekil_Eleman = " ?'#{n]$ ";
+        static readonly string Vekil_Eleman2 = " ?'#{r]$ ";
+        static readonly string Vekil_AdıVeİçerik = " ?'#{b]$ ";
+
+        public static readonly string Seviye_DoğrulamaKodu = "ArgeMup.HazirKod_Cdiyez.Depo_" + AdıVeİçerik;
+        public static readonly string Seviye_ArtıBir = "+" + AdıVeİçerik;
+        public static readonly string Seviye_Eşittir = "=" + AdıVeİçerik;
+        public static readonly string Seviye_EksiBir = "-" + AdıVeİçerik;
 
         public static string KullancıYazısı_Depoya_Göre_Uygunlaştır(string KullanıcıYazısı)
         {
@@ -229,10 +234,90 @@ namespace ArgeMup.HazirKod
                 _Adı = Adı;
                 _Depo = Depo;
             }
+            public Eleman_(List<string> Eleman_AdıİçeriğiElemaları, int BirÖncekiSeviye, Depo_ Depo)
+            {
+                // seviye0>eleman1>içerik[0]>içerik[1]\n                0
+                // seviye1>eleman1_alteleman1>içerik[0]\n               1
+                // seviye1>eleman1_alteleman2>içerik[0]\n               1
+                // seviye2>eleman1_alteleman2_alteleman1>içerik[0]\n    2
+                // seviye0>eleman2>içerik[0]>içerik[1]\n                0
+                
+                if (Depo == null) throw new Exception("Depo boş olamaz");
+                _Depo = Depo;
+                _Elemanları = new Eleman_[0];
+
+                string[] dizi_içerik = null;
+                int okunan_seviye = -1, sonrakinin_seviyesi = -1;
+
+                _SıradakiniOku_(ref okunan_seviye);
+                if (okunan_seviye != BirÖncekiSeviye + 1) throw new Exception("Seviye bilgisi uyumsuz - " + Eleman_AdıİçeriğiElemaları[0]);
+
+                _Adı = Depo_Ayraçlar.KullancıYazısı_İlkHalineGetir(dizi_içerik[1]);
+                _İçeriği = new string[dizi_içerik.Length - 2 /*Seviye + adı*/];
+                for (int i = 0; i < _İçeriği.Length; i++)
+                {
+                    _İçeriği[i] = Depo_Ayraçlar.KullancıYazısı_İlkHalineGetir(dizi_içerik[i + 2]);
+                    if (string.IsNullOrEmpty(_İçeriği[i])) _İçeriği[i] = null;
+                }
+
+                Eleman_AdıİçeriğiElemaları.RemoveAt(0); 
+
+            YenidenDene:
+                _SıradakiniOku_(ref sonrakinin_seviyesi);
+                if (sonrakinin_seviyesi <= okunan_seviye)
+                {
+                    Elemanları_BoşMu();
+                    return;
+                }
+
+                //sonraki eleman şimdiki elemanın alt elemanı olduğundan içerden devam edecek
+                Array.Resize(ref _Elemanları, _Elemanları.Length + 1);
+                _Elemanları[_Elemanları.Length - 1] = new Eleman_(Eleman_AdıİçeriğiElemaları, okunan_seviye, Depo);
+                goto YenidenDene;
+
+                void _SıradakiniOku_(ref int _Seviye_)
+                {
+                    while (Eleman_AdıİçeriğiElemaları.Count > 0 && string.IsNullOrEmpty(Eleman_AdıİçeriğiElemaları[0])) Eleman_AdıİçeriğiElemaları.RemoveAt(0);
+                    if (Eleman_AdıİçeriğiElemaları.Count <= 0) { _Seviye_ = -1; return; }
+
+                    _YenidenDene_:
+                    string _sıradaki_ = Eleman_AdıİçeriğiElemaları[0];
+                    dizi_içerik = _sıradaki_.Split(Depo_Ayraçlar.AdıVeİçerik);
+                    if (dizi_içerik == null || dizi_içerik.Length < 2 /*seviye + adı*/) throw new Exception("içerik uygun değil " + _sıradaki_);
+                    
+                    if (!int.TryParse(dizi_içerik[0], out _Seviye_))
+                    {
+                        //seviye takibi yaparak işaretlenmiş satırları çöz
+                        int _düzeltme_bir_önceki_seviye_ = okunan_seviye;
+                        for (int _düzeltme_i_ = 0; _düzeltme_i_ < Eleman_AdıİçeriğiElemaları.Count; _düzeltme_i_++)
+                        {
+                            string _düzeltme_içerik_ = Eleman_AdıİçeriğiElemaları[_düzeltme_i_];
+                            if (string.IsNullOrEmpty(_düzeltme_içerik_)) continue;
+
+                            if (_düzeltme_içerik_.StartsWith(Depo_Ayraçlar.Seviye_ArtıBir)) { _düzeltme_bir_önceki_seviye_++; Eleman_AdıİçeriğiElemaları[_düzeltme_i_] = _düzeltme_bir_önceki_seviye_ + _düzeltme_içerik_.Remove(0, 1); }
+                            else if (_düzeltme_içerik_.StartsWith(Depo_Ayraçlar.Seviye_Eşittir)) { Eleman_AdıİçeriğiElemaları[_düzeltme_i_] = _düzeltme_bir_önceki_seviye_ + _düzeltme_içerik_.Remove(0, 1); }
+                            else if (_düzeltme_içerik_.StartsWith(Depo_Ayraçlar.Seviye_EksiBir)) { _düzeltme_bir_önceki_seviye_--; Eleman_AdıİçeriğiElemaları[_düzeltme_i_] = _düzeltme_bir_önceki_seviye_ + _düzeltme_içerik_.Remove(0, 1); }
+                            else
+                            {
+                                string[] _düzeltme_içerik_dizi_ = _düzeltme_içerik_.Split(Depo_Ayraçlar.AdıVeİçerik);
+                                if (_düzeltme_içerik_dizi_ == null || _düzeltme_içerik_dizi_.Length < 2 /*seviye + adı*/) throw new Exception("içerik uygun değil " + _düzeltme_içerik_);
+                                if (!int.TryParse(_düzeltme_içerik_dizi_[0], out _düzeltme_bir_önceki_seviye_)) throw new Exception("seviye uygun değil" + _düzeltme_içerik_dizi_[0]);
+                            }
+                        }
+                        goto _YenidenDene_; 
+                    }
+                    
+                    if (_Seviye_ < 0) throw new Exception("seviye uygun değil" + _sıradaki_ + " " + _Seviye_);
+                }
+            }
+            //Eski sistemden okumak için
             public Eleman_(ref List<string> Eleman_AdıİçeriğiElemaları, int Seviye, Depo_ Depo)
             {
-                // eleman1'içerik[0]'içerik[1]\n
-                // 'eleman1_alteleman1'içerik[0]\n
+                // eleman1>içerik[0]>içerik[1]\n                    0
+                // >eleman1_alteleman1>içerik[0]\n                  1
+                // >eleman1_alteleman2>içerik[0]\n                  1
+                // >>eleman1_alteleman2_alteleman1>içerik[0]\n      2
+                // eleman2>içerik[0]>içerik[1]\n                    0
 
                 if (Depo == null) throw new Exception("Depo boş olamaz");
                 _Depo = Depo;
@@ -645,7 +730,7 @@ namespace ArgeMup.HazirKod
             {
                 get
                 {
-                    return Bul(ElemanAdıDizisi, true, false); 
+                    return Bul(ElemanAdıDizisi, true, false);
                 }
             }
             public IDepo_Eleman[] Elemanları //Tüm Elemanları
@@ -796,7 +881,7 @@ namespace ArgeMup.HazirKod
             public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur, bool BağımsızKopyaOluştur)
             {
                 IDepo_Eleman bulunan = Bul_Getir(ElemanAdıDizisi);
-                
+
                 if (bulunan == null && YoksaOluştur)
                 {
                     Yaz(ElemanAdıDizisi, null);
@@ -805,7 +890,7 @@ namespace ArgeMup.HazirKod
 
                 if (!BağımsızKopyaOluştur || bulunan == null) return bulunan;
 
-                Depo_ Bağımsız_yeni_depo = new Depo_(bulunan.YazıyaDönüştür(null));
+                Depo_ Bağımsız_yeni_depo = new Depo_(bulunan.YazıyaDönüştür(null, false, false));
                 if (Bağımsız_yeni_depo.Elemanları.Length == 0)
                 {
                     //Sadece adı olan elemanlardan oluştuğundan (içerik veya elemanı yok) yeni bir nesne oluşturulacak
@@ -813,12 +898,13 @@ namespace ArgeMup.HazirKod
                 }
                 return Bağımsız_yeni_depo.Elemanları[0];
             }
-            public string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları)
+            public string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları, bool DoğrulamaKoduEkle)
             {
                 Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
                 if (bulunan == null) return "";
 
                 string eleman_adı_ve_içeriği = "";
+                int BirÖncekiSeviye = -5;
 
                 if (SadeceElemanları)
                 {
@@ -832,6 +918,11 @@ namespace ArgeMup.HazirKod
                     _YazıyaDönüştür_(bulunan, 0);
                 }
 
+                if (DoğrulamaKoduEkle && !string.IsNullOrEmpty(eleman_adı_ve_içeriği))
+                {
+                    eleman_adı_ve_içeriği = Depo_Ayraçlar.Seviye_DoğrulamaKodu + ArgeMup.HazirKod.DoğrulamaKodu.Üret.Yazıdan(eleman_adı_ve_içeriği) + Depo_Ayraçlar.Eleman + eleman_adı_ve_içeriği;
+                }
+
                 return eleman_adı_ve_içeriği;
 
                 void _YazıyaDönüştür_(Eleman_ Eleman, int Seviye)
@@ -839,7 +930,16 @@ namespace ArgeMup.HazirKod
                     if (Eleman == null || Eleman.İçiBoşOlduğuİçinSilinecek) return;
 
                     //Seviye belirteci
-                    for (int i = 0; i < Seviye; i++) eleman_adı_ve_içeriği += Depo_Ayraçlar.AdıVeİçerik;
+                    if (Seviye <= 9) eleman_adı_ve_içeriği += Seviye.ToString() + Depo_Ayraçlar.AdıVeİçerik;
+                    else
+                    {
+                        int seviye_farkı = Seviye - BirÖncekiSeviye;
+                        if (seviye_farkı == 1) eleman_adı_ve_içeriği += Depo_Ayraçlar.Seviye_ArtıBir;
+                        else if (seviye_farkı == 0) eleman_adı_ve_içeriği += Depo_Ayraçlar.Seviye_Eşittir;
+                        else if (seviye_farkı == -1) eleman_adı_ve_içeriği += Depo_Ayraçlar.Seviye_EksiBir;
+                        else eleman_adı_ve_içeriği += Seviye.ToString() + Depo_Ayraçlar.AdıVeİçerik;
+                    }
+                    BirÖncekiSeviye = Seviye;
 
                     //Adı
                     eleman_adı_ve_içeriği += Depo_Ayraçlar.KullancıYazısı_Depoya_Göre_Uygunlaştır(Eleman.Adı);
@@ -865,38 +965,24 @@ namespace ArgeMup.HazirKod
             }
             public void Ekle(string ElemanAdıDizisi, string YazıOlarakElemanlar)
             {
-                if (!string.IsNullOrEmpty(YazıOlarakElemanlar))
+                List<Eleman_> okunanlar = _Depo.YazıOlarakElemanlar_Ayıkla(YazıOlarakElemanlar);
+
+                if (okunanlar.Count > 0)
                 {
-                    string[] dizi = YazıOlarakElemanlar.Split(Depo_Ayraçlar.Eleman);
-                    if (dizi != null && dizi.Length > 0)
+                    Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
+
+                    if (bulunan == null)
                     {
-                        List<string> Elemanlar = dizi.ToList();
-                        List<Eleman_> gecici = new List<Eleman_>();
-
-                        while (Elemanlar.Count > 0)
-                        {
-                            Eleman_ yeni = new Eleman_(ref Elemanlar, 0, _Depo);
-                            if (!yeni.İçiBoşOlduğuİçinSilinecek) gecici.Add(yeni);
-                        }
-
-                        if (gecici.Count > 0)
-                        {
-                            Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
-
-                            if (bulunan == null)
-                            {
-                                Yaz(ElemanAdıDizisi, null);
-                                bulunan = Bul_Getir(ElemanAdıDizisi);
-                            }
-
-                            if (bulunan._Elemanları == null) bulunan._Elemanları = new Eleman_[gecici.Count];
-                            else Array.Resize(ref bulunan._Elemanları, bulunan._Elemanları.Length + gecici.Count);
-
-                            Array.Copy(gecici.ToArray(), 0, bulunan.Elemanları, bulunan._Elemanları.Length - gecici.Count, gecici.Count);
-
-                            _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
-                        }
+                        Yaz(ElemanAdıDizisi, null);
+                        bulunan = Bul_Getir(ElemanAdıDizisi);
                     }
+
+                    if (bulunan._Elemanları == null) bulunan._Elemanları = new Eleman_[okunanlar.Count];
+                    else Array.Resize(ref bulunan._Elemanları, bulunan._Elemanları.Length + okunanlar.Count);
+
+                    Array.Copy(okunanlar.ToArray(), 0, bulunan.Elemanları, bulunan._Elemanları.Length - okunanlar.Count, okunanlar.Count);
+
+                    _Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
                 }
             }
             public void Sil(string ElemanAdıDizisi, bool Sadeceİçeriğini, bool SadeceElemanlarını)
@@ -934,7 +1020,7 @@ namespace ArgeMup.HazirKod
                     bulunan._Elemanları = l.ToArray();
                 }
                 else return;
-                    
+
                 bulunan._Depo.EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
             }
             public void Sırala(string ElemanAdıDizisi, List<string> ElemanAdıSıralaması)
@@ -981,6 +1067,49 @@ namespace ArgeMup.HazirKod
                 return ElemanAdıListesi;
             }
             #endregion
+        }
+        List<Eleman_> YazıOlarakElemanlar_Ayıkla(string YazıOlarakElemanlar)
+        {
+            List<Eleman_> okunanlar = new List<Eleman_>();
+
+            if (!string.IsNullOrEmpty(YazıOlarakElemanlar))
+            {
+                YazıOlarakElemanlar = YazıOlarakElemanlar.Replace(Depo_Ayraçlar.Eleman2.ToString(), null);
+                
+                string[] dizi = YazıOlarakElemanlar.Split(Depo_Ayraçlar.Eleman);
+                if (dizi != null && dizi.Length > 0)
+                {
+                    List<string> Elemanlar = dizi.ToList();
+                    bool EskiTipte = false;
+
+                    if (YazıOlarakElemanlar.StartsWith(Depo_Ayraçlar.Seviye_DoğrulamaKodu))
+                    {
+                        string[] dizi_başlık = dizi[0].Split(Depo_Ayraçlar.AdıVeİçerik);
+                        if (dizi_başlık == null || dizi_başlık.Length != 2) throw new Exception("Doğruluk kontrolü içeriği uygun değil " + dizi[0]);
+
+                        //başlığı sil
+                        YazıOlarakElemanlar = YazıOlarakElemanlar.Substring(dizi[0].Length + 1 /*Depo_Ayraçlar.AdıVeİçerik*/);
+
+                        string doko_hesaplanan = ArgeMup.HazirKod.DoğrulamaKodu.Üret.Yazıdan(YazıOlarakElemanlar);
+                        if (doko_hesaplanan != dizi_başlık[1]) throw new Exception("Doğrulama kodu uyumsuz");
+
+                        //başlığı sil
+                        Elemanlar.RemoveAt(0);
+                    }
+                    else EskiTipte = !YazıOlarakElemanlar.StartsWith("0" + Depo_Ayraçlar.AdıVeİçerik);
+
+                    while (Elemanlar.Count > 0)
+                    {
+                        Eleman_ üretilen;
+                        if (EskiTipte) üretilen = new Eleman_(ref Elemanlar, 0, this);
+                        else üretilen = new Eleman_(Elemanlar, -1, this);
+
+                        if (!üretilen.İçiBoşOlduğuİçinSilinecek) okunanlar.Add(üretilen);
+                    }
+                }
+            }
+
+            return okunanlar;
         }
 
         public Depo_(string YazıOlarakElemanlar = null, Action<Depo_> GeriBildirimİşlemi_EnAzBir_ElemanAdıVeyaİçeriği_Değişti = null)
@@ -1139,7 +1268,7 @@ namespace ArgeMup.HazirKod
 
             return bulunan;
         }
-        public string YazıyaDönüştür(string ElemanAdıDizisi = null, bool SadeceElemanları = false)
+        public string YazıyaDönüştür(string ElemanAdıDizisi = null, bool SadeceElemanları = false, bool DoğrulamaKoduEkle = true)
         {
             if (string.IsNullOrEmpty(ElemanAdıDizisi))
             {
@@ -1148,8 +1277,13 @@ namespace ArgeMup.HazirKod
                 string çıktı = "";
                 foreach (Eleman_ Eleman in _Elemanları)
                 {
-                    string oluşturulan = Eleman.YazıyaDönüştür(null, false);
+                    string oluşturulan = Eleman.YazıyaDönüştür(null, false, false);
                     if (!string.IsNullOrEmpty(oluşturulan)) çıktı += oluşturulan;
+                }
+
+                if (DoğrulamaKoduEkle && !string.IsNullOrEmpty(çıktı))
+                {
+                    çıktı = Depo_Ayraçlar.Seviye_DoğrulamaKodu + ArgeMup.HazirKod.DoğrulamaKodu.Üret.Yazıdan(çıktı) + Depo_Ayraçlar.Eleman + çıktı;
                 }
 
                 return çıktı;
@@ -1159,42 +1293,21 @@ namespace ArgeMup.HazirKod
                 IDepo_Eleman bulunan = Bul(ElemanAdıDizisi);
                 if (bulunan == null) return "";
 
-                return bulunan.YazıyaDönüştür(null, SadeceElemanları);
+                return bulunan.YazıyaDönüştür(null, SadeceElemanları, DoğrulamaKoduEkle);
             }
         }
         public void Ekle(string YazıOlarakElemanlar)
         {
-            // eleman1'içerik[0]'içerik[1]\n                    0
-            // 'eleman1_alteleman1'içerik[0]\n                  1
-            // 'eleman1_alteleman2'içerik[0]\n                  1
-            // ''eleman1_alteleman2_alteleman1'içerik[0]\n      2
-            // eleman2'içerik[0]'içerik[1]\n                    0
+            List<Eleman_> okunanlar = YazıOlarakElemanlar_Ayıkla(YazıOlarakElemanlar);
 
-            if (!string.IsNullOrEmpty(YazıOlarakElemanlar))
+            if (okunanlar.Count > 0)
             {
-                YazıOlarakElemanlar = YazıOlarakElemanlar.Replace(Depo_Ayraçlar.Eleman2.ToString(), null);
-                string[] dizi = YazıOlarakElemanlar.Split(Depo_Ayraçlar.Eleman);
-                if (dizi != null && dizi.Length > 0)
-                {
-                    List<string> Elemanlar = dizi.ToList();
-                    List<Eleman_> gecici = new List<Eleman_>();
+                if (_Elemanları == null) _Elemanları = new Eleman_[okunanlar.Count];
+                else Array.Resize(ref _Elemanları, _Elemanları.Length + okunanlar.Count);
 
-                    while (Elemanlar.Count > 0)
-                    {
-                        Eleman_ yeni = new Eleman_(ref Elemanlar, 0, this);
-                        if (!yeni.İçiBoşOlduğuİçinSilinecek) gecici.Add(yeni);
-                    }
+                Array.Copy(okunanlar.ToArray(), 0, Elemanları, _Elemanları.Length - okunanlar.Count, okunanlar.Count);
 
-                    if (gecici.Count > 0)
-                    {
-                        if (_Elemanları == null) _Elemanları = new Eleman_[gecici.Count];
-                        else Array.Resize(ref _Elemanları, _Elemanları.Length + gecici.Count);
-
-                        Array.Copy(gecici.ToArray(), 0, Elemanları, _Elemanları.Length - gecici.Count, gecici.Count);
-
-                        EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
-                    }
-                }
+                EnAzBir_ElemanAdıVeyaİçeriği_Değişti = true;
             }
         }
         public void Sil(string ElemanAdıDizisi, bool Sadeceİçeriğini = false, bool SadeceElemanlarını = false)
@@ -1638,11 +1751,11 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
 
                 return okunan;
             }
-            public string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları)
+            public string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları, bool DoğrulamaKoduEkle)
             {
                 if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
-                string okunan = AsılEleman.YazıyaDönüştür(ElemanAdıDizisi, SadeceElemanları);
+                string okunan = AsılEleman.YazıyaDönüştür(ElemanAdıDizisi, SadeceElemanları, DoğrulamaKoduEkle);
 
                 Depo.Kilit.ReleaseMutex();
 
@@ -1859,11 +1972,11 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
 
             return okunan;
         }
-        public string YazıyaDönüştür(string ElemanAdıDizisi = null, bool SadeceElemanları = false)
+        public string YazıyaDönüştür(string ElemanAdıDizisi = null, bool SadeceElemanları = false, bool DoğrulamaKoduEkle = true)
         {
             if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
-            string okunan = Depo.YazıyaDönüştür(ElemanAdıDizisi, SadeceElemanları);
+            string okunan = Depo.YazıyaDönüştür(ElemanAdıDizisi, SadeceElemanları, DoğrulamaKoduEkle);
 
             Kilit.ReleaseMutex();
 

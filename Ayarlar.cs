@@ -56,7 +56,7 @@ namespace ArgeMup.HazirKod
                 Depo.Yaz("Kendi", Sürüm);
                 Depo.Yaz("Kendi/Oluşturulma", DateTime.Now);
                 Depo.Yaz("Kendi/Konum", AyarlarDosyasıYolu);
-                Depo.Yaz("Kendi/Bilgisayar ve kullanıcı aAdı", Kendi.BilgisayarAdı + "/" + Kendi.KullanıcıAdı);
+                Depo.Yaz("Kendi/Bilgisayar ve kullanıcı adı", Kendi.BilgisayarAdı + "/" + Kendi.KullanıcıAdı);
                 Depo.Yaz("Kendi/Bütünlük kontrolü", "ArGeMuP");
                 Depo.Yaz("Kendi/Son kayıt", DateTime.Now);
 
@@ -83,7 +83,7 @@ namespace ArgeMup.HazirKod
                 try 
                 {
                     okunan = Depo.Oku("Kendi/Bütünlük kontrolü");
-                    if (string.IsNullOrEmpty(okunan) || okunan != DoğrulamaKodu.Üret.Yazıdan(Depo.Bul("Ayarlar").YazıyaDönüştür(null))) throw new Exception(); 
+                    if (string.IsNullOrEmpty(okunan) || okunan != DoğrulamaKodu.Üret.Yazıdan(Depo.Bul("Ayarlar").YazıyaDönüştür(null, false, false))) throw new Exception(); 
                 }
                 catch (Exception) { throw new Exception("Bütünlük Kontrolü Hatalı - " + _AyarlarDosyasıYolu); }
             }
@@ -123,9 +123,9 @@ namespace ArgeMup.HazirKod
             if (File.Exists(_AyarlarDosyasıYolu) && !File.Exists(_AyarlarDosyasıYolu + ".yedek")) File.Copy(_AyarlarDosyasıYolu, _AyarlarDosyasıYolu + ".yedek", false);
 
             ArgeMup.HazirKod.Depo_ birarada = new ArgeMup.HazirKod.Depo_();
-            string Ayarlar = Depo_Ayarlar.YazıyaDönüştür(null);
-            birarada.Ekle(Depo.Bul("Uygulama").YazıyaDönüştür(null));
-            birarada.Ekle(Depo.Bul("Kendi").YazıyaDönüştür(null));
+            string Ayarlar = Depo_Ayarlar.YazıyaDönüştür(null, false, false);
+            birarada.Ekle(Depo.Bul("Uygulama").YazıyaDönüştür(null, false, false));
+            birarada.Ekle(Depo.Bul("Kendi").YazıyaDönüştür(null, false, false));
             birarada.Yaz("Kendi/Bütünlük kontrolü", DoğrulamaKodu.Üret.Yazıdan(Ayarlar));
             birarada.Yaz("Kendi/Son kayıt", DateTime.Now);
 

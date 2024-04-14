@@ -1,6 +1,7 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
 #if HazirKod_Cdiyez_Derleyici
+// Nuget Microsoft.CodeAnalysis.Scripting
 #warning TEHLİKE - Kullanılmayan derlemeler atılamadığından ram taşması ihtimali - https://github.com/dotnet/roslyn/issues/41722
 
 using System;

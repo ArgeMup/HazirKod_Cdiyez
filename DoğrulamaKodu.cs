@@ -45,9 +45,9 @@ namespace ArgeMup.HazirKod
             {
                 return D_HexYazı.BaytDizisinden(BaytDizisinden(D_Yazı.BaytDizisine(Yazı)));
             }
-            static public byte[] BaytDizisinden(byte[] Dizi)
+            static public byte[] BaytDizisinden(byte[] Dizi, int ÇıktıKarakterSayısı = 64)
             {
-                return D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(Dizi, 64);
+                return D_GeriDönülemezKarmaşıklaştırmaMetodu.BaytDizisinden(Dizi, ÇıktıKarakterSayısı);
             }
             static public string Akıştan(Stream Akış)
             {

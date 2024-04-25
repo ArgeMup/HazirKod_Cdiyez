@@ -19,6 +19,7 @@ namespace ArgeMup.HazirKod
             public const string Sürüm = "V1.0";
             string DosyaYolu;
             string TcpSunucu_ErişimNoktası;
+            string Edinilen_DoğrulamaKodu = null, Hesaplanan_DoğrulamaKodu = null;
             GeriBildirim_İşlemi_Uygulama_ GeriBildirim_İşlemi_Uygulama;
 
             Çalıştır_ ÇalıştırılanUygulamalarDeposu;
@@ -40,6 +41,7 @@ namespace ArgeMup.HazirKod
 
                 Başlat(AğAdresi_Uygulama, AğAdresi_DoğrulamaKodu, EnDüşükSürüm, Ayarlar);
             }
+            public bool BağlantıKuruldu { get => TcpSunucu_BağlantıKuruldu != null; }
             public void Gönder(byte[] Girdi)
             {
                 if (TcpSunucu_BağlantıKuruldu == null) throw new Exception("Bağlantı kurulmadı");
@@ -49,74 +51,114 @@ namespace ArgeMup.HazirKod
 
             void Başlat(string AğAdresi_Uygulama = null, string AğAdresi_DoğrulamaKodu = null, string EnDüşükSürüm = "0.0", IDepo_Eleman Ayarlar = null)
             {
+                TcpSunucu_BağlantıKuruldu = null;
                 if (disposedValue) return;
 
-                TcpSunucu_BağlantıKuruldu = null;
-                Dosya.AğÜzerinde_ Dosya_AğÜzerinde = null;
-                if (Dosya.GüncelMi(DosyaYolu, EnDüşükSürüm)) GeriBildirim_Islemi_AğÜzerinde(true, null, null);
-                else if (AğAdresi_Uygulama.BoşMu(true)) GeriBildirim_İşlemi_Uygulama(false, null, "AğAdresi_Uygulama içeriği boş");
-                else Dosya_AğÜzerinde = new Dosya.AğÜzerinde_(new Uri(AğAdresi_Uygulama), DosyaYolu, GeriBildirim_Islemi_AğÜzerinde, 30000);
+                Dosya.AğÜzerinde_ Dosya_AğÜzerinde_DoğrulamaKodu = null, Dosya_AğÜzerinde_Uygulama = null;
 
-                void GeriBildirim_Islemi_AğÜzerinde(bool Sonuç_AğÜzerinde, Uri AğAdresi, object Çıktı_DosyaYolu)
+                if (Edinilen_DoğrulamaKodu.BoşMu(true) && AğAdresi_DoğrulamaKodu.DoluMu(true))
                 {
-                    bool Sonuç_Genel = false;
-                    string Açıklama = null;
-                    Dosya.AğÜzerinde_ Dosya_AğÜzerinde_DoğrulamaKodu = null;
+                    Dosya_AğÜzerinde_DoğrulamaKodu = new Dosya.AğÜzerinde_(new Uri(AğAdresi_DoğrulamaKodu), null, GeriBildirim_Islemi_AğÜzerinde_DoğrulamaKodu);
+                }
+                else
+                {
+                    GeriBildirim_Islemi_AğÜzerinde_DoğrulamaKodu(true, null, null);
+                }
 
-                    try
+                void GeriBildirim_Islemi_AğÜzerinde_DoğrulamaKodu(bool Sonuç_AğÜzerinde_DoğrulamaKodu, Uri _AğAdresi_DoğrulamaKodu_, object Çıktı_DoğrulamaKodu)
+                {
+                    Dosya_AğÜzerinde_DoğrulamaKodu?.Dispose(); Dosya_AğÜzerinde_DoğrulamaKodu = null;
+
+                    if (!Sonuç_AğÜzerinde_DoğrulamaKodu)
                     {
-                        if (!Sonuç_AğÜzerinde || !File.Exists(DosyaYolu)) goto Çıkış;
-
-                        if (KilitDosyası == null) KilitDosyası = new FileStream(DosyaYolu, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-                        if (AğAdresi_DoğrulamaKodu.DoluMu(true))
+                        Edinilen_DoğrulamaKodu = Ayarlar?.Oku(AğAdresi_DoğrulamaKodu.Replace("/", "'"));
+                        if (Edinilen_DoğrulamaKodu.BoşMu(true))
                         {
-                            string Ayarlar_adı = AğAdresi_DoğrulamaKodu.Replace("/", "'");
-                            string Ayarlar_içindeki_doko = Ayarlar == null ? null : Ayarlar.Oku(Ayarlar_adı);
-                            string Uygulamadan_hesaplanan_doko = DoğrulamaKodu.Üret.Akıştan(KilitDosyası);
+                            GeriBildirim_İşlemi_Uygulama(false, null, "AğAdresi_DoğrulamaKodu indirilemedi <" + AğAdresi_DoğrulamaKodu + ">");
+                            return;
+                        }
+                    }
 
-                            if (Ayarlar_içindeki_doko.BoşMu() || Ayarlar_içindeki_doko != Uygulamadan_hesaplanan_doko)
+                    if (Çıktı_DoğrulamaKodu != null)
+                    {
+                        Edinilen_DoğrulamaKodu = (Çıktı_DoğrulamaKodu as byte[]).Yazıya();
+                        Ayarlar?.Yaz(AğAdresi_DoğrulamaKodu.Replace("/", "'"), Edinilen_DoğrulamaKodu);
+                    }
+
+                    if (!Dosya.GüncelMi(DosyaYolu, EnDüşükSürüm))
+                    {
+                        if (AğAdresi_Uygulama.BoşMu(true))
+                        {
+                            GeriBildirim_İşlemi_Uygulama(false, null, "AğAdresi_Uygulama içeriği boş");
+                        }
+                        else
+                        {
+                            Dosya_AğÜzerinde_Uygulama = new Dosya.AğÜzerinde_(new Uri(AğAdresi_Uygulama), DosyaYolu, GeriBildirim_Islemi_AğÜzerinde_Uygulama, 30000);
+                        }
+                    }
+                    else
+                    {
+                        GeriBildirim_Islemi_AğÜzerinde_Uygulama(true, null, null);
+                    }
+                }
+                void GeriBildirim_Islemi_AğÜzerinde_Uygulama(bool Sonuç_AğÜzerinde_Uygulama, Uri _AğAdresi_Uygulama_, object Çıktı_Uygulama)
+                {
+                    Dosya_AğÜzerinde_Uygulama?.Dispose(); Dosya_AğÜzerinde_Uygulama = null;
+
+                    if (!Sonuç_AğÜzerinde_Uygulama || !File.Exists(DosyaYolu))
+                    {
+                        GeriBildirim_İşlemi_Uygulama(false, null, "AğAdresi_Uygulama indirilemedi <" + AğAdresi_Uygulama + ">");
+                        return;
+                    }
+
+                    if (KilitDosyası == null)
+                    {
+                        KilitDosyası = new FileStream(DosyaYolu, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        Hesaplanan_DoğrulamaKodu = null;
+                    }
+
+                    if (Edinilen_DoğrulamaKodu.DoluMu(true))
+                    {
+                        if (Hesaplanan_DoğrulamaKodu.BoşMu(true)) Hesaplanan_DoğrulamaKodu = DoğrulamaKodu.Üret.Akıştan(KilitDosyası);
+
+                        if (Hesaplanan_DoğrulamaKodu != Edinilen_DoğrulamaKodu)
+                        {
+                            KilitDosyası.Dispose(); KilitDosyası = null;
+
+                            if (!Dosya.Sil(DosyaYolu))
                             {
-                                bool _Dosya_AğÜzerinde_DoğrulamaKodu_Bitti_ = false;
-                                string _Dosya_AğÜzerinde_DoğrulamaKodu_İçerik_ = null;
-                                Dosya_AğÜzerinde_DoğrulamaKodu = new Dosya.AğÜzerinde_(new Uri(AğAdresi_DoğrulamaKodu), null, _GeriBildirim_Islemi_AğÜzerinde_DoğrulamaKodu_);
-                                while (!_Dosya_AğÜzerinde_DoğrulamaKodu_Bitti_ && ArkaPlan.Ortak.Çalışsın) Thread.Sleep(5);
-                                if (Uygulamadan_hesaplanan_doko != _Dosya_AğÜzerinde_DoğrulamaKodu_İçerik_)
+                                GeriBildirim_İşlemi_Uygulama(false, null, "Dosya silinemedi <" + DosyaYolu + ">");
+                            }
+                            else
+                            {
+                                if (_AğAdresi_Uygulama_ == null)
                                 {
-                                    Açıklama = "Uygulama ve doğrulama kodu uyumsuz";
-                                    goto Çıkış;
+                                    //Doğrudan çağırıldı
+                                    GeriBildirim_Islemi_AğÜzerinde_DoğrulamaKodu(true, null, null);
                                 }
-                                Ayarlar.Yaz(Ayarlar_adı, _Dosya_AğÜzerinde_DoğrulamaKodu_İçerik_);
-
-                                void _GeriBildirim_Islemi_AğÜzerinde_DoğrulamaKodu_(bool _Sonuç_AğÜzerinde_DoğrulamaKodu_, Uri _AğAdresiDoğrulamaKodu_, object _Çıktı_DoğrulamaKodu_)
+                                else
                                 {
-                                    _Dosya_AğÜzerinde_DoğrulamaKodu_İçerik_ = _Sonuç_AğÜzerinde_DoğrulamaKodu_ ? ((byte[])_Çıktı_DoğrulamaKodu_).Yazıya() : null;
-                                    _Dosya_AğÜzerinde_DoğrulamaKodu_Bitti_ = true;
+                                    //Dosya.AğÜzerinde_ işleminden çağırıldı
+                                    GeriBildirim_Islemi_AğÜzerinde_Uygulama(false, null, null);
                                 }
                             }
+                            
+                            return;
                         }
-
-                        if (TcpSunucu == null)
-                        {
-                            TcpSunucu = new TcpSunucu_(0, GeriBildirim_Islemi_TcpSunucu, SatırSatırGönderVeAl: false, Güvenli: true);
-                            while (TcpSunucu.EtkinErişimNoktası() == 0 && ArkaPlan.Ortak.Çalışsın) Thread.Sleep(5);
-
-                            TcpSunucu_ErişimNoktası = TcpSunucu.EtkinErişimNoktası().ToString();
-                            TcpSunucu_DonanımHaberleşmesi = TcpSunucu;
-                        }
-                        else TcpSunucu.Durdur(null); //etkin bağlantıları durdur
-
-                        if (ÇalıştırılanUygulama != null) try { ÇalıştırılanUygulama.Kill(); } catch (Exception) { }
-                        ÇalıştırılanUygulama = ÇalıştırılanUygulamalarDeposu.UygulamayıDoğrudanÇalıştır(DosyaYolu, new string[] { TcpSunucu_ErişimNoktası });
-
-                        Sonuç_Genel = true;
                     }
-                    catch (Exception ex) { Açıklama = ex.ToString(); }
 
-                Çıkış:
-                    Dosya_AğÜzerinde_DoğrulamaKodu?.Dispose();
-                    Dosya_AğÜzerinde?.Dispose();
-                    if (!Sonuç_Genel) GeriBildirim_İşlemi_Uygulama(Sonuç_Genel, null, Açıklama);
+                    if (TcpSunucu == null)
+                    {
+                        TcpSunucu = new TcpSunucu_(0, GeriBildirim_Islemi_TcpSunucu, SatırSatırGönderVeAl: false, Güvenli: true);
+                        while (TcpSunucu.EtkinErişimNoktası() == 0 && ArkaPlan.Ortak.Çalışsın) Thread.Sleep(5);
+
+                        TcpSunucu_ErişimNoktası = TcpSunucu.EtkinErişimNoktası().ToString();
+                        TcpSunucu_DonanımHaberleşmesi = TcpSunucu;
+                    }
+                    else TcpSunucu.Durdur(null); //etkin bağlantıları durdur
+
+                    if (ÇalıştırılanUygulama != null) try { ÇalıştırılanUygulama.Kill(); } catch (Exception) { }
+                    ÇalıştırılanUygulama = ÇalıştırılanUygulamalarDeposu.UygulamayıDoğrudanÇalıştır(DosyaYolu, new string[] { TcpSunucu_ErişimNoktası });
                 }
             }
             void GeriBildirim_Islemi_TcpSunucu(string Kaynak, GeriBildirim_Türü_ Tür, object İçerik, object Hatırlatıcı)
@@ -141,13 +183,13 @@ namespace ArgeMup.HazirKod
                         TcpSunucu_BağlantıKuruldu = ErişimNoktası_PID_UygunMu(Kaynak) ? Kaynak : null;
                         break;
 
-                        //case GeriBildirim_Türü_.BilgiGeldi:
-                        //case GeriBildirim_Türü_.BağlantıKurulmasıTekrarDenecek:
-                        //case GeriBildirim_Türü_.Durduruldu:
-                        //    break;
+                    //case GeriBildirim_Türü_.BilgiGeldi:
+                    //case GeriBildirim_Türü_.BağlantıKurulmasıTekrarDenecek:
+                    //case GeriBildirim_Türü_.Durduruldu:
+                    //    break;
                 }
 
-                GeriBildirim_İşlemi_Uygulama(TcpSunucu_BağlantıKuruldu != null, İçerik as byte[], null);
+                GeriBildirim_İşlemi_Uygulama(TcpSunucu_BağlantıKuruldu != null, İçerik as byte[], Tür.ToString());
             }
 
             bool ErişimNoktası_PID_UygunMu(string ErişimNoktası)
@@ -203,6 +245,7 @@ namespace ArgeMup.HazirKod
                         TcpSunucu_BağlantıKuruldu = null;
                         TcpSunucu?.Dispose();
                         KilitDosyası?.Dispose();
+                        try { ÇalıştırılanUygulama?.Kill(); } catch (Exception) { }
                     }
 
                     // TODO: free unmanaged resources (unmanaged objects) and override finalizer
@@ -264,11 +307,11 @@ namespace ArgeMup.HazirKod
                         Tcpİstemci_BağlantıKuruldu = true;
                         break;
 
-                     //case GeriBildirim_Türü_.BilgiGeldi:
-                     //    break;
+                    //case GeriBildirim_Türü_.BilgiGeldi:
+                    //    break;
                 }
 
-                GeriBildirim_İşlemi_Uygulama(Tcpİstemci_BağlantıKuruldu, İçerik as byte[], null);
+                GeriBildirim_İşlemi_Uygulama(Tcpİstemci_BağlantıKuruldu, İçerik as byte[], Tür.ToString());
             }
 
             #region IDisposable

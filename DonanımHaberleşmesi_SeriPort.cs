@@ -1,5 +1,7 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
+// Nuget System.IO.Ports
+
 #if HazirKod_Cdiyez_SeriPort
     using System;
     using System.IO.Ports;

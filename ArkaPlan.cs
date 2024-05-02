@@ -108,7 +108,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
         }
     }
 
-    public class Hatırlatıcı_
+    public class Hatırlatıcı_ : IDisposable
     {
         public const string Sürüm = "V1.2";
         public int TekrarHatırlatmaGecikmesi_msn = 0;
@@ -337,7 +337,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
                 b.GeriBildirim_Islemini_çalıştır = true;
             }
 
-            ArkaPlanGörevi_Başlat(); //değişiklikleri işlet
+            if (bulunanlar.Count > 0) ArkaPlanGörevi_Başlat();
         }
         public DateTime SonrakiTetikleme_Hesapla(DateTime BaşlangıçNoktası, string KomutCümlesi)
         {
@@ -421,7 +421,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
                 Liste.Remove(b);
             }
 
-            if (bulunanlar.Count > 0) ArkaPlanGörevi_Başlat(); //değişiklikleri işlet
+            if (bulunanlar.Count > 0) ArkaPlanGörevi_Başlat();
         }
         public System.Collections.Generic.List<Durum_> Bul(bool SüresiDolanlarıDahilEt = true, bool ÇalışmayıBekleyenleriDahilEt = true, string TakmaAdıKıstası = "*", bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
         {
@@ -535,6 +535,11 @@ namespace ArgeMup.HazirKod.ArkaPlan
             bool TekrarÇağır = Interlocked.Read(ref Ucuz_Kilit) > 1;
             Interlocked.Exchange(ref Ucuz_Kilit, 0);
             if (TekrarÇağır) ArkaPlanGörevi_Başlat();
+        }
+
+        public void Dispose()
+        {
+            AyarlarıOku(true);
         }
     }
 }

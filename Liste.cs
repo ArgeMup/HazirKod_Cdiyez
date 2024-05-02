@@ -46,8 +46,8 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
             Eleman = default(T);
             bool sonuç = false;
 
-            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) return false;
-            
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
             if (SıraNo < Elemanlar.Count)
             {
                 Eleman = Elemanlar[SıraNo];
@@ -77,7 +77,7 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
         #region Hassas Ara İşlemler
         public List<T> HassasAraİşlem_Başlat()
         {
-            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) return null;
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
             return Elemanlar;
         }
@@ -206,7 +206,7 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
         }
         public bool Remove(T value)
         {
-            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) return false;
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
 
             bool sonuç = Elemanlar.Remove(value);
 

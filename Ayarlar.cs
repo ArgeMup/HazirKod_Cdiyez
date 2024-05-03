@@ -1,5 +1,6 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
+using ArgeMup.HazirKod.Ekİşlemler;
 using System;
 using System.IO;
 
@@ -77,7 +78,7 @@ namespace ArgeMup.HazirKod
                         ayrl.Sil(null);
                         Depo.Ekle(ayrlr_içeriği);
                     }
-                    catch (Exception) { }
+                    catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
                 }
 
                 try 
@@ -124,12 +125,12 @@ namespace ArgeMup.HazirKod
 
             ArgeMup.HazirKod.Depo_ birarada = new ArgeMup.HazirKod.Depo_();
             string Ayarlar = Depo_Ayarlar.YazıyaDönüştür(null, false, false);
-            birarada.Ekle(Depo.Bul("Uygulama").YazıyaDönüştür(null, false, false));
-            birarada.Ekle(Depo.Bul("Kendi").YazıyaDönüştür(null, false, false));
+            birarada.Ekle(Depo.Bul("Uygulama").YazıyaDönüştür(null, false, false), false);
+            birarada.Ekle(Depo.Bul("Kendi").YazıyaDönüştür(null, false, false), false);
             birarada.Yaz("Kendi/Bütünlük kontrolü", DoğrulamaKodu.Üret.Yazıdan(Ayarlar));
             birarada.Yaz("Kendi/Son kayıt", DateTime.Now);
 
-            if (Parola == null) birarada.Ekle(Ayarlar);
+            if (Parola == null) birarada.Ekle(Ayarlar, false);
             else birarada.Yaz("Ayarlar", Karmaşıklaştırma.Karıştır(Ayarlar, Parola));
 
             File.WriteAllText(_AyarlarDosyasıYolu, birarada.YazıyaDönüştür());

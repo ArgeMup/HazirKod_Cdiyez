@@ -1,5 +1,6 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
+using ArgeMup.HazirKod.Ekİşlemler;
 using System;
 
 namespace ArgeMup.HazirKod
@@ -32,7 +33,7 @@ namespace ArgeMup.HazirKod
                 Microsoft.Win32.Registry.SetValue(AnaDal + AltDal, Parametre, Ayar);
                 return true;
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
             return false;
         }

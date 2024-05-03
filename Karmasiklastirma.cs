@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using ArgeMup.HazirKod.Dönüştürme;
+using ArgeMup.HazirKod.Ekİşlemler;
 
 namespace ArgeMup.HazirKod
 {
@@ -44,7 +45,7 @@ namespace ArgeMup.HazirKod
 
                 return çıktı;
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
             return null;
         }
 
@@ -85,7 +86,7 @@ namespace ArgeMup.HazirKod
 
                 return çıktı;
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
             return null;
         }
 

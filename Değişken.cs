@@ -188,7 +188,7 @@ namespace ArgeMup.HazirKod
                     {
                         return _Dönüştür_();
                     }
-                    catch (Exception) { }
+                    catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
                     if (DönüştürmeHatasıOldu_YeniTipiBelirle != null)
                     {
@@ -197,7 +197,7 @@ namespace ArgeMup.HazirKod
                             AltTipi = DönüştürmeHatasıOldu_YeniTipiBelirle(Depo.Adı, AltTipi);
                             if (AltTipi != null) return _Dönüştür_();
                         }
-                        catch (Exception) { }
+                        catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
                     }
 
                     object _Dönüştür_()

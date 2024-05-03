@@ -157,7 +157,7 @@ namespace ArgeMup.HazirKod
                     }
                     else TcpSunucu.Durdur(null); //etkin bağlantıları durdur
 
-                    if (ÇalıştırılanUygulama != null) try { ÇalıştırılanUygulama.Kill(); } catch (Exception) { }
+                    try { ÇalıştırılanUygulama?.Kill(); } catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
                     ÇalıştırılanUygulama = ÇalıştırılanUygulamalarDeposu.UygulamayıDoğrudanÇalıştır(DosyaYolu, new string[] { TcpSunucu_ErişimNoktası });
                 }
             }

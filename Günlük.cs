@@ -11,7 +11,7 @@ namespace ArgeMup.HazirKod
 {
     public class Günlük
     {
-        public const string Sürüm = "V1.4";
+        public const string Sürüm = "V1.5";
 
         public enum Seviye { Kapalı, BeklenmeyenDurum, Hata, Uyarı, Bilgi, Geveze, HazirKod };
         public static Seviye GenelSeviye = Seviye.Geveze;
@@ -76,9 +76,15 @@ namespace ArgeMup.HazirKod
             if (Seviyesi > GenelSeviye) return;
             if (Mesaj == null) Mesaj = "";
 
-            string içerik = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " " + Mesaj.Replace("\r\n", "|").Replace('\r', '|').Replace('\n', '|');
+            string içerik = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo;
+            Mesaj = Mesaj.TrimEnd(' ', '\r', '\n');
 
-            Ekle_(içerik, Seviyesi, Hemen);
+            if (Mesaj.Contains("\r\n")) içerik += "\r\n\t" + Mesaj.Replace("\r\n", "\r\n\t");
+            else if (Mesaj.Contains("\n")) içerik += "\n\t" + Mesaj.Replace("\n", "\n\t");
+            else if (Mesaj.Contains("\r")) içerik += "\r\t" + Mesaj.Replace("\r", "\r\t");
+            else içerik += " " + Mesaj;
+
+            Ekle_(içerik.TrimEnd(' ', '\r', '\n'), Seviyesi, Hemen);
         }
         public static void Ekle(byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, Seviye Seviyesi = Seviye.Geveze, string ÖnYazı = null, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0, bool Hemen = false)
         {
@@ -104,7 +110,7 @@ namespace ArgeMup.HazirKod
 
                         string Aralık_sayısı = (BaşlangıçKonumu + Adet - 1).ToString().Length.ToString();
 
-                        içerik += başlık;
+                        içerik += "\t";
                         for (int i = 0; i < şimdiki_adet; i++)
                         {
                             içerik += BaytDizisi[BaşlangıçKonumu + i].ToString("X2") + " ";

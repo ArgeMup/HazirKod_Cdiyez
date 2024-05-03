@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using ArgeMup.HazirKod.Dönüştürme;
+using ArgeMup.HazirKod.Ekİşlemler;
 
 namespace ArgeMup.HazirKod
 {
@@ -35,7 +36,7 @@ namespace ArgeMup.HazirKod
 
                 return false;
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
             return true;
         }
@@ -143,7 +144,8 @@ namespace ArgeMup.HazirKod
                     return true;
                 }, 0);
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
+
             return Adet;
         }
         public int DiğerUygulamayıKapat(bool ZorlaKapat = false)
@@ -171,7 +173,8 @@ namespace ArgeMup.HazirKod
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
+
             return Adet;
         }
 

@@ -1,6 +1,7 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ArgeMup.HazirKod.Dönüştürme;
@@ -111,7 +112,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
     public class Hatırlatıcı_ : IDisposable
     {
         public const string Sürüm = "V1.2";
-        public int TekrarHatırlatmaGecikmesi_msn = 0;
+        public int Kilit_Devralma_ZamanAşımı_msn = 10000;
         public class Durum_
         {
             public string TakmaAdı;
@@ -123,26 +124,27 @@ namespace ArgeMup.HazirKod.ArkaPlan
 
         /// <summary>
         /// Kullanım Senaryosu 1 - Görevler
-        /// başlangıç   > new ArgeMup.HazirKod.ArkaPlan.Hatırlatıcı_();
-        /// Kurma       > Kur(TakmaAdı, GeriBildirim_Islemi, Hatırlatıcı);
-        /// İşlem       > çıkış kodu > 0 olduğu sürece çağırılmaya devam edecek
-        /// bitiş       > gerekli değil
+        /// Başlangıç           > new ArgeMup.HazirKod.ArkaPlan.Hatırlatıcı_();
+        /// Kurma               > Ekle(TakmaAdı, İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi, GeriBildirim_Islemi, Hatırlatıcı, SonsuzDöngüVeyaUzunİşlem);
+        /// İşlem               > çıkış kodu > 0 olduğu sürece çağırılmaya devam edecek
+        /// Bitiş               > Dispose
         /// 
         /// Kullanım Senaryosu 2 - Takvim
         /// İlk Açılış
-        ///     başlangıç   > new ArgeMup.HazirKod.ArkaPlan.Hatırlatıcı_();
-        ///     Kurma       > Kur(TakmaAdı, İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi, GeriBildirim_Islemi, Hatırlatıcı);
-        ///     bitiş       > AyarlarıOku(true) dan alınan çıktıları biryere kaydet
+        ///     Başlangıç       > new ArgeMup.HazirKod.ArkaPlan.Hatırlatıcı_();
+        ///     Kurma           > Ekle(TakmaAdı, İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi, GeriBildirim_Islemi, Hatırlatıcı, SonsuzDöngüVeyaUzunİşlem);
+        ///     Bitiş           > AyarlarıOku(true) dan alınan çıktıları biryere kaydet
         /// İkinci ve Sonraki Açılışlar
-        ///     başlangıç   > new ArgeMup.HazirKod.ArkaPlan.Hatırlatıcı_(kaydedilen çıktıları aktar);
-        ///     Kur         > Kur(TakmaAdı, GeriBildirim_Islemi, Hatırlatıcı);
-        ///     bitiş       > AyarlarıOku(true) dan alınan çıktıları biryere kaydet
-        /// İşlem           > çıkış kodu = 0 olduğu sürece zamanlama, tekrarlama sistemi tarafından kendiliğinden hesaplanmaya devam edecek
+        ///     Başlangıç       > new ArgeMup.HazirKod.ArkaPlan.Hatırlatıcı_(kaydedilen çıktıları aktar);
+        ///     Kur             > Düzenle(TakmaAdıKıstası, GeriBildirim_Islemi, Hatırlatıcı, SonsuzDöngüVeyaUzunİşlem);
+        ///     Bitiş           > AyarlarıOku(true) dan alınan çıktıları biryere kaydet
+        /// İşlem               > TekrarlayıcıKomutCümlesi olan görevler -> SonrakiTetikleme_Kur çağırılmalı ve çıkış kodu = 0 olmalı
+        ///                                             olmayan görevler -> çıkış kodu > 0 olduğu sürece çağırılmaya devam edecek
         ///
         /// Kullanım Senaryosu 3 - Basit Takvim
-        /// başlangıç + bitiş   > Takvim deki gibi farklı olarak GeriBildirim_Islemi ve Hatırlatıcı tanımlanmayabilir
-        /// Kurma               > Kur(TakmaAdı, İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi);
-        /// İşlem               > Düzenli olarak Listele komutunun çağırılması ile güncel durumlar okunabilir
+        /// Başlangıç + Bitiş   > Takvim den farklı olarak GeriBildirim_Islemi tanımlanmayabilir, güncel durum gerektiğinde Bul ile okunabilir
+        /// Güncel durumu oku   > List<Durum_> Bul(SüresiDolanlarıDahilEt, ÇalışmayıBekleyenleriDahilEt, TakmaAdıKıstası);
+        /// Bitiş               > Dispose
         /// </summary>
 
         /// <summary>
@@ -150,12 +152,15 @@ namespace ArgeMup.HazirKod.ArkaPlan
         /// Func<string, object, int> GeriBildirim_Islemi
         /// int GeriBildirim_Islemi(string TakmaAdı, object Hatırlatıcı)
         /// {
+        ///     Uzun sürecek işlemlerde kontrol et
+        ///     ArgeMup.HazirKod.ArkaPlan.Ortak.Çalışsın 
+        /// 
         ///     ...
         ///     return 1000;
         /// }
         /// çıkış kodu > 0 : msn kadar erteler ve tekrar çağırır
         /// çıkış kodu < 0 : tamamen silip, tekrar çağırılmasını engeller
-        /// çıkış kodu = 0 : tekrarlayıcı sistemi sonraki tetiklemenin zamanlamasını Kur_SonrakiTetikleme komutu ile yeniden hesaplar
+        /// çıkış kodu = 0 : zamanlamaya etkisi olmaz, SonrakiTetikleme_Kur veya Düzenle çağırılana kadar bekler 
         /// </summary>
 
         /// <summary>
@@ -244,10 +249,9 @@ namespace ArgeMup.HazirKod.ArkaPlan
         }
 
         bool Çalışsın = true;
-        CancellationTokenSource İptalEtmeAnahtarıKaynağı = null;
-        EşZamanlıÇokluErişim.Liste_<Biri_> Liste = new EşZamanlıÇokluErişim.Liste_<Biri_>();
+        Mutex Kilit;
+        List<Biri_> Liste;
         IDepo_Eleman Ayarlar = null;
-        long Ucuz_Kilit = 0;
 
         public Hatırlatıcı_(string Ayarlar = null)
         {
@@ -270,8 +274,10 @@ namespace ArgeMup.HazirKod.ArkaPlan
         }
         void Başlat()
         {
-            // Hatırlatıcı_ dalı
+            Kilit = new Mutex();
+            Liste = new List<Biri_>();
 
+            // Hatırlatıcı_ dalı
             IDepo_Eleman te = Ayarlar.Bul("Tetikleyiciler");
             if (te != null)
             {
@@ -281,18 +287,80 @@ namespace ArgeMup.HazirKod.ArkaPlan
                     DateTime İlkTetikleyeceğiZaman = biri.Oku_TarihSaat(null, default, 0);
                     string TekrarlayıcıKomutCümlesi = biri.Oku(null, null, 1);
 
-                    if (string.IsNullOrEmpty(TakmaAdı) || İlkTetikleyeceğiZaman == default(DateTime)) continue;
+                    if (string.IsNullOrEmpty(TakmaAdı) || İlkTetikleyeceğiZaman == default) continue;
 
                     Ekle(TakmaAdı, İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi);
                 }
             }
+
+            #region Arkaplan görevi
+            new Task(() =>
+            {
+                while (Çalışsın && Ortak.Çalışsın)
+                {
+                    Kilit.WaitOne();
+                    int Bekleme = 1000;
+                    Biri_ EnYakınGörev = null;
+                    DateTime Şimdi = DateTime.Now;
+
+                    foreach (Biri_ biri in Liste)
+                    {
+                        if (biri.GeriBildirim_Islemini_çalıştır &&
+                            biri.GeriBildirim_Islemi != null)
+                        {
+                            if (biri.HesaplananTetiklemeAnı > Şimdi)
+                            {
+                                //daha erken
+                                if (EnYakınGörev == null || biri.HesaplananTetiklemeAnı < EnYakınGörev.HesaplananTetiklemeAnı) EnYakınGörev = biri;
+                            }
+                            else
+                            {
+                                //süresi doldu
+                                biri.ÇıkışDeğeri = 0;
+                                biri.GeriBildirim_Islemini_çalıştır = false;
+
+                                Task t1 = new Task(() =>
+                                {
+                                    biri.ÇıkışDeğeri = biri.GeriBildirim_Islemi(biri.TakmaAdı, biri.Hatırlatıcı);
+                                }, biri.SonsuzDöngüVeyaUzunİşlem ? TaskCreationOptions.LongRunning : TaskCreationOptions.None);
+
+                                t1.ContinueWith((t2) =>
+                                {
+                                    Kilit.WaitOne();
+
+                                    if (biri.ÇıkışDeğeri < 0) Liste.Remove(biri);                   //listeden silinir, artık çağırılmayacak
+                                    else if (biri.ÇıkışDeğeri > 0) biri.Ertele(biri.ÇıkışDeğeri);   //Listede kalır, belirtilen süre sonra tekrar çağırılacak
+                                    //else if (biri.ÇıkışDeğeri == 0)                               //Listede kalır, artık çağırılmayacak
+                                            
+                                    Kilit.ReleaseMutex();
+                                });
+
+                                t1.Start();
+                            }
+                        }
+                    }
+                    if (EnYakınGörev != null)
+                    {
+                        Bekleme = (int)(EnYakınGörev.HesaplananTetiklemeAnı - Şimdi).TotalMilliseconds;
+
+                        if (Bekleme > 1000) Bekleme = 1000;
+                        else if (Bekleme < 1) Bekleme = 1; //cpu yüzdesini düşürmek için
+                    }
+                
+                    Kilit.ReleaseMutex();
+                    Task.Delay(Bekleme).Wait();
+                }
+            }, TaskCreationOptions.LongRunning).Start();
+            #endregion
         }
 
         public void Düzenle(string TakmaAdıKıstası, Func<string, object, int> GeriBildirim_Islemi, object Hatırlatıcı = null, bool SonsuzDöngüVeyaUzunİşlem = false, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
         {
             if (GeriBildirim_Islemi == null) throw new Exception("GeriBildirim_Islemi boş olmamalı");
 
-            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı.BenzerMi(TakmaAdıKıstası, BüyükKüçükHarfDuyarlı, Ayraç));
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+            List<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı.BenzerMi(TakmaAdıKıstası, BüyükKüçükHarfDuyarlı, Ayraç));
             foreach (Biri_ b in bulunanlar)
             {
                 b.GeriBildirim_Islemi = GeriBildirim_Islemi;
@@ -300,23 +368,28 @@ namespace ArgeMup.HazirKod.ArkaPlan
                 b.SonsuzDöngüVeyaUzunİşlem = SonsuzDöngüVeyaUzunİşlem;
             }
 
-            if (bulunanlar.Count > 0) ArkaPlanGörevi_Başlat();
+            Kilit.ReleaseMutex();
         }
         public void Ekle(string TakmaAdı, DateTime İlkTetikleyeceğiZaman, string TekrarlayıcıKomutCümlesi = null, Func<string, object, int> GeriBildirim_Islemi = null, object Hatırlatıcı = null, bool SonsuzDöngüVeyaUzunİşlem = false)
         {
             if (!string.IsNullOrEmpty(TekrarlayıcıKomutCümlesi))
             {
+                //Cümle hata kontrolü
                 if (SonrakiTetikleme_Hesapla(İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi) == default) throw new Exception("TekrarlayıcıKomutCümlesi uygun değil");
             }
 
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
             Liste.Add(new Biri_(Ayarlar.Bul("Tetikleyiciler/" + TakmaAdı, true), İlkTetikleyeceğiZaman, TekrarlayıcıKomutCümlesi, GeriBildirim_Islemi, Hatırlatıcı, SonsuzDöngüVeyaUzunİşlem));
 
-            if (GeriBildirim_Islemi != null) ArkaPlanGörevi_Başlat();
+            Kilit.ReleaseMutex();
         }
 
         public void SonrakiTetikleme_Kur(string TakmaAdıKıstası, bool GelecektekiBirZamanaKur = true, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
         {
-            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı.BenzerMi(TakmaAdıKıstası, BüyükKüçükHarfDuyarlı, Ayraç));
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+            List<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı.BenzerMi(TakmaAdıKıstası, BüyükKüçükHarfDuyarlı, Ayraç));
             foreach (Biri_ b in bulunanlar)
             {
                 if (GelecektekiBirZamanaKur)
@@ -337,9 +410,61 @@ namespace ArgeMup.HazirKod.ArkaPlan
                 b.GeriBildirim_Islemini_çalıştır = true;
             }
 
-            if (bulunanlar.Count > 0) ArkaPlanGörevi_Başlat();
+            Kilit.ReleaseMutex();
         }
-        public DateTime SonrakiTetikleme_Hesapla(DateTime BaşlangıçNoktası, string KomutCümlesi)
+
+        public void Sil(string TakmaAdıKıstası, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
+        {
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+            List<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı.BenzerMi(TakmaAdıKıstası, BüyükKüçükHarfDuyarlı, Ayraç));
+            foreach (Biri_ b in bulunanlar)
+            {
+                b.Ayarlar.Sil(null);
+                Liste.Remove(b);
+            }
+
+            Kilit.ReleaseMutex();
+        }
+        public List<Durum_> Bul(bool SüresiDolanlarıDahilEt = true, bool ÇalışmayıBekleyenleriDahilEt = true, string TakmaAdıKıstası = "*", bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
+        {
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+            List<Durum_> bulunanlar = new List<Durum_>();
+            DateTime şimdi = DateTime.Now;
+
+            foreach (Biri_ hatırlatıcı in Liste.FindAll
+                        (x =>
+                            ((SüresiDolanlarıDahilEt && x.HesaplananTetiklemeAnı <= şimdi)
+                                ||
+                                (ÇalışmayıBekleyenleriDahilEt && x.HesaplananTetiklemeAnı > şimdi))
+                            &&
+                            x.TakmaAdı.BenzerMi(TakmaAdıKıstası, BüyükKüçükHarfDuyarlı, Ayraç)
+                        )
+                    )
+            {
+                bulunanlar.Add(new Durum_
+                {
+                    TakmaAdı = hatırlatıcı.TakmaAdı,
+                    TekrarlayıcıKomutCümlesi = hatırlatıcı.TekrarlayıcıKomutCümlesi,
+                    Hatırlatıcı = hatırlatıcı.Hatırlatıcı,
+                    TetikleneceğiAn = hatırlatıcı.HesaplananTetiklemeAnı,
+                    TetiklenmesiBekleniyor = hatırlatıcı.HesaplananTetiklemeAnı > şimdi
+                });
+            }
+
+            Kilit.ReleaseMutex();
+
+            return bulunanlar;
+        }
+        public string AyarlarıOku(bool VeDurdur = false)
+        {
+            if (VeDurdur) Çalışsın = false;
+
+            return Ayarlar.YazıyaDönüştür(null);
+        }
+
+        public static DateTime SonrakiTetikleme_Hesapla(DateTime BaşlangıçNoktası, string KomutCümlesi)
         {
             if (string.IsNullOrEmpty(KomutCümlesi)) return default;
 
@@ -407,139 +532,13 @@ namespace ArgeMup.HazirKod.ArkaPlan
 
                 if (sonuç) return BaşlangıçNoktası;
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
             return default;
         }
-
-        public void Sil(string TakmaAdıKıstası, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
-        {
-            EşZamanlıÇokluErişim.Liste_<Biri_> bulunanlar = Liste.FindAll(x => x.TakmaAdı.BenzerMi(TakmaAdıKıstası, BüyükKüçükHarfDuyarlı, Ayraç));
-            foreach (Biri_ b in bulunanlar)
-            {
-                b.Ayarlar.Sil(null);
-                Liste.Remove(b);
-            }
-
-            if (bulunanlar.Count > 0) ArkaPlanGörevi_Başlat();
-        }
-        public System.Collections.Generic.List<Durum_> Bul(bool SüresiDolanlarıDahilEt = true, bool ÇalışmayıBekleyenleriDahilEt = true, string TakmaAdıKıstası = "*", bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
-        {
-            System.Collections.Generic.List<Durum_> bulunanlar = new System.Collections.Generic.List<Durum_>();
-            DateTime şimdi = DateTime.Now;
-
-            foreach (Biri_ hatırlatıcı in Liste.FindAll
-                        (x =>
-                            ((SüresiDolanlarıDahilEt && x.HesaplananTetiklemeAnı <= şimdi)
-                                ||
-                                (ÇalışmayıBekleyenleriDahilEt && x.HesaplananTetiklemeAnı > şimdi))
-                            &&
-                            x.TakmaAdı.BenzerMi(TakmaAdıKıstası, BüyükKüçükHarfDuyarlı, Ayraç)
-                        )
-                    )
-            {
-                bulunanlar.Add(new Durum_
-                {
-                    TakmaAdı = hatırlatıcı.TakmaAdı,
-                    TekrarlayıcıKomutCümlesi = hatırlatıcı.TekrarlayıcıKomutCümlesi,
-                    Hatırlatıcı = hatırlatıcı.Hatırlatıcı,
-                    TetikleneceğiAn = hatırlatıcı.HesaplananTetiklemeAnı,
-                    TetiklenmesiBekleniyor = hatırlatıcı.HesaplananTetiklemeAnı > şimdi
-                });
-            }
-
-            return bulunanlar;
-        }
-        public string AyarlarıOku(bool VeDurdur = false)
-        {
-            if (VeDurdur)
-            {
-                Çalışsın = false;
-                ArkaPlanGörevi_Başlat();
-            }
-
-            return Ayarlar.YazıyaDönüştür(null);
-        }
-
-        void ArkaPlanGörevi_Başlat()
-        {
-            if (!Çalışsın || !Ortak.Çalışsın || Interlocked.Increment(ref Ucuz_Kilit) > 1) return;
-            
-            Biri_ EnYakınGörev = null;
-            foreach (Biri_ biri in Liste)
-            {
-                if (biri.GeriBildirim_Islemini_çalıştır &&
-                    biri.GeriBildirim_Islemi != null)
-                {
-                    if (biri.HesaplananTetiklemeAnı > DateTime.Now)
-                    {
-                        //daha erken
-                        if (EnYakınGörev == null || biri.HesaplananTetiklemeAnı < EnYakınGörev.HesaplananTetiklemeAnı) EnYakınGörev = biri;
-                    }
-                    else
-                    {
-                        //süresi doldu
-                        biri.ÇıkışDeğeri = 0;
-                        biri.GeriBildirim_Islemini_çalıştır = false;
-
-                        Task t1 = new Task(() =>
-                        {
-                            biri.ÇıkışDeğeri = biri.GeriBildirim_Islemi(biri.TakmaAdı, biri.Hatırlatıcı);
-                        }, biri.SonsuzDöngüVeyaUzunİşlem ? TaskCreationOptions.LongRunning : TaskCreationOptions.None);
-
-                        t1.ContinueWith((t2) =>
-                        {
-                            if (biri.ÇıkışDeğeri < 0) Liste.Remove(biri);                   //kendi kendini silebilmesi için
-                            else if (biri.ÇıkışDeğeri > 0) biri.Ertele(biri.ÇıkışDeğeri);   //kendini geciktirebimesi için
-                            else /*if (biri.ÇıkışDeğeri == 0)*/                             //tekrarlama kıstasları üzerinden tetiklet
-                            {
-                                if (TekrarHatırlatmaGecikmesi_msn > 0) biri.Ertele(TekrarHatırlatmaGecikmesi_msn);
-                                //else                                                      //tekrarlama kıstasları üzerinden tetiklet
-                            }
-
-                            if (biri.GeriBildirim_Islemini_çalıştır  /*Liste.Count > 0*/) ArkaPlanGörevi_Başlat();
-                        });
-
-                        t1.Start();
-                    }
-                }
-            }
-
-            if (EnYakınGörev != null)
-            {
-                if (İptalEtmeAnahtarıKaynağı != null)
-                {
-                    İptalEtmeAnahtarıKaynağı.Cancel();
-                    Thread.Sleep(1);
-                    İptalEtmeAnahtarıKaynağı.Dispose();
-                    İptalEtmeAnahtarıKaynağı = null;
-                }
-                İptalEtmeAnahtarıKaynağı = new CancellationTokenSource();
-                CancellationToken ct = İptalEtmeAnahtarıKaynağı.Token;
-
-                new Task(() =>
-                {
-                    while (Çalışsın && Ortak.Çalışsın && !ct.IsCancellationRequested && EnYakınGörev.HesaplananTetiklemeAnı > DateTime.Now)
-                    {
-                        TimeSpan gecikme = EnYakınGörev.HesaplananTetiklemeAnı - DateTime.Now;
-
-                        if (gecikme.TotalMilliseconds > int.MaxValue) ct.WaitHandle.WaitOne(int.MaxValue);
-                        else if (gecikme.TotalMilliseconds > 1) ct.WaitHandle.WaitOne(gecikme);
-                        else ct.WaitHandle.WaitOne(1);
-                    }
-
-                    if (!ct.IsCancellationRequested) ArkaPlanGörevi_Başlat();
-                }).Start();
-            }
-
-            bool TekrarÇağır = Interlocked.Read(ref Ucuz_Kilit) > 1;
-            Interlocked.Exchange(ref Ucuz_Kilit, 0);
-            if (TekrarÇağır) ArkaPlanGörevi_Başlat();
-        }
-
         public void Dispose()
         {
-            AyarlarıOku(true);
+            Çalışsın = false;
         }
     }
 }

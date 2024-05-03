@@ -38,7 +38,7 @@ namespace ArgeMup.HazirKod
 
                 if (Directory.Exists(Yolu)) return true;
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
             return false;
         }
@@ -52,7 +52,7 @@ namespace ArgeMup.HazirKod
                 
                 if (!Directory.Exists(Yolu)) return true;
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
             return false;
         }
@@ -229,7 +229,7 @@ namespace ArgeMup.HazirKod
 
                 return File.Exists(Hedef);
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
             if (File.Exists(yedek_dosya_adı))
             {
@@ -250,7 +250,7 @@ namespace ArgeMup.HazirKod
 
                 if (!File.Exists(Yolu)) return true;
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
             return false;
         }

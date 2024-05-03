@@ -7,8 +7,9 @@
     using System.Drawing;
     using System.Linq;
     using System.Runtime.InteropServices;
+	using ArgeMup.HazirKod.Ekİşlemler;
 
-    namespace ArgeMup.HazirKod
+	namespace ArgeMup.HazirKod
     {
         public class PencereVeTepsiIkonuKontrolu_ : IDisposable
         {
@@ -211,7 +212,7 @@
                         return true;
                     }
                 }
-                catch (Exception) { }
+                catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
                 return false;
             }
@@ -290,7 +291,7 @@
                     TeİkMe.SayacKonum -= Tepsiİkonu.Icon.Size.Width / 10;
                     if (--TeİkMe.SayacKonum < TeİkMe.Uzunluğu) { TeİkMe.SayacKonum = 0; TeİkMe.Metin_ = TeİkMe.Metin; }
                 }
-                catch (Exception) { }
+                catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
                 if (TeİkMe.Zamanlayıcı != null) TeİkMe.Zamanlayıcı.Enabled = true;
             }

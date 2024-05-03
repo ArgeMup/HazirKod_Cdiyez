@@ -60,6 +60,7 @@ namespace ArgeMup.HazirKod
         bool Oku_Bit(string ElemanAdıDizisi, bool BulunamamasıVeyaBoşOlmasıDurumundakiİçeriği = default, int SıraNo = 0);
 
         IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false, bool BağımsızKopyaOluştur = false);
+        List<IDepo_Eleman> Bul(string ElemanAdıDizisi, Predicate<IDepo_Eleman> Kıstas);
         string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları = false, bool DoğrulamaKoduEkle = true);
         void Ekle(string ElemanAdıDizisi, string Eleman, bool DoğrulamaKoduOlmalı = true);
         void Sil(string ElemanAdıDizisi, bool Sadeceİçeriğini = false, bool SadeceElemanlarını = false);
@@ -898,6 +899,22 @@ namespace ArgeMup.HazirKod
                 }
                 return Bağımsız_yeni_depo.Elemanları[0];
             }
+            public List<IDepo_Eleman> Bul(string ElemanAdıDizisi, Predicate<IDepo_Eleman> Kıstas)
+            {
+                if (Kıstas == null) throw new ArgumentNullException("Kıstas == null");
+
+                List<IDepo_Eleman> bulunanlar = new List<IDepo_Eleman>();
+
+                Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
+                if (bulunan == null || bulunan._Elemanları == null || bulunan._Elemanları.Length == 0) return bulunanlar;
+
+                foreach (Eleman_ AltEleman in bulunan._Elemanları)
+                {
+                    if (Kıstas(AltEleman)) bulunanlar.Add(AltEleman);
+                }
+
+                return bulunanlar;
+            }
             public string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları, bool DoğrulamaKoduEkle)
             {
                 Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
@@ -1268,6 +1285,13 @@ namespace ArgeMup.HazirKod
             }
 
             return bulunan;
+        }
+        public List<IDepo_Eleman> Bul(string ElemanAdıDizisi, Predicate<IDepo_Eleman> Kıstas)
+        {
+            IDepo_Eleman bulunan = Bul(ElemanAdıDizisi);
+            if (bulunan == null) return new List<IDepo_Eleman>();
+            
+            return bulunan.Bul(null, Kıstas);
         }
         public string YazıyaDönüştür(string ElemanAdıDizisi = null, bool SadeceElemanları = false, bool DoğrulamaKoduEkle = true)
         {
@@ -1752,6 +1776,21 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
 
                 return okunan;
             }
+            public List<IDepo_Eleman> Bul(string ElemanAdıDizisi, Predicate<IDepo_Eleman> Kıstas)
+            {
+                if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+                List<IDepo_Eleman> bulunanlar = AsılEleman.Bul(ElemanAdıDizisi, Kıstas);
+                List<IDepo_Eleman> bulunanlar_Kilitli = new List<IDepo_Eleman>();
+                foreach (IDepo_Eleman bulunan in bulunanlar)
+                {
+                    bulunanlar_Kilitli.Add(new Depo_Kilitli_Eleman_(bulunan, Depo));
+                }
+
+                Depo.Kilit.ReleaseMutex();
+
+                return bulunanlar;
+            }
             public string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları, bool DoğrulamaKoduEkle)
             {
                 if (!Depo.Kilit.WaitOne(Depo.Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
@@ -1972,6 +2011,21 @@ namespace ArgeMup.HazirKod.EşZamanlıÇokluErişim
             Kilit.ReleaseMutex();
 
             return okunan;
+        }
+        public List<IDepo_Eleman> Bul(string ElemanAdıDizisi, Predicate<IDepo_Eleman> Kıstas)
+        {
+            if (!Kilit.WaitOne(Kilit_Devralma_ZamanAşımı_msn)) throw new Exception("Kilit devralınamadı");
+
+            List<IDepo_Eleman> bulunanlar = Depo.Bul(ElemanAdıDizisi, Kıstas);
+            List<IDepo_Eleman> bulunanlar_Kilitli = new List<IDepo_Eleman>();
+            foreach (IDepo_Eleman bulunan in bulunanlar)
+            {
+                bulunanlar_Kilitli.Add(new Depo_Kilitli_Eleman_(bulunan, this));
+            }
+
+            Kilit.ReleaseMutex();
+
+            return bulunanlar_Kilitli;
         }
         public string YazıyaDönüştür(string ElemanAdıDizisi = null, bool SadeceElemanları = false, bool DoğrulamaKoduEkle = true)
         {

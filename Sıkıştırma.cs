@@ -2,7 +2,8 @@
 
 #if HazirKod_Cdiyez_Sıkıştırma
 
-    using System;
+	using ArgeMup.HazirKod.Ekİşlemler;
+	using System;
     using System.IO;
     using System.IO.Compression;
 
@@ -86,10 +87,7 @@
 
                     return true;
                 }
-                catch (Exception ex)
-                {
-                    Günlük.Ekle(ex.ToString(), Günlük.Seviye.HazirKod);
-                }
+                catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
 
                 if (File.Exists(yedek_dosya_adı))
                 {

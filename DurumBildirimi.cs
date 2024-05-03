@@ -1,7 +1,8 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
 #if HazirKod_Cdiyez_Görsel
-    using System;
+	using ArgeMup.HazirKod.Ekİşlemler;
+	using System;
     using System.Drawing;
     using System.Windows.Forms;
 
@@ -91,7 +92,7 @@
 
                     Zamanlayıcı.Start();
                 }
-                catch (Exception) { }
+                catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
             }
 
             private void Tepsiİkonu_BalloonTipShown(object sender, EventArgs e)
@@ -122,7 +123,7 @@
 
                     if (Tepsiİkonu == null && ipucu == null && Zamanlayıcı != null) { Zamanlayıcı.Dispose(); Zamanlayıcı = null; }
                 }
-                catch (Exception) { }
+                catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
             }
             private string Kırp(string Girdi, int Uzunluk)
             {

@@ -891,7 +891,7 @@ namespace ArgeMup.HazirKod
 
                 if (!BağımsızKopyaOluştur || bulunan == null) return bulunan;
 
-                Depo_ Bağımsız_yeni_depo = new Depo_(bulunan.YazıyaDönüştür(null, false, false));
+                Depo_ Bağımsız_yeni_depo = new Depo_(bulunan.YazıyaDönüştür(null, false, false), null, false);
                 if (Bağımsız_yeni_depo.Elemanları.Length == 0)
                 {
                     //Sadece adı olan elemanlardan oluştuğundan (içerik veya elemanı yok) yeni bir nesne oluşturulacak

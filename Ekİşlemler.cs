@@ -4,7 +4,7 @@ namespace ArgeMup.HazirKod.Ekİşlemler
 {
     public static class _Ekİşlemler_Yazı
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         public static byte[] BaytDizisine(this string Girdi)
         {
@@ -185,7 +185,7 @@ namespace ArgeMup.HazirKod.Ekİşlemler
 
     public static class _Ekİşlemler_BaytDizisi
     {
-        public const string Sürüm = "V1.0";
+        public const string Sürüm = "V1.1";
 
         public static string Yazıya(this byte[] Girdi, int Boyut = int.MinValue)
         {

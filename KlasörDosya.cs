@@ -173,7 +173,7 @@ namespace ArgeMup.HazirKod
 
     public class Dosya
     {
-        public const string Sürüm = "V1.3";
+        public const string Sürüm = "V1.4";
 
         public static bool VarMı(string Yolu)
         {

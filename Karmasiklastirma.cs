@@ -4,13 +4,12 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using ArgeMup.HazirKod.Dönüştürme;
-using ArgeMup.HazirKod.Ekİşlemler;
 
 namespace ArgeMup.HazirKod
 {
     public static class DahaCokKarmasiklastirma
     {
-        public const string Sürüm = "V1.2";
+        public const string Sürüm = "V1.3";
         public static string Karıştır(string Girdi, string Parola)
         {
             return D_HexYazı.BaytDizisinden(Karıştır(D_Yazı.BaytDizisine(Girdi), D_Yazı.BaytDizisine(Parola)));

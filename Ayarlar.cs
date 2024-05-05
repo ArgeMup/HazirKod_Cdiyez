@@ -8,7 +8,7 @@ namespace ArgeMup.HazirKod
 {
     public class Ayarlar_ 
     {
-        public const string Sürüm = "V5.2";
+        public const string Sürüm = "V5.3";
         public string AyarlarDosyasıYolu
         {
             get

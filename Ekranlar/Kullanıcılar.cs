@@ -438,7 +438,7 @@ namespace ArgeMup.HazirKod.Ekranlar
 
             AyarlarDosyaYolu = AyarlarDosyaYolu ?? Kendi.Klasörü + @"\ArgeMup.HazirKod_Cdiyez.Ekranlar.Kullanıcılar.Ayarlar";
             if (!System.IO.File.Exists(AyarlarDosyaYolu)) _Ayarlar_Üst_ = new Ayarlar_Üst_();
-            else _Ayarlar_Üst_ = Ayarlar_Üst_.Sınıf_Oluştur(typeof(Ayarlar_Üst_), AyarlarDosyaYolu.DosyaYolu_Oku_Yazı()) as Ayarlar_Üst_;
+            else _Ayarlar_Üst_ = Ayarlar_Üst_.Sınıf_Oluştur(typeof(Ayarlar_Üst_), Dosya.Oku_Yazı(AyarlarDosyaYolu)) as Ayarlar_Üst_;
 
             if (_Ayarlar_Üst_ == null || _Ayarlar_Üst_.KullanıcılarVeParolalar == null) throw new Exception("Ayarlar_Üst == null || Ayarlar_Üst.KullanıcılarVeParolalar == null");
 

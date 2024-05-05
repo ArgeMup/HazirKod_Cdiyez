@@ -125,7 +125,7 @@ namespace ArgeMup.HazirKod
                         {
                             KilitDosyası.Dispose(); KilitDosyası = null;
 
-                            if (!Dosya.Sil(DosyaYolu))
+                            if (!Temkinli.Dosya.Sil(DosyaYolu))
                             {
                                 GeriBildirim_İşlemi_Uygulama(false, null, "Dosya silinemedi <" + DosyaYolu + ">");
                             }

@@ -34,7 +34,7 @@ namespace ArgeMup.HazirKod
                     .WithOptimizationLevel(Microsoft.CodeAnalysis.OptimizationLevel.Release)
                     .WithReferences(Kardeşleri);
 
-            if (File.Exists(KodVeyaDosyaYolu)) KodVeyaDosyaYolu = KodVeyaDosyaYolu.DosyaYolu_Oku_Yazı(); //Dosya içeriğini al
+            if (File.Exists(KodVeyaDosyaYolu)) KodVeyaDosyaYolu = Dosya.Oku_Yazı(KodVeyaDosyaYolu); //Dosya içeriğini al
 
             Microsoft.CodeAnalysis.Scripting.Script<object> DerlenmişKod_önişlem = Microsoft.CodeAnalysis.CSharp.Scripting.CSharpScript.Create(KodVeyaDosyaYolu, DerlemeSeçenekleri, AracılıkYapacakOlanNesne_Tipi);
             Microsoft.CodeAnalysis.Scripting.ScriptRunner<object> DerlenmişKod = DerlenmişKod_önişlem.CreateDelegate();
@@ -266,7 +266,7 @@ namespace ArgeMup.HazirKod
                 
                     ms.Seek(0, SeekOrigin.Begin);
                     Çıktı = ms.ToArray();
-                    if (ÇıktıDosyaAdı != null) Çıktı.Dosyaİçeriği_Yaz(ÇıktıDosyaAdı);
+                    if (ÇıktıDosyaAdı != null) Dosya.Yaz(ÇıktıDosyaAdı, Çıktı);
                 }
                 #endregion
 
@@ -316,7 +316,7 @@ namespace ArgeMup.HazirKod
                 System.CodeDom.Compiler.CompilerResults results = provider.CompileAssemblyFromSource(options, Kodlar);
                 #endregion
 
-                string ÇıktıKlasörü = (ÇıktıDosyaAdı != null ? Klasör.ÜstKlasör(ÇıktıDosyaAdı) : Kendi.Klasörü) + "\\";
+                string ÇıktıKlasörü = ( ÇıktıDosyaAdı != null ? Klasör.ÜstKlasör(ÇıktıDosyaAdı) : Kendi.Klasörü ) + "\\";
                 #region Hata durumu incelemesi
                 if (results.Errors.Count > 0)
                 {

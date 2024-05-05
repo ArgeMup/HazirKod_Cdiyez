@@ -12,7 +12,7 @@ namespace ArgeMup.HazirKod
 {
     public class Klasör
     {
-        public const string Sürüm = "V1.3";
+        public const string Sürüm = "V1.4";
         public const int EşZamanlıİşlemSayısı_Sabiti = 10;
 
         public static string[] Listele_Dosya(string Yolu, string Filtre = "*.*", SearchOption Kapsam = SearchOption.AllDirectories)
@@ -27,34 +27,20 @@ namespace ArgeMup.HazirKod
 
             return Directory.GetDirectories(Yolu, Filtre, Kapsam);
         }
-        public static bool Oluştur(string Yolu, bool Düzelt = true)
+
+        public static bool VarMı(string Yolu)
         {
-            try
-            {
-                if (Directory.Exists(Yolu)) return true;
-
-                if (Düzelt) Yolu = D_DosyaKlasörAdı.Düzelt(Yolu, false);
-                Directory.CreateDirectory(Yolu);
-
-                if (Directory.Exists(Yolu)) return true;
-            }
-            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
-
-            return false;
+            return Directory.Exists(Yolu);
         }
-        public static bool Sil(string Yolu)
+        public static void Oluştur(string Yolu)
         {
-            try
-            {
-                if (!Directory.Exists(Yolu)) return true;
+            Directory.CreateDirectory(Yolu);
+        }
+        public static void Sil(string Yolu)
+        {
+            if (!Directory.Exists(Yolu)) return;
 
-                Directory.Delete(Yolu, true);
-                
-                if (!Directory.Exists(Yolu)) return true;
-            }
-            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
-
-            return false;
+            Directory.Delete(Yolu, true);
         }
         public static void Sil_İçiBoşOlanları(string Yolu)
         {
@@ -170,36 +156,18 @@ namespace ArgeMup.HazirKod
             return kls;
 		} 
 
-        public static string ÜstKlasör(string Yolu, int Seviye = 1, bool KökeUlaşıncaDur = false)
+        public static string ÜstKlasör(string Yolu, int Seviye = 1)
         {
-            Yolu = D_DosyaKlasörAdı.Düzelt(Yolu);
+            int Detay_Seviye = 0;
+            DirectoryInfo Detay = new DirectoryInfo(Yolu);
 
-            string kök = Path.GetPathRoot(Yolu);
-            if (!string.IsNullOrEmpty(kök)) kök = kök.TrimEnd(Path.DirectorySeparatorChar);
-            if (string.IsNullOrEmpty(kök))
+            while (Detay_Seviye < Seviye)
             {
-                int konum_bölüm = Yolu.TrimStart(Path.DirectorySeparatorChar).IndexOf(Path.DirectorySeparatorChar);
-                if (konum_bölüm < 0) return null;
-                
-                kök = Yolu.Substring(0, konum_bölüm);
-            }
-            Yolu = Yolu.Substring(kök.Length);
-
-            while (Seviye-- > 0)
-            {
-                int konum_bölüm = Yolu.LastIndexOf(Path.DirectorySeparatorChar);
-                if (konum_bölüm < 0)
-                {
-                    if (KökeUlaşıncaDur) return kök;
-
-                    if (Seviye >= 0) return null;
-                    else return kök;
-                }
-
-                Yolu = Yolu.Substring(0, konum_bölüm);
+                Detay = Detay.Parent;
+                Detay_Seviye++;
             }
 
-            return kök + Yolu;
+            return Detay.FullName;
         }
     }
 
@@ -207,52 +175,55 @@ namespace ArgeMup.HazirKod
     {
         public const string Sürüm = "V1.3";
 
-        public static bool Kopyala(string Kaynak, string Hedef)
+        public static bool VarMı(string Yolu)
         {
-            string yedek_dosya_adı = Hedef + ".yedek";
-
-            try
-            {
-                if (File.Exists(Hedef))
-                {
-                    if (File.Exists(yedek_dosya_adı)) File.Delete(yedek_dosya_adı);
-
-                    File.Move(Hedef, yedek_dosya_adı);
-                }
-                else Klasör.Oluştur(Path.GetDirectoryName(Hedef));
-
-                File.Copy(Kaynak, Hedef);
-                File.SetAttributes(Hedef, File.GetAttributes(Kaynak));
-                File.SetLastWriteTime(Hedef, File.GetLastWriteTime(Kaynak));
-
-                if (File.Exists(yedek_dosya_adı)) File.Delete(yedek_dosya_adı);
-
-                return File.Exists(Hedef);
-            }
-            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
-
-            if (File.Exists(yedek_dosya_adı))
-            {
-                if (File.Exists(Hedef)) File.Delete(Hedef);
-
-                File.Move(yedek_dosya_adı, Hedef);
-            }
-
-            return false;
+            return File.Exists(Yolu);
         }
-        public static bool Sil(string Yolu)
+        public static string Klasörü(string Yolu)
         {
-            try
-            {
-                if (!File.Exists(Yolu)) return true;
+            return Klasör.ÜstKlasör(Yolu);
+        }
+        public static string SadeceAdı(string DosyaYolu)
+        {
+            return Path.GetFileName(DosyaYolu);
+        }
+        public static string SadeceSoyAdı(string DosyaYolu)
+        {
+            return Path.GetExtension(DosyaYolu).Substring(1);
+        }
+        public static string Oku_Yazı(string DosyaYolu)
+        {
+            return File.ReadAllText(DosyaYolu);
+        }
+        public static byte[] Oku_BaytDizisi(string DosyaYolu)
+        {
+            return File.ReadAllBytes(DosyaYolu);
+        }
+        public static void Yaz(string DosyaYolu, string Yazı)
+        {
+            Directory.CreateDirectory(Klasörü(DosyaYolu));
 
-                File.Delete(Yolu);
+            File.WriteAllText(DosyaYolu, Yazı);
+        }
+        public static void Yaz(string DosyaYolu, byte[] BaytDizisi)
+        {
+            Directory.CreateDirectory(Klasörü(DosyaYolu));
 
-                if (!File.Exists(Yolu)) return true;
-            }
-            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
+            File.WriteAllBytes(DosyaYolu, BaytDizisi);
+        }
+        public static void Kopyala(string Kaynak, string Hedef)
+        {
+            Directory.CreateDirectory(Klasörü(Hedef));
 
-            return false;
+            File.Copy(Kaynak, Hedef, true);
+            File.SetAttributes(Hedef, File.GetAttributes(Kaynak));
+            File.SetLastWriteTime(Hedef, File.GetLastWriteTime(Kaynak));
+        }
+        public static void Sil(string Yolu)
+        {
+            if (!File.Exists(Yolu)) return;
+
+            File.Delete(Yolu);
         }
         public static bool Sil_TarihineGöre(string Klasörü, double Gün, IEnumerable<string> Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
@@ -345,8 +316,8 @@ namespace ArgeMup.HazirKod
                     {
                         if (BaşkaBirYerdeAçıkMı(HedefDosyaYolu, ZamanAşımı_msn)) return;
                         
-                        string kls = Path.GetDirectoryName(HedefDosyaYolu);
-                        if (kls.DoluMu(true) && !Klasör.Oluştur(kls)) return;
+                        string kls = Klasörü(HedefDosyaYolu);
+                        if (kls.DoluMu(true)) Klasör.Oluştur(kls);
                     }
 
                     using (İstemci = new System.Net.Http.HttpClient())
@@ -561,7 +532,7 @@ namespace ArgeMup.HazirKod
 
             public İçerik_Dosya_(string Kök, string DosyaYolu, bool DoğrulamaKodunuÜret)
             {
-                Yolu = D_DosyaKlasörAdı.Düzelt(DosyaYolu.Substring(Kök.Length + 1), false);
+                Yolu = D_DosyaKlasörAdı.Düzelt(DosyaYolu.Substring(Kök.Length + 1));
 
                 if (File.Exists(DosyaYolu))
                 {
@@ -878,30 +849,44 @@ namespace ArgeMup.HazirKod
 
             void İşl_Kls(Fark_Klasör_ kls, object o)
             {
-                switch (kls.Farklılık)
+                try
                 {
-                    case Farklılık_Klasör.SadeceSolda:
-                        if (!Klasör.Oluştur(Sağdaki.Kök + @"\" + kls.Yolu)) kls_l.Add(kls);
-                        break;
+                    switch (kls.Farklılık)
+                    {
+                        case Farklılık_Klasör.SadeceSolda:
+                            Klasör.Oluştur(Sağdaki.Kök + @"\" + kls.Yolu);
+                            break;
 
-                    case Farklılık_Klasör.SadeceSağda:
-                        if (!Klasör.Oluştur(Kök + @"\" + kls.Yolu)) kls_l.Add(kls);
-                        break;
+                        case Farklılık_Klasör.SadeceSağda:
+                            Klasör.Oluştur(Kök + @"\" + kls.Yolu);
+                            break;
+                    }
+                }
+                catch (Exception)
+                {
+                    kls_l.Add(kls);
                 }
             }
             void İşl_Dsy(Fark_Dosya_ dsy, object o)
             {
-                switch (dsy.Farklılık)
+                try
                 {
-                    case Farklılık_Dosya.SadeceSolda:
-                    case Farklılık_Dosya.SoldakiDahaYeni:
-                        if (!Dosya.Kopyala(Kök + @"\" + dsy.Yolu, Sağdaki.Kök + @"\" + dsy.Yolu)) dsy_l.Add(dsy);
-                        break;
+                    switch (dsy.Farklılık)
+                    {
+                        case Farklılık_Dosya.SadeceSolda:
+                        case Farklılık_Dosya.SoldakiDahaYeni:
+                            Dosya.Kopyala(Kök + @"\" + dsy.Yolu, Sağdaki.Kök + @"\" + dsy.Yolu);
+                            break;
 
-                    case Farklılık_Dosya.SadeceSağda:
-                    case Farklılık_Dosya.SağdakiDahaYeni:
-                        if (!Dosya.Kopyala(Sağdaki.Kök + @"\" + dsy.Yolu, Kök + @"\" + dsy.Yolu)) dsy_l.Add(dsy);
-                        break;
+                        case Farklılık_Dosya.SadeceSağda:
+                        case Farklılık_Dosya.SağdakiDahaYeni:
+                            Dosya.Kopyala(Sağdaki.Kök + @"\" + dsy.Yolu, Kök + @"\" + dsy.Yolu);
+                            break;
+                    }
+                }
+                catch (Exception)
+                {
+                    dsy_l.Add(dsy);
                 }
             }
         }
@@ -933,43 +918,57 @@ namespace ArgeMup.HazirKod
 
             void İşl_Kls(Fark_Klasör_ kls, object o)
             {
-                switch (kls.Farklılık)
+                try
                 {
-                    case Farklılık_Klasör.SadeceSolda:
-                        if (FazlaKlasörVeDosyalarıSil)
-                        {
-                            if (!Klasör.Sil(Kök + @"\" + kls.Yolu)) kls_l.Add(kls);
-                        }
-                        break;
+                    switch (kls.Farklılık)
+                    {
+                        case Farklılık_Klasör.SadeceSolda:
+                            if (FazlaKlasörVeDosyalarıSil)
+                            {
+                                Klasör.Sil(Kök + @"\" + kls.Yolu);
+                            }
+                            break;
 
-                    case Farklılık_Klasör.SadeceSağda:
-                        if (!Klasör.Oluştur(Kök + @"\" + kls.Yolu)) kls_l.Add(kls);
-                        break;
+                        case Farklılık_Klasör.SadeceSağda:
+                            Klasör.Oluştur(Kök + @"\" + kls.Yolu);
+                            break;
+                    }
+                }
+                catch (Exception)
+                {
+                    kls_l.Add(kls);
                 }
             }
             void İşl_Dsy(Fark_Dosya_ dsy, object o)
             {
-                switch (dsy.Farklılık)
+                try
                 {
-                    case Farklılık_Dosya.SadeceSolda:
-                        if (FazlaKlasörVeDosyalarıSil)
-                        {
-                            if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) dsy_l.Add(dsy);
-                        }
-                        break;
+                    switch (dsy.Farklılık)
+                    {
+                        case Farklılık_Dosya.SadeceSolda:
+                            if (FazlaKlasörVeDosyalarıSil)
+                            {
+                                Dosya.Sil(Kök + @"\" + dsy.Yolu);
+                            }
+                            break;
 
-                    case Farklılık_Dosya.SadeceSağda:
-                    case Farklılık_Dosya.SağdakiDahaYeni:
-                    case Farklılık_Dosya.SoldakiDahaYeni:
-                        if (!Dosya.Kopyala(AsılKlasör.Kök + @"\" + dsy.Yolu, Kök + @"\" + dsy.Yolu)) dsy_l.Add(dsy);
-                        break;
+                        case Farklılık_Dosya.SadeceSağda:
+                        case Farklılık_Dosya.SağdakiDahaYeni:
+                        case Farklılık_Dosya.SoldakiDahaYeni:
+                            Dosya.Kopyala(AsılKlasör.Kök + @"\" + dsy.Yolu, Kök + @"\" + dsy.Yolu);
+                            break;
 
-                    case Farklılık_Dosya.AynıTarihli:
-                        if (!dsy.Aynı_Doğrulama_Kodu)
-                        {
-                            if (!Dosya.Kopyala(AsılKlasör.Kök + @"\" + dsy.Yolu, Kök + @"\" + dsy.Yolu)) dsy_l.Add(dsy);
-                        }
-                        break;
+                        case Farklılık_Dosya.AynıTarihli:
+                            if (!dsy.Aynı_Doğrulama_Kodu)
+                            {
+                                Dosya.Kopyala(AsılKlasör.Kök + @"\" + dsy.Yolu, Kök + @"\" + dsy.Yolu);
+                            }
+                            break;
+                    }
+                }
+                catch (Exception)
+                {
+                    dsy_l.Add(dsy);
                 }
             }
         }
@@ -998,7 +997,7 @@ namespace ArgeMup.HazirKod
 
             void İşl(İçerik_Dosya_ dsy, object o)
             {
-                if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
+                if (!Temkinli.Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
             }
         }
         public bool Dosya_Sil_BoyutunaGöre(long TümDosyaların_KapladığıAlan_bayt)
@@ -1025,7 +1024,7 @@ namespace ArgeMup.HazirKod
 
             void İşl(İçerik_Dosya_ dsy, object o)
             {
-                if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
+                if (!Temkinli.Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
             }
         }
         public bool Dosya_Sil_SayısınaGöre(int AzamiToplamDosyaSayısı)
@@ -1052,7 +1051,7 @@ namespace ArgeMup.HazirKod
 
             void İşl(İçerik_Dosya_ dsy, object o)
             {
-                if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
+                if (!Temkinli.Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
             }
         }
         public bool Dosya_Sil_SayısınaVeBoyutunaGöre(int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt)
@@ -1090,7 +1089,7 @@ namespace ArgeMup.HazirKod
 
             void İşl(İçerik_Dosya_ dsy, object o)
             {
-                if (!Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
+                if (!Temkinli.Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
             }
         }
         #endregion

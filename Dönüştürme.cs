@@ -178,18 +178,18 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
     public static class D_DosyaKlasörAdı
     {
-        public const string Sürüm = "V1.2";
+        public const string Sürüm = "V1.3";
 
         public static string KullanılmayacakKarakterler_DosyaAdı { get { return new string(System.IO.Path.GetInvalidFileNameChars()); } }
         public static string KullanılmayacakKarakterler_KlasörYolu { get { return new string(System.IO.Path.GetInvalidPathChars()); } }
         
-        public static string Düzelt(string Girdi, bool GeçersizKarakterleriSil = true)
+        public static string Düzelt(string Girdi, bool GeçersizKarakterleriSil = false)
         {
-            Girdi = Girdi.Trim().TrimEnd('\\');
+            Girdi = Girdi.Trim();
 
             if (GeçersizKarakterleriSil)
             {
-                string kök = "", kls = "", dsy = "";
+                string kök, kls = "", dsy;
 
                 int konum_bölüm = Girdi.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
                 if (konum_bölüm >= 0)
@@ -209,17 +209,11 @@ namespace ArgeMup.HazirKod.Dönüştürme
                     kls = kls.Replace(c.ToString(), "");
                 }
 
-                string birleştirilmiş = (string.IsNullOrEmpty(kls) ? null : kls) + dsy;
-
-                kök = System.IO.Path.GetPathRoot(birleştirilmiş);
-                string kls_köksüz = birleştirilmiş.Substring(kök.Length);
-                string tekli = System.IO.Path.DirectorySeparatorChar.ToString();
-                string ikili = tekli + tekli;
-                while (kls_köksüz.Contains(ikili)) kls_köksüz = kls_köksüz.Replace(ikili, tekli);
-
-                Girdi = kök + kls_köksüz;
+                Girdi = kls + System.IO.Path.DirectorySeparatorChar + dsy;
             }
-            
+
+            Girdi = Klasör.ÜstKlasör(Girdi, 0);
+
             return Girdi;
         }
     }

@@ -23,7 +23,6 @@ namespace ArgeMup.HazirKod
         EşZamanlıÇokluErişim.Depo_ Depo;
         IDepo_Eleman Depo_Ayarlar = null;
         System.Timers.Timer Zamanlayıcı = null;
-        DahaCokKarmasiklastirma_ Karmaşıklaştırma;
         #endregion
        
         public Ayarlar_(string AyarlarİçinParola = null, string AyarlarDosyası = null, int DeğişiklikleriKaydetmeAralığı_Sn = 5*60)
@@ -33,18 +32,14 @@ namespace ArgeMup.HazirKod
 			
 			if (!File.Exists(AyarlarDosyasıYolu)) 
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(AyarlarDosyasıYolu));
+                Klasör.Oluştur(Dosya.Klasörü(AyarlarDosyasıYolu));
                 FileStream gecici = File.Create(AyarlarDosyasıYolu);
                 gecici.Close();
                 File.Delete(AyarlarDosyasıYolu);
             }
           
             if (string.IsNullOrEmpty(AyarlarİçinParola)) Parola = null;
-            else
-            {
-                Parola = AyarlarİçinParola;
-                Karmaşıklaştırma = new DahaCokKarmasiklastirma_();
-            }
+            else Parola = AyarlarİçinParola;
 
             string okunan = "";
             if (File.Exists(AyarlarDosyasıYolu))  okunan = File.ReadAllText(_AyarlarDosyasıYolu);
@@ -58,7 +53,6 @@ namespace ArgeMup.HazirKod
                 Depo.Yaz("Kendi/Oluşturulma", DateTime.Now);
                 Depo.Yaz("Kendi/Konum", AyarlarDosyasıYolu);
                 Depo.Yaz("Kendi/Bilgisayar ve kullanıcı adı", Kendi.BilgisayarAdı + "/" + Kendi.KullanıcıAdı);
-                Depo.Yaz("Kendi/Bütünlük kontrolü", "ArGeMuP");
                 Depo.Yaz("Kendi/Son kayıt", DateTime.Now);
 
                 Depo.Yaz("Uygulama", Kendi.Sürümü_Dosya);
@@ -74,19 +68,12 @@ namespace ArgeMup.HazirKod
                     try
                     {
                         IDepo_Eleman ayrl = Depo.Bul("Ayarlar");
-                        string ayrlr_içeriği = Karmaşıklaştırma.Düzelt(ayrl[0], Parola);
+                        string ayrlr_içeriği = DahaCokKarmasiklastirma.Düzelt(ayrl[0], Parola);
                         ayrl.Sil(null);
                         Depo.Ekle(ayrlr_içeriği);
                     }
                     catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
                 }
-
-                try 
-                {
-                    okunan = Depo.Oku("Kendi/Bütünlük kontrolü");
-                    if (string.IsNullOrEmpty(okunan) || okunan != DoğrulamaKodu.Üret.Yazıdan(Depo.Bul("Ayarlar").YazıyaDönüştür(null, false, false))) throw new Exception(); 
-                }
-                catch (Exception) { throw new Exception("Bütünlük Kontrolü Hatalı - " + _AyarlarDosyasıYolu); }
             }
 
             if (DeğişiklikleriKaydetmeAralığı_Sn > 0)
@@ -112,7 +99,6 @@ namespace ArgeMup.HazirKod
                 try
                 {
                     if (Zamanlayıcı != null) { Zamanlayıcı.Dispose(); Zamanlayıcı = null; }
-                    if (Karmaşıklaştırma != null) { Karmaşıklaştırma.Dispose(); Karmaşıklaştırma = null; }
                 }
                 catch (Exception) { }
             }
@@ -124,14 +110,13 @@ namespace ArgeMup.HazirKod
             if (File.Exists(_AyarlarDosyasıYolu) && !File.Exists(_AyarlarDosyasıYolu + ".yedek")) File.Copy(_AyarlarDosyasıYolu, _AyarlarDosyasıYolu + ".yedek", false);
 
             ArgeMup.HazirKod.Depo_ birarada = new ArgeMup.HazirKod.Depo_();
-            string Ayarlar = Depo_Ayarlar.YazıyaDönüştür(null, false, false);
             birarada.Ekle(Depo.Bul("Uygulama").YazıyaDönüştür(null, false, false), false);
             birarada.Ekle(Depo.Bul("Kendi").YazıyaDönüştür(null, false, false), false);
-            birarada.Yaz("Kendi/Bütünlük kontrolü", DoğrulamaKodu.Üret.Yazıdan(Ayarlar));
             birarada.Yaz("Kendi/Son kayıt", DateTime.Now);
 
+            string Ayarlar = Depo_Ayarlar.YazıyaDönüştür(null);
             if (Parola == null) birarada.Ekle(Ayarlar, false);
-            else birarada.Yaz("Ayarlar", Karmaşıklaştırma.Karıştır(Ayarlar, Parola));
+            else birarada.Yaz("Ayarlar", DahaCokKarmasiklastirma.Karıştır(Ayarlar, Parola));
 
             File.WriteAllText(_AyarlarDosyasıYolu, birarada.YazıyaDönüştür());
 
@@ -297,6 +282,10 @@ namespace ArgeMup.HazirKod
         public IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false, bool BağımsızKopyaOluştur = false)
         {
             return Depo_Ayarlar.Bul(ElemanAdıDizisi, YoksaOluştur, BağımsızKopyaOluştur);
+        }
+        public System.Collections.Generic.List<IDepo_Eleman> Bul(string ElemanAdıDizisi, Predicate<IDepo_Eleman> Kıstas)
+        {
+            return Depo_Ayarlar.Bul(ElemanAdıDizisi, Kıstas);
         }
         public void Sil(string ElemanAdıDizisi, bool Sadeceİçeriğini, bool SadeceElemanlarını)
         {

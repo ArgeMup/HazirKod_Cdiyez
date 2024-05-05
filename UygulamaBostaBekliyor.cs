@@ -37,7 +37,7 @@
                 {
                     foreach (var dosya in VideolarınBulunduklarıKlasörler)
                     {
-                        string yol = Path.GetDirectoryName(dosya+"\\");
+                        string yol = Dosya.Klasörü(dosya);
                         if (!Directory.Exists(yol)) continue;
                         UzaktakiOynatılacakVideolarListesi.AddRange(Directory.GetFiles(yol));
                     }

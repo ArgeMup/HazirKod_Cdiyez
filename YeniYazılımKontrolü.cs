@@ -22,13 +22,13 @@ namespace ArgeMup.HazirKod
             if (HedefDosyaYolu == null) İndirilenDosyanınAdı = Kendi.Klasörü + @"\" + İndirilenDosyanınAdı; 
             else
             {
-                İndirilenDosyanınAdı = Path.GetDirectoryName(HedefDosyaYolu) + @"\" + İndirilenDosyanınAdı;
+                İndirilenDosyanınAdı = Dosya.Klasörü(HedefDosyaYolu) + @"\" + İndirilenDosyanınAdı;
                 this.HedefDosyaYolu = HedefDosyaYolu;
             }
 
-            if (Directory.Exists(Path.GetDirectoryName(İndirilenDosyanınAdı)))
+            if (Klasör.VarMı(Dosya.Klasörü(İndirilenDosyanınAdı)))
             {
-                string[] ÖncekiDenemeler = Directory.GetFiles(Path.GetDirectoryName(İndirilenDosyanınAdı), "ArgeMuP.HazirKod.YeniYazılımKontrolü.*", SearchOption.TopDirectoryOnly);
+                string[] ÖncekiDenemeler = Directory.GetFiles(Dosya.Klasörü(İndirilenDosyanınAdı), "ArgeMuP.HazirKod.YeniYazılımKontrolü.*", SearchOption.TopDirectoryOnly);
                 if (ÖncekiDenemeler != null) foreach (string dsy in ÖncekiDenemeler) Dosya.Sil(dsy);
             }
             
@@ -79,23 +79,28 @@ namespace ArgeMup.HazirKod
                         if (HedefDosyaVarMı)
                         {
                             string HedefDosyaYolununYedeği = HedefDosyaYolu + ".V" + şimdiki.FileVersion;
-                            if (!Dosya.Sil(HedefDosyaYolununYedeği)) GeriBildirim_İşlemi?.Invoke(false, "Yedek dosya silinemedi");
-                            else File.Move(HedefDosyaYolu, HedefDosyaYolununYedeği);
+                            Dosya.Sil(HedefDosyaYolununYedeği);
+                            File.Move(HedefDosyaYolu, HedefDosyaYolununYedeği);
                         }
 
                         if (File.Exists(HedefDosyaYolu)) GeriBildirim_İşlemi?.Invoke(false, "Hedef dosya silinemedi");
-                        else if (!Dosya.Kopyala(İndirilenDosya_Adı_Yazı, HedefDosyaYolu)) GeriBildirim_İşlemi?.Invoke(false, "Hedef dosya oluşturulamadı");
-                        else GeriBildirim_İşlemi?.Invoke(true, (HedefDosyaVarMı ? "Eski:V" + şimdiki.FileVersion + " " : null) + "Yeni:V" + gelen.FileVersion);
+                        else
+                        {
+                            Dosya.Kopyala(İndirilenDosya_Adı_Yazı, HedefDosyaYolu);
+                            GeriBildirim_İşlemi?.Invoke(true, (HedefDosyaVarMı ? "Eski:V" + şimdiki.FileVersion + " " : null) + "Yeni:V" + gelen.FileVersion);
+                        }
                     }
                     else GeriBildirim_İşlemi?.Invoke(true, "Güncel V" + şimdiki.FileVersion);
                 }
                 else GeriBildirim_İşlemi?.Invoke(false, "Hatalı");
 
                 Dosya.Sil(İndirilenDosya_Adı_Yazı);
+                GeriBildirim_İşlemi = null;
             }
             catch (Exception ex)
             {
                 GeriBildirim_İşlemi?.Invoke(false, ex.Message);
+                GeriBildirim_İşlemi = null;
             }
 
             Durdur();

@@ -2,8 +2,7 @@
 
 #if HazirKod_Cdiyez_Sıkıştırma
 
-	using ArgeMup.HazirKod.Ekİşlemler;
-	using System;
+    using System;
     using System.IO;
     using System.IO.Compression;
 
@@ -11,92 +10,64 @@
     {
         public class SıkıştırılmışDosya
         {
-            public const string Sürüm = "V1.0";
+            public const string Sürüm = "V1.1";
 
-            public static bool Klasörden(string Kaynak, string HedefZipDosyasıYolu, bool YeniBirDosyaOluştur = true)
+            public static void Klasörden(string Kaynak, string HedefZipDosyasıYolu, bool YeniBirDosyaOluştur = true)
             {
-                return Klasörden(new Klasör_(Kaynak, DoğrulamaKodunuÜret:false), HedefZipDosyasıYolu, YeniBirDosyaOluştur);
+                Klasörden(new Klasör_(Kaynak, DoğrulamaKodunuÜret: false), HedefZipDosyasıYolu, YeniBirDosyaOluştur);
             }
             public static void Klasöre(string KaynakZipDosyasıYolu, string HedefKlasör)
             {
                 Klasöre(Listele(KaynakZipDosyasıYolu, false), HedefKlasör);
             }
 
-            public static bool Klasörden(Klasör_ Kaynak, string HedefZipDosyasıYolu, bool YeniBirDosyaOluştur = true)
+            public static void Klasörden(Klasör_ Kaynak, string HedefZipDosyasıYolu, bool YeniBirDosyaOluştur = true)
             {
-                string yedek_dosya_adı = HedefZipDosyasıYolu + ".yedek";
                 ZipArchiveMode tip = ZipArchiveMode.Create;
 
                 if (File.Exists(HedefZipDosyasıYolu))
                 {
-                    if (File.Exists(yedek_dosya_adı)) File.Delete(yedek_dosya_adı);
-
-                    if (YeniBirDosyaOluştur)
-                    {
-                        File.Move(HedefZipDosyasıYolu, yedek_dosya_adı);
-                    }
-                    else
-                    {
-                        File.Copy(HedefZipDosyasıYolu, yedek_dosya_adı);
-
-                        tip = ZipArchiveMode.Update;
-                    }
+                    if (YeniBirDosyaOluştur) Dosya.Sil(HedefZipDosyasıYolu);
+                    else tip = ZipArchiveMode.Update;
                 }
-                else Klasör.Oluştur(Klasör.ÜstKlasör(HedefZipDosyasıYolu));
-            
-                try
+                else Directory.CreateDirectory(Klasör.ÜstKlasör(HedefZipDosyasıYolu));
+
+                using (ZipArchive archive = ZipFile.Open(HedefZipDosyasıYolu, tip))
                 {
-                    using (ZipArchive archive = ZipFile.Open(HedefZipDosyasıYolu, tip))
+                    for (int SıraNo = 0; SıraNo < Kaynak.Klasörler.Count; SıraNo++)
                     {
-                        for (int SıraNo = 0; SıraNo < Kaynak.Klasörler.Count; SıraNo++)
-                        {
-                            archive.CreateEntry(Kaynak.Klasörler[SıraNo] + @"\", CompressionLevel.Optimal);
-                        }
+                        archive.CreateEntry(Kaynak.Klasörler[SıraNo] + @"\", CompressionLevel.Optimal);
+                    }
 
-                        for (int SıraNo = 0; SıraNo < Kaynak.Dosyalar.Count; SıraNo++)
-                        {
-                            ZipArchiveEntry biri = null;
+                    for (int SıraNo = 0; SıraNo < Kaynak.Dosyalar.Count; SıraNo++)
+                    {
+                        ZipArchiveEntry biri = null;
 
-                            using (FileStream K = new FileStream(Kaynak.Kök + @"\" + Kaynak.Dosyalar[SıraNo].Yolu, FileMode.Open, FileAccess.Read))
+                        using (FileStream K = new FileStream(Kaynak.Kök + @"\" + Kaynak.Dosyalar[SıraNo].Yolu, FileMode.Open, FileAccess.Read))
+                        {
+                            biri = archive.CreateEntry(Kaynak.Dosyalar[SıraNo].Yolu, CompressionLevel.Optimal);
+                            biri.LastWriteTime = Kaynak.Dosyalar[SıraNo].DeğiştirilmeTarihi;
+
+                            using (Stream H = biri.Open())
                             {
-                                biri = archive.CreateEntry(Kaynak.Dosyalar[SıraNo].Yolu, CompressionLevel.Optimal);
-                                biri.LastWriteTime = Kaynak.Dosyalar[SıraNo].DeğiştirilmeTarihi;
+                                long KaynakDosyaBoyutu = K.Length, KaynakOkunmuşAdet = 0;
+                                int KaynakOkunacakDosyaBoyutu;
+                                byte[] Tampon = new byte[4 * 1024];
 
-                                using (Stream H = biri.Open())
+                                while (KaynakOkunmuşAdet < KaynakDosyaBoyutu)
                                 {
-                                    long KaynakDosyaBoyutu = K.Length, KaynakOkunmuşAdet = 0;
-                                    int KaynakOkunacakDosyaBoyutu;
-                                    byte[] Tampon = new byte[4 * 1024];
+                                    if (KaynakDosyaBoyutu - KaynakOkunmuşAdet > Tampon.Length) KaynakOkunacakDosyaBoyutu = Tampon.Length;
+                                    else KaynakOkunacakDosyaBoyutu = (int)KaynakDosyaBoyutu - (int)KaynakOkunmuşAdet;
 
-                                    while (KaynakOkunmuşAdet < KaynakDosyaBoyutu)
-                                    {
-                                        if (KaynakDosyaBoyutu - KaynakOkunmuşAdet > Tampon.Length) KaynakOkunacakDosyaBoyutu = Tampon.Length;
-                                        else KaynakOkunacakDosyaBoyutu = (int)KaynakDosyaBoyutu - (int)KaynakOkunmuşAdet;
+                                    KaynakOkunacakDosyaBoyutu = K.Read(Tampon, 0, KaynakOkunacakDosyaBoyutu);
+                                    H.Write(Tampon, 0, KaynakOkunacakDosyaBoyutu);
 
-                                        KaynakOkunacakDosyaBoyutu = K.Read(Tampon, 0, KaynakOkunacakDosyaBoyutu);
-                                        H.Write(Tampon, 0, KaynakOkunacakDosyaBoyutu);
-
-                                        KaynakOkunmuşAdet += KaynakOkunacakDosyaBoyutu;
-                                    }
+                                    KaynakOkunmuşAdet += KaynakOkunacakDosyaBoyutu;
                                 }
                             }
-                        } 
-                    }
-
-                    if (File.Exists(yedek_dosya_adı)) Dosya.Sil(yedek_dosya_adı);
-
-                    return true;
+                        }
+                    } 
                 }
-                catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
-
-                if (File.Exists(yedek_dosya_adı))
-                {
-                    if (File.Exists(HedefZipDosyasıYolu)) File.Delete(HedefZipDosyasıYolu);
-
-                    File.Move(yedek_dosya_adı, HedefZipDosyasıYolu);
-                }
-
-                return false;
             }
             public static Klasör_ Listele(string KaynakZipDosyasıYolu, bool DoğrulamaKodunuÜret = true)
             {

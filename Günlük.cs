@@ -38,7 +38,7 @@ namespace ArgeMup.HazirKod
             if (Klasörü != null)
             {
                 if (Klasörü == "") Klasörü = @"\\?\" + Klasör.Depolama(Klasör.Kapsamı.Geçici) + @"\Gunluk";
-                if (!Klasör.Oluştur(Klasörü)) throw new Exception("Klasör oluşturulamadı " + Klasörü);
+                Klasör.Oluştur(Klasörü);
 
                 Yolu = Klasörü + @"\" + D_TarihSaat.Yazıya(DateTime.Now, D_TarihSaat.Şablon_DosyaAdı) + ".Gunluk";
 

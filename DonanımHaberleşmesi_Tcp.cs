@@ -283,7 +283,6 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         int GüvenliBağlantıKuruldu = 0;
         Tcpİstemci_ Tcpİstemci = null; IDonanımHaberleşmesi DonanımHaberleşmesi = null;
         byte[] Simetrik_Karmaşıklaştırma_Parola_Giden = null, Simetrik_Karmaşıklaştırma_Parola_Gelen = null;
-        DahaCokKarmasiklastirma_ Simetrik_Karmaşıklaştırma = new DahaCokKarmasiklastirma_();
         DahaCokKarmasiklastirma_Asimetrik_ Asimetrik_Karmaşıklaştırma_Giden = null, Asimetrik_Karmaşıklaştırma_Gelen = null;
         GeriBildirim_Islemi_ GeriBildirim_Islemi = null;
         #endregion
@@ -324,7 +323,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                     break;
 
                 case GeriBildirim_Türü_.BilgiGeldi:
-                    if (GüvenliBağlantıKuruldu == 2) GeriBildirim_Islemi?.Invoke(Kaynak, Tür, Simetrik_Karmaşıklaştırma.Düzelt((byte[])İçerik, Simetrik_Karmaşıklaştırma_Parola_Gelen), Hatırlatıcı);
+                    if (GüvenliBağlantıKuruldu == 2) GeriBildirim_Islemi?.Invoke(Kaynak, Tür, DahaCokKarmasiklastirma.Düzelt((byte[])İçerik, Simetrik_Karmaşıklaştırma_Parola_Gelen), Hatırlatıcı);
                     else
                     {
                         string gelen = Dönüştürme.D_Yazı.BaytDizisinden((byte[])İçerik);
@@ -340,7 +339,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                         else if (gelen.StartsWith("B|"))
                         {
                             Simetrik_Karmaşıklaştırma_Parola_Giden = Asimetrik_Karmaşıklaştırma_Giden.Düzelt(Dönüştürme.D_Yazı.Taban64ten(gelen.Substring(2)));
-                            DonanımHaberleşmesi.Gönder(Dönüştürme.D_Yazı.BaytDizisine("C|" + Dönüştürme.D_BaytDizisi.Taban64e(Simetrik_Karmaşıklaştırma.Karıştır(Dönüştürme.D_Yazı.BaytDizisine(ElŞıkışma), Simetrik_Karmaşıklaştırma_Parola_Giden))));
+                            DonanımHaberleşmesi.Gönder(Dönüştürme.D_Yazı.BaytDizisine("C|" + Dönüştürme.D_BaytDizisi.Taban64e(DahaCokKarmasiklastirma.Karıştır(Dönüştürme.D_Yazı.BaytDizisine(ElŞıkışma), Simetrik_Karmaşıklaştırma_Parola_Giden))));
 
                             Asimetrik_Karmaşıklaştırma_Giden.Dispose();
                             Asimetrik_Karmaşıklaştırma_Giden = null;
@@ -348,7 +347,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                         }
                         else if (gelen.StartsWith("C|"))
                         {
-                            if (Dönüştürme.D_Yazı.BaytDizisinden(Simetrik_Karmaşıklaştırma.Düzelt(Dönüştürme.D_Yazı.Taban64ten(gelen.Substring(2)), Simetrik_Karmaşıklaştırma_Parola_Gelen)) == ElŞıkışma)
+                            if (Dönüştürme.D_Yazı.BaytDizisinden(DahaCokKarmasiklastirma.Düzelt(Dönüştürme.D_Yazı.Taban64ten(gelen.Substring(2)), Simetrik_Karmaşıklaştırma_Parola_Gelen)) == ElŞıkışma)
                             {
                                 if (Interlocked.Increment(ref GüvenliBağlantıKuruldu) == 2) GeriBildirim_Islemi?.Invoke(Kaynak, GeriBildirim_Türü_.BağlantıKuruldu, null, Hatırlatıcı);
                             }
@@ -373,7 +372,6 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
                 Tcpİstemci?.Dispose();
                 Tcpİstemci = null;
                 DonanımHaberleşmesi = null;
-                Simetrik_Karmaşıklaştırma.Dispose();
             }
             else Tcpİstemci?.Durdur();
 
@@ -400,7 +398,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         {
             if (GüvenliBağlantıKuruldu != 2) throw new Exception("Bağlantı Kurulmadı");
 
-            DonanımHaberleşmesi.Gönder(Simetrik_Karmaşıklaştırma.Karıştır(Bilgi, Simetrik_Karmaşıklaştırma_Parola_Giden), Alıcı);
+            DonanımHaberleşmesi.Gönder(DahaCokKarmasiklastirma.Karıştır(Bilgi, Simetrik_Karmaşıklaştırma_Parola_Giden), Alıcı);
         }
         void IDonanımHaberleşmesi.Gönder(string Bilgi, string Alıcı)
         {

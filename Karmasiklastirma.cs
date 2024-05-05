@@ -8,122 +8,77 @@ using ArgeMup.HazirKod.Ekİşlemler;
 
 namespace ArgeMup.HazirKod
 {
-    public class DahaCokKarmasiklastirma_ : IDisposable
+    public static class DahaCokKarmasiklastirma
     {
         public const string Sürüm = "V1.2";
-        public string Karıştır(string Girdi, string Parola)
+        public static string Karıştır(string Girdi, string Parola)
         {
             return D_HexYazı.BaytDizisinden(Karıştır(D_Yazı.BaytDizisine(Girdi), D_Yazı.BaytDizisine(Parola)));
         }
-        public byte[] Karıştır(byte[] Girdi, byte[] Parola)
+        public static byte[] Karıştır(byte[] Girdi, byte[] Parola)
         {
-            try
+            byte[] çıktı;
+
+            using (Aes aesAlg = Aes.Create())
             {
-                byte[] çıktı;
+                aesAlg.Mode = CipherMode.CBC;
+                aesAlg.Padding = PaddingMode.PKCS7;
+                aesAlg.IV = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
-                using (Aes aesAlg = Aes.Create())
+                PasswordDeriveBytes pdb = new PasswordDeriveBytes(Parola, aesAlg.IV);
+                aesAlg.Key = pdb.GetBytes(aesAlg.KeySize / 8);
+                aesAlg.IV = pdb.GetBytes(aesAlg.BlockSize / 8);
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msEncrypt = new MemoryStream())
                 {
-                    aesAlg.Mode = CipherMode.CBC;
-                    aesAlg.Padding = PaddingMode.PKCS7;
-                    aesAlg.IV = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-
-                    PasswordDeriveBytes pdb = new PasswordDeriveBytes(Parola, aesAlg.IV);
-                    aesAlg.Key = pdb.GetBytes(aesAlg.KeySize / 8);
-                    aesAlg.IV = pdb.GetBytes(aesAlg.BlockSize / 8);
-
-                    ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-                    using (MemoryStream msEncrypt = new MemoryStream())
-                    {
-                        using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-	                    {
-	                        csEncrypt.Write(Girdi, 0, Girdi.Length);
-	                    }
-	                    çıktı = msEncrypt.ToArray();
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+	                {
+	                    csEncrypt.Write(Girdi, 0, Girdi.Length);
 	                }
-                }
-
-                return çıktı;
+	                çıktı = msEncrypt.ToArray();
+	            }
             }
-            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
-            return null;
+
+            return çıktı;
         }
 
-        public string Düzelt(string Girdi, string Parola)
+        public static string Düzelt(string Girdi, string Parola)
         {
             return D_Yazı.BaytDizisinden(Düzelt(D_HexYazı.BaytDizisine(Girdi), D_Yazı.BaytDizisine(Parola)));
         }
-        public byte[] Düzelt(byte[] Girdi, byte[] Parola)
+        public static byte[] Düzelt(byte[] Girdi, byte[] Parola)
         {
-            try
+            byte[] çıktı = null;
+
+            using (Aes aesAlg = Aes.Create())
             {
-                byte[] çıktı = null;
+                aesAlg.Mode = CipherMode.CBC;
+                aesAlg.Padding = PaddingMode.PKCS7;
+                aesAlg.IV = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
-                using (Aes aesAlg = Aes.Create())
+                PasswordDeriveBytes pdb = new PasswordDeriveBytes(Parola, aesAlg.IV);
+                aesAlg.Key = pdb.GetBytes(aesAlg.KeySize / 8);
+                aesAlg.IV = pdb.GetBytes(aesAlg.BlockSize / 8);
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+                using (MemoryStream msEncrypt = new MemoryStream(Girdi))
                 {
-                    aesAlg.Mode = CipherMode.CBC;
-                    aesAlg.Padding = PaddingMode.PKCS7;
-                    aesAlg.IV = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-
-                    PasswordDeriveBytes pdb = new PasswordDeriveBytes(Parola, aesAlg.IV);
-                    aesAlg.Key = pdb.GetBytes(aesAlg.KeySize / 8);
-                    aesAlg.IV = pdb.GetBytes(aesAlg.BlockSize / 8);
-
-                    ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                    using (MemoryStream msEncrypt = new MemoryStream(Girdi))
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, decryptor, CryptoStreamMode.Read))
                     {
-                        using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, decryptor, CryptoStreamMode.Read))
-                        {
-		                    using (MemoryStream ms = new MemoryStream())
-		                    {
-		                        csEncrypt.CopyTo(ms);
-		                        çıktı = ms.ToArray();
-		                    }
+		                using (MemoryStream ms = new MemoryStream())
+		                {
+		                    csEncrypt.CopyTo(ms);
+		                    çıktı = ms.ToArray();
 		                }
-                    }
+		            }
                 }
-
-                return çıktı;
             }
-            catch (Exception ex) { ex.Günlük(null, Günlük.Seviye.HazirKod); }
-            return null;
+
+            return çıktı;
         }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects).
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                //disposedValue = true;
-            }
-        }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~DahaCokKarmasiklastirma_() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 
     public class DahaCokKarmasiklastirma_Asimetrik_ : IDisposable
@@ -143,8 +98,7 @@ namespace ArgeMup.HazirKod
         const int AesParolaKarakterSayısı = 32; //aes anahtar uzunluğu 256 bit
         const int RsaPKCSKarakterSayısı = 11; //https://www.rfc-editor.org/rfc/rfc3447#section-7.2.1
 
-        RSACryptoServiceProvider rsa = null;
-        DahaCokKarmasiklastirma_ dçk = null;
+        RSACryptoServiceProvider rsa;
 
         /// <summary>
         /// Yaslama -> PKCS#1 V1.5
@@ -174,8 +128,7 @@ namespace ArgeMup.HazirKod
             {
                 byte[] şifre = Rastgele.BaytDizisi(AesParolaKarakterSayısı);
 
-                if (dçk == null) dçk = new DahaCokKarmasiklastirma_();
-                byte[] şifreli = dçk.Karıştır(Girdi, şifre);
+                byte[] şifreli = DahaCokKarmasiklastirma.Karıştır(Girdi, şifre);
 
                 int rsa_paketi_boş_alan = AzamiKarakterSayısı - AesParolaKarakterSayısı;
                 byte[] rsa_paketi = new byte[AzamiKarakterSayısı];
@@ -209,8 +162,7 @@ namespace ArgeMup.HazirKod
                 Array.Copy(rsa_paketi, AesParolaKarakterSayısı, şifreli, 0, rsa_paketi_boş_alan);
                 Array.Copy(Girdi, RsaParolaKarakterSayısı, şifreli, rsa_paketi_boş_alan, rsa_paketi_dışında_kalan);
 
-                if (dçk == null) dçk = new DahaCokKarmasiklastirma_();
-                byte[] çıktı = dçk.Düzelt(şifreli, şifre);
+                byte[] çıktı = DahaCokKarmasiklastirma.Düzelt(şifreli, şifre);
                 return çıktı;
             }
         }
@@ -259,7 +211,6 @@ namespace ArgeMup.HazirKod
                 {
                     // TODO: dispose managed state (managed objects)
                     rsa?.Dispose();
-                    dçk?.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

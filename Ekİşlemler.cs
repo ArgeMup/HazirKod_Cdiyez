@@ -54,14 +54,13 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return Değişken.Üret(Tipi, Depo["ArGeMuP"]);
         }
 
-        static ArgeMup.HazirKod.DahaCokKarmasiklastirma_ DaÇoKa = new ArgeMup.HazirKod.DahaCokKarmasiklastirma_();
         public static string Karıştır(this string Girdi, string Şifre)
         {
-            return DaÇoKa.Karıştır(Girdi, Şifre);
+            return DahaCokKarmasiklastirma.Karıştır(Girdi, Şifre);
         }
         public static string Düzelt(this string Girdi, string Şifre)
         {
-            return DaÇoKa.Düzelt(Girdi, Şifre);
+            return DahaCokKarmasiklastirma.Düzelt(Girdi, Şifre);
         }
 
         public static byte[] Taban64ten(this string Girdi)
@@ -127,48 +126,6 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             }
 
             return false;
-        }
-
-        public static string DosyaYolu_Düzelt(this string DosyaYolu, bool GeçersizKarakterleriSil = true)
-        {
-            return ArgeMup.HazirKod.Dönüştürme.D_DosyaKlasörAdı.Düzelt(DosyaYolu, GeçersizKarakterleriSil);
-        }
-        public static string DosyaYolu_DosyaAdı(this string DosyaYolu)
-        {
-            return System.IO.Path.GetFileName(DosyaYolu);
-        }
-        public static string DosyaYolu_DosyaSoyAdı(this string DosyaYolu)
-        {
-            return System.IO.Path.GetExtension(DosyaYolu).Substring(1);
-        }
-        public static string DosyaYolu_ÜstKlasör(this string DosyaYolu, int Seviye = 1, bool KökeUlaşıncaDur = false)
-        {
-            return Klasör.ÜstKlasör(DosyaYolu, Seviye, KökeUlaşıncaDur);
-        }
-        public static string DosyaYolu_Oku_Yazı(this string DosyaYolu)
-        {
-            if (!System.IO.File.Exists(DosyaYolu)) return null;
-            else return System.IO.File.ReadAllText(DosyaYolu);
-        }
-        public static byte[] DosyaYolu_Oku_BaytDizisi(this string DosyaYolu)
-        {
-            if (!System.IO.File.Exists(DosyaYolu)) return null;
-            else return System.IO.File.ReadAllBytes(DosyaYolu);
-        }
-        public static void DosyaYolu_Yaz(this string DosyaYolu, string Yazı)
-        {
-            Klasör.Oluştur(DosyaYolu.DosyaYolu_ÜstKlasör(), false);
-            System.IO.File.WriteAllText(DosyaYolu, Yazı);
-        }
-        public static void DosyaYolu_Yaz(this string DosyaYolu, byte[] BaytDizisi)
-        {
-            Klasör.Oluştur(DosyaYolu.DosyaYolu_ÜstKlasör(), false);
-            System.IO.File.WriteAllBytes(DosyaYolu, BaytDizisi);
-        }
-        public static void Dosyaİçeriği_Yaz(this string İçerik, string DosyaYolu)
-        {
-            Klasör.Oluştur(DosyaYolu.DosyaYolu_ÜstKlasör(), false);
-            System.IO.File.WriteAllText(DosyaYolu, İçerik);
         }
 
         public static string Günlük(this string Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0, bool Hemen = false)
@@ -239,25 +196,18 @@ namespace ArgeMup.HazirKod.Ekİşlemler
             return ArgeMup.HazirKod.Dönüştürme.D_HexYazı.BaytDizisinden(Girdi, Adet, BaşlangıçKonumu);
         }
 
-        static ArgeMup.HazirKod.DahaCokKarmasiklastirma_ DaÇoKa = new ArgeMup.HazirKod.DahaCokKarmasiklastirma_();
         public static byte[] Karıştır(this byte[] Girdi, byte[] Şifre)
         {
-            return DaÇoKa.Karıştır(Girdi, Şifre);
+            return DahaCokKarmasiklastirma.Karıştır(Girdi, Şifre);
         }
         public static byte[] Düzelt(this byte[] Girdi, byte[] Şifre)
         {
-            return DaÇoKa.Düzelt(Girdi, Şifre);
+            return DahaCokKarmasiklastirma.Düzelt(Girdi, Şifre);
         }
 
         public static string Taban64e(this byte[] Girdi)
         {
             return ArgeMup.HazirKod.Dönüştürme.D_BaytDizisi.Taban64e(Girdi);
-        }
-
-        public static void Dosyaİçeriği_Yaz(this byte[] İçerik, string DosyaYolu)
-        {
-            Klasör.Oluştur(DosyaYolu.DosyaYolu_ÜstKlasör(), false);
-            System.IO.File.WriteAllBytes(DosyaYolu, İçerik);
         }
 
         public static byte[] Günlük(this byte[] Girdi, string ÖnYazı = null, ArgeMup.HazirKod.Günlük.Seviye Seviyesi = ArgeMup.HazirKod.Günlük.Seviye.Geveze, [System.Runtime.CompilerServices.CallerFilePath] string ÇağıranDosya = "", [System.Runtime.CompilerServices.CallerLineNumber] int ÇağıranSatırNo = 0, bool Hemen = false)

@@ -68,7 +68,7 @@ namespace ArgeMup.HazirKod
                     SihirliKelime = SihirliKelime
                 };
 
-                KlasörYolu = D_DosyaKlasörAdı.Düzelt(KlasörYolu, false);
+                KlasörYolu = D_DosyaKlasörAdı.Düzelt(KlasörYolu);
 
                 string[] liste_d = Directory.GetFiles(KlasörYolu, "*.*", Kapsamı).Where((biri, içerik) => !biri.EndsWith(DoğrulamaKodu_DosyaAdı)).ToArray();
                 string[] liste_k = Directory.GetDirectories(KlasörYolu, "*", Kapsamı);
@@ -112,7 +112,7 @@ namespace ArgeMup.HazirKod
                     SihirliKelime = SihirliKelime
                 };
 
-                KlasörYolu = D_DosyaKlasörAdı.Düzelt(KlasörYolu, false) + "\\";
+                KlasörYolu = D_DosyaKlasörAdı.Düzelt(KlasörYolu) + "\\";
 
                 if (!File.Exists(KlasörYolu + DoğrulamaKodu_DosyaAdı)) return Durum_.DoğrulamaDosyasıYok;
                 string[] dosya_içeriği = File.ReadAllLines(KlasörYolu + DoğrulamaKodu_DosyaAdı);

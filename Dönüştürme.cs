@@ -185,11 +185,9 @@ namespace ArgeMup.HazirKod.Dönüştürme
         
         public static string Düzelt(string Girdi, bool GeçersizKarakterleriSil = false)
         {
-            Girdi = Girdi.Trim();
-
             if (GeçersizKarakterleriSil)
             {
-                string kök, kls = "", dsy;
+                string kls = "", dsy;
 
                 int konum_bölüm = Girdi.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
                 if (konum_bölüm >= 0)

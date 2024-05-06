@@ -159,7 +159,7 @@ namespace ArgeMup.HazirKod
         public static string ÜstKlasör(string Yolu, int Seviye = 1)
         {
             int Detay_Seviye = 0;
-            DirectoryInfo Detay = new DirectoryInfo(Yolu);
+            DirectoryInfo Detay = new DirectoryInfo(Yolu.Trim().TrimEnd('\\'));
 
             while (Detay_Seviye < Seviye)
             {
@@ -532,7 +532,7 @@ namespace ArgeMup.HazirKod
 
             public İçerik_Dosya_(string Kök, string DosyaYolu, bool DoğrulamaKodunuÜret)
             {
-                Yolu = D_DosyaKlasörAdı.Düzelt(DosyaYolu.Substring(Kök.Length + 1));
+                Yolu = DosyaYolu.Substring(Kök.Length + 1);
 
                 if (File.Exists(DosyaYolu))
                 {
@@ -601,7 +601,7 @@ namespace ArgeMup.HazirKod
             Klasörler.Clear();
             Dosyalar = null;
 
-            Kök = KökKlasör.TrimEnd('\\');
+            Kök = KökKlasör.DoluMu(true) ? D_DosyaKlasörAdı.Düzelt(KökKlasör) : KökKlasör;
             if (!Directory.Exists(Kök))
             {
                 Dosyalar = new List<İçerik_Dosya_>();

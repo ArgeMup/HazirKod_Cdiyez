@@ -202,78 +202,80 @@ namespace ArgeMup.HazirKod
             }
         }
 
-        public static class SıkıştırılmışDosya
-        {
-            public const string Sürüm = "V1.0";
-
-            public static bool Klasörden(string Kaynak, string HedefZipDosyasıYolu, bool YeniBirDosyaOluştur = true)
-            {
-                string yedek_dosya_adı = HedefZipDosyasıYolu + ".yedek";
-                
-                try
-                {
-                    if (ArgeMup.HazirKod.Dosya.VarMı(HedefZipDosyasıYolu))
-                    {
-                        ArgeMup.HazirKod.Dosya.Sil(yedek_dosya_adı);
-
-                        if (YeniBirDosyaOluştur)
-                        {
-                            System.IO.File.Move(HedefZipDosyasıYolu, yedek_dosya_adı);
-                        }
-                        else
-                        {
-                            System.IO.File.Copy(HedefZipDosyasıYolu, yedek_dosya_adı);
-                        }
-                    }
-
-                    ArgeMup.HazirKod.SıkıştırılmışDosya.Klasörden(Kaynak, HedefZipDosyasıYolu, YeniBirDosyaOluştur);
-                    ArgeMup.HazirKod.Dosya.Sil(yedek_dosya_adı);
-
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    ex.Günlük(null, Günlük.Seviye.HazirKod);
-
-                    if (ArgeMup.HazirKod.Dosya.VarMı(yedek_dosya_adı))
-                    {
-                        ArgeMup.HazirKod.Dosya.Sil(HedefZipDosyasıYolu);
-                        System.IO.File.Move(yedek_dosya_adı, HedefZipDosyasıYolu);
-                    }
-                }
-
-                return false;
-            }
-            public static bool Klasöre(string KaynakZipDosyasıYolu, string HedefKlasör)
-            {
-                string yedek_klasör_adı = HedefKlasör.TrimEnd('\\') + ".yedek";
-
-                try
-                {
-                    if (ArgeMup.HazirKod.Klasör.VarMı(HedefKlasör))
-                    {
-                        ArgeMup.HazirKod.Klasör.Sil(yedek_klasör_adı);
-                        System.IO.Directory.Move(HedefKlasör, yedek_klasör_adı);
-                    }
-
-                    ArgeMup.HazirKod.SıkıştırılmışDosya.Klasöre(KaynakZipDosyasıYolu, HedefKlasör);
-                    ArgeMup.HazirKod.Klasör.Sil(yedek_klasör_adı);
-
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    ex.Günlük(null, Günlük.Seviye.HazirKod);
-
-                    if (ArgeMup.HazirKod.Klasör.VarMı(yedek_klasör_adı))
-                    {
-                        ArgeMup.HazirKod.Klasör.Sil(HedefKlasör);
-                        System.IO.Directory.Move(yedek_klasör_adı, HedefKlasör);
-                    }
-                }
-
-                return false;
-            }
-        }
+        #if HazirKod_Cdiyez_Sıkıştırma
+	        public static class SıkıştırılmışDosya
+	        {
+	            public const string Sürüm = "V1.0";
+	
+	            public static bool Klasörden(string Kaynak, string HedefZipDosyasıYolu, bool YeniBirDosyaOluştur = true)
+	            {
+	                string yedek_dosya_adı = HedefZipDosyasıYolu + ".yedek";
+	                
+	                try
+	                {
+	                    if (ArgeMup.HazirKod.Dosya.VarMı(HedefZipDosyasıYolu))
+	                    {
+	                        ArgeMup.HazirKod.Dosya.Sil(yedek_dosya_adı);
+	
+	                        if (YeniBirDosyaOluştur)
+	                        {
+	                            System.IO.File.Move(HedefZipDosyasıYolu, yedek_dosya_adı);
+	                        }
+	                        else
+	                        {
+	                            System.IO.File.Copy(HedefZipDosyasıYolu, yedek_dosya_adı);
+	                        }
+	                    }
+	
+	                    ArgeMup.HazirKod.SıkıştırılmışDosya.Klasörden(Kaynak, HedefZipDosyasıYolu, YeniBirDosyaOluştur);
+	                    ArgeMup.HazirKod.Dosya.Sil(yedek_dosya_adı);
+	
+	                    return true;
+	                }
+	                catch (Exception ex)
+	                {
+	                    ex.Günlük(null, Günlük.Seviye.HazirKod);
+	
+	                    if (ArgeMup.HazirKod.Dosya.VarMı(yedek_dosya_adı))
+	                    {
+	                        ArgeMup.HazirKod.Dosya.Sil(HedefZipDosyasıYolu);
+	                        System.IO.File.Move(yedek_dosya_adı, HedefZipDosyasıYolu);
+	                    }
+	                }
+	
+	                return false;
+	            }
+	            public static bool Klasöre(string KaynakZipDosyasıYolu, string HedefKlasör)
+	            {
+	                string yedek_klasör_adı = HedefKlasör.TrimEnd('\\') + ".yedek";
+	
+	                try
+	                {
+	                    if (ArgeMup.HazirKod.Klasör.VarMı(HedefKlasör))
+	                    {
+	                        ArgeMup.HazirKod.Klasör.Sil(yedek_klasör_adı);
+	                        System.IO.Directory.Move(HedefKlasör, yedek_klasör_adı);
+	                    }
+	
+	                    ArgeMup.HazirKod.SıkıştırılmışDosya.Klasöre(KaynakZipDosyasıYolu, HedefKlasör);
+	                    ArgeMup.HazirKod.Klasör.Sil(yedek_klasör_adı);
+	
+	                    return true;
+	                }
+	                catch (Exception ex)
+	                {
+	                    ex.Günlük(null, Günlük.Seviye.HazirKod);
+	
+	                    if (ArgeMup.HazirKod.Klasör.VarMı(yedek_klasör_adı))
+	                    {
+	                        ArgeMup.HazirKod.Klasör.Sil(HedefKlasör);
+	                        System.IO.Directory.Move(yedek_klasör_adı, HedefKlasör);
+	                    }
+	                }
+	
+	                return false;
+	            }
+	        }
+        #endif
     }
 }

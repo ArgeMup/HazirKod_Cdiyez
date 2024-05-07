@@ -182,8 +182,56 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
         public static string KullanılmayacakKarakterler_DosyaAdı { get { return new string(System.IO.Path.GetInvalidFileNameChars()); } }
         public static string KullanılmayacakKarakterler_KlasörYolu { get { return new string(System.IO.Path.GetInvalidPathChars()); } }
-        
-        public static string Düzelt(string Girdi, bool GeçersizKarakterleriSil = false)
+
+        /// <summary>
+        /// Klasör\\\\\\<ArG&#eMuP.mup              -> Klasör\\ArGeMuP.mup
+        /// <br>C:\\Klasör\\\\\\<ArG&#eMuP.mup      -> C:\\Klasör\\ArGeMuP.mup</br>
+        /// </summary>
+        public static string Düzelt_Bağlantılı(string Girdi, bool GeçersizKarakterleriSil = false)
+        {
+            Girdi = Girdi.Trim().TrimEnd('\\');
+
+            if (GeçersizKarakterleriSil)
+            {
+                string kök, kls = "", dsy;
+
+                int konum_bölüm = Girdi.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
+                if (konum_bölüm >= 0)
+                {
+                    dsy = Girdi.Substring(konum_bölüm + 1);
+                    kls = Girdi.Substring(0, konum_bölüm + 1);
+                }
+                else dsy = Girdi;
+
+                foreach (char c in KullanılmayacakKarakterler_DosyaAdı)
+                {
+                    dsy = dsy.Replace(c.ToString(), "");
+                }
+
+                foreach (char c in KullanılmayacakKarakterler_KlasörYolu)
+                {
+                    kls = kls.Replace(c.ToString(), "");
+                }
+
+                string birleştirilmiş = (string.IsNullOrEmpty(kls) ? null : kls) + dsy;
+
+                kök = System.IO.Path.GetPathRoot(birleştirilmiş);
+                string kls_köksüz = birleştirilmiş.Substring(kök.Length);
+                string tekli = System.IO.Path.DirectorySeparatorChar.ToString();
+                string ikili = tekli + tekli;
+                while (kls_köksüz.Contains(ikili)) kls_köksüz = kls_köksüz.Replace(ikili, tekli);
+
+                Girdi = kök + kls_köksüz;
+            }
+
+            return Girdi;
+        }
+
+        /// <summary>
+        /// Klasör\\\\\\<ArG&#eMuP.mup              -> UygulamanınBulunduğuKlasör\\Klasör\\ArGeMuP.mup
+        /// <br>C:\\Klasör\\\\\\<ArG&#eMuP.mup      -> C:\\Klasör\\ArGeMuP.mup</br>
+        /// </summary>
+        public static string Düzelt_Tam(string Girdi, bool GeçersizKarakterleriSil = false)
         {
             if (GeçersizKarakterleriSil)
             {

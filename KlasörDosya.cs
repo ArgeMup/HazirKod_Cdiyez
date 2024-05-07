@@ -601,7 +601,7 @@ namespace ArgeMup.HazirKod
             Klasörler.Clear();
             Dosyalar = null;
 
-            Kök = KökKlasör.DoluMu(true) ? D_DosyaKlasörAdı.Düzelt(KökKlasör) : KökKlasör;
+            Kök = KökKlasör.DoluMu(true) ? D_DosyaKlasörAdı.Düzelt_Tam(KökKlasör) : KökKlasör;
             if (!Directory.Exists(Kök))
             {
                 Dosyalar = new List<İçerik_Dosya_>();

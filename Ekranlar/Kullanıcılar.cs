@@ -778,7 +778,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                     kullanıcı_parolası = KullanıcıAdı + kullanıcı_parolası + SihirliKelime;
                     kullanıcı_parolası = ArgeMup.HazirKod.Dönüştürme.D_GeriDönülemezKarmaşıklaştırmaMetodu.Yazıdan(kullanıcı_parolası, 32);
 
-                    string oluşturulan_kök_parola = KaydedilenKökParola.Düzelt(kullanıcı_parolası);
+                    string oluşturulan_kök_parola = Temkinli.DahaCokKarmasiklastirma.Düzelt(KaydedilenKökParola, kullanıcı_parolası);
                     if (oluşturulan_kök_parola.DoluMu(true))
                     {
                         Ayarlar_Alt_Araİşlemler(oluşturulan_kök_parola);

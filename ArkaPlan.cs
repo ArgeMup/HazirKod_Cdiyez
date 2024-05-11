@@ -77,7 +77,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
             {
                 Interlocked.Increment(ref EşZamanlıİşlemSayısı_Çalışan);
 
-                Task t1 = new Task(() =>
+                Task A1 = new Task(() =>
                 {
                     int za = Environment.TickCount + GöreviSilmedenÖnceBeklenecekSüre_msn;
 
@@ -97,14 +97,18 @@ namespace ArgeMup.HazirKod.ArkaPlan
 
                 }, TaskCreationOptions.LongRunning);
 
-                t1.ContinueWith((t2) =>
+                A1.ContinueWith((A2) =>
                 {
+#if DEBUG
+                    A2.Exception?.Günlük(null, Günlük.Seviye.HazirKod);
+#endif
+
                     if (Interlocked.Decrement(ref EşZamanlıİşlemSayısı_Çalışan) == 0 && TümüÖğütülünceÇağırılacakİşlem != null && Liste.Count == 0) TümüÖğütülünceÇağırılacakİşlem(Hatırlatıcı);
 
                     ArkaPlanGörevi_Başlat();
                 });
 
-                t1.Start();
+                A1.Start();
             }
         }
     }
@@ -294,7 +298,7 @@ namespace ArgeMup.HazirKod.ArkaPlan
             }
 
             #region Arkaplan görevi
-            new Task(() =>
+            Task A1 = new Task(() =>
             {
                 while (Çalışsın && Ortak.Çalışsın)
                 {
@@ -319,26 +323,31 @@ namespace ArgeMup.HazirKod.ArkaPlan
                                 biri.ÇıkışDeğeri = 0;
                                 biri.GeriBildirim_Islemini_çalıştır = false;
 
-                                Task t1 = new Task(() =>
+                                Task B1 = new Task(() =>
                                 {
                                     biri.ÇıkışDeğeri = biri.GeriBildirim_Islemi(biri.TakmaAdı, biri.Hatırlatıcı);
                                 }, biri.SonsuzDöngüVeyaUzunİşlem ? TaskCreationOptions.LongRunning : TaskCreationOptions.None);
 
-                                t1.ContinueWith((t2) =>
+                                B1.ContinueWith((B2) =>
                                 {
+#if DEBUG
+                                    B2.Exception?.Günlük(null, Günlük.Seviye.HazirKod);
+#endif
+
                                     Kilit.WaitOne();
 
                                     if (biri.ÇıkışDeğeri < 0) Liste.Remove(biri);                   //listeden silinir, artık çağırılmayacak
                                     else if (biri.ÇıkışDeğeri > 0) biri.Ertele(biri.ÇıkışDeğeri);   //Listede kalır, belirtilen süre sonra tekrar çağırılacak
                                     //else if (biri.ÇıkışDeğeri == 0)                               //Listede kalır, artık çağırılmayacak
-                                            
+
                                     Kilit.ReleaseMutex();
                                 });
 
-                                t1.Start();
+                                B1.Start();
                             }
                         }
                     }
+
                     if (EnYakınGörev != null)
                     {
                         Bekleme = (int)(EnYakınGörev.HesaplananTetiklemeAnı - Şimdi).TotalMilliseconds;
@@ -346,11 +355,20 @@ namespace ArgeMup.HazirKod.ArkaPlan
                         if (Bekleme > 1000) Bekleme = 1000;
                         else if (Bekleme < 1) Bekleme = 1; //cpu yüzdesini düşürmek için
                     }
-                
+
                     Kilit.ReleaseMutex();
                     Task.Delay(Bekleme).Wait();
                 }
-            }, TaskCreationOptions.LongRunning).Start();
+            }, TaskCreationOptions.LongRunning);
+
+            A1.ContinueWith((A2) =>
+            {
+#if DEBUG
+                A2.Exception?.Günlük(null, Günlük.Seviye.HazirKod);
+#endif
+            });
+
+            A1.Start();
             #endregion
         }
 

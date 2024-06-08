@@ -32,7 +32,8 @@ namespace ArgeMup.HazirKod.Ekranlar
                 case İşlemTürü_.Giriş:
                     Ekran_Ayarlar.Visible = false;
 
-                    Ekran_Giriş_Kullanıcı.Items.AddRange(Kullanıcılar._Ayarlar_Üst_.KullanıcılarVeParolalar.Keys.ToArray());
+                    string GizliElemanBaşlangıcı = new ListeKutusu.Ayarlar_().GizliElemanBaşlangıcı;
+                    Ekran_Giriş_Kullanıcı.Items.AddRange(Kullanıcılar._Ayarlar_Üst_.KullanıcılarVeParolalar.Keys.Where(x => !x.StartsWith(GizliElemanBaşlangıcı)).ToArray());
 
                     Width = Ekran_Giriş_YeniParola_2.Width * 2;
                     Height = Ekran_Giriş_Tamam.Top + Ekran_Giriş_Tamam.Height + 50;
@@ -73,7 +74,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                     Kullanıcılar_Liste.Dock = DockStyle.Fill;
                     Kullanıcılar_Ayraç.Panel1.Controls.Add(Kullanıcılar_Liste);
                     Kullanıcılar_Ayraç.SplitterDistance = Kullanıcılar_Ayraç.Width / 2;
-                    ListeKutusu.Ayarlar_ ListeKutusu_Ayarlar = new ListeKutusu.Ayarlar_(true, true, ListeKutusu.Ayarlar_.ElemanKonumu_.AdanZyeSıralanmış, true, false, true);
+                    ListeKutusu.Ayarlar_ ListeKutusu_Ayarlar = new ListeKutusu.Ayarlar_(true, true, ListeKutusu.Ayarlar_.ElemanKonumu_.AdanZyeSıralanmış, true, true, true);
                     Kullanıcılar_Liste.Başlat(null, Kullanıcı_isimleri, "Kullamıcılar", ListeKutusu_Ayarlar);
                     Kullanıcılar_Liste.GeriBildirim_İşlemi += Kullanıcılar_Liste_GeriBildirim_İşlemi;
 
@@ -172,6 +173,8 @@ namespace ArgeMup.HazirKod.Ekranlar
                         return Ayarlar_Kaydet(Eski_KökParola);
 
                     case ListeKutusu.İşlemTürü.AdıDeğiştirildi:
+                    case ListeKutusu.İşlemTürü.Gizlendi:
+                    case ListeKutusu.İşlemTürü.GörünürDurumaGetirildi:
                         string mesaj = "Bu işlem ile kullanıcının parolası silinecek. Parolayı tekrar belirlemeyi unutmayınız." +
                             Environment.NewLine + Environment.NewLine + "İşleme devam etmek istiyor musunuz?";
                         DialogResult Dr = MessageBox.Show(mesaj, Text, MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -636,16 +639,17 @@ namespace ArgeMup.HazirKod.Ekranlar
                 //son yapılan ayarlama uygun mu kontrolü
                 if (ParolaKontrolüGerekiyorMu)
                 {
-                    int AyarlarıDeğiştirebilenKullanıcıSayısı = Ayarlar_Alt.Kişiler.Where(x => KullanıcılarVeParolalar.ContainsKey(x.Adı) && x.İzinliMi(İzin_AyarlardaDeğişiklikYapabilir)).Count();
+                    string GizliElemanBaşlangıcı = new ListeKutusu.Ayarlar_().GizliElemanBaşlangıcı;
+                    int AyarlarıDeğiştirebilenKullanıcıSayısı = Ayarlar_Alt.Kişiler.Where(x => KullanıcılarVeParolalar.ContainsKey(x.Adı) && x.İzinliMi(İzin_AyarlardaDeğişiklikYapabilir) && !x.Adı.StartsWith(GizliElemanBaşlangıcı)).Count();
                     if (AyarlarıDeğiştirebilenKullanıcıSayısı < 1)
                     {
                         MessageBox.Show("Son değişiklik ile hiçbir kullanıcı bu sayfaya ulaşamayacak." +
                             Environment.NewLine + Environment.NewLine +
                             "Öncelikle ayarları değiştirebilme hakkına sahip bir rol oluşturun" + Environment.NewLine +
-                            "Sonra bu rolu parolası olan bir kulanıcıya eşleyin." +
+                            "Sonra bu rolu parolası olan görünür durumda bir kullanıcıya eşleyin." +
                             Environment.NewLine + Environment.NewLine +
                             "Eğer parolası olan tek bir yönetici var ve onun adını değiştirmek istiyorsanız" + Environment.NewLine +
-                            "Öncelikle yeni ad ile yeni bir yönetici oluşturunuz ve parolasını belirleyiniz." + Environment.NewLine +
+                            "Öncelikle yeni ad ile yeni bir görünür yönetici oluşturunuz ve parolasını belirleyiniz." + Environment.NewLine +
                             "Sonra eski yöneticiyi siliniz.",
                             "İşlem iptal edildi");
 

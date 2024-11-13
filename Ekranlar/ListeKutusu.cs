@@ -29,11 +29,13 @@ namespace ArgeMup.HazirKod.Ekranlar
             public ElemanKonumu_ ElemanKonumu = ElemanKonumu_.Değiştirilebilir;
             public enum ÇokluSeçim_ { Kapalı, SolFareTuşuİle, CtrlTuşuİle };
             public ÇokluSeçim_ ÇokluSeçim = ÇokluSeçim_.Kapalı;
+            public Dictionary<string, List<string>> Gruplar = null;
 			
             public Ayarlar_(bool Eklenebilir = true, bool AdıDeğiştirilebilir = true, ElemanKonumu_ ElemanKonumu = ElemanKonumu_.Değiştirilebilir, bool Silinebilir = true,
                 bool Gizlenebilir = true, bool GizliOlanlarıGöster = true, string GizliElemanBaşlangıcı = ".:Gizli:. ",
                 string[] Yasakİçerik = null, ÇokluSeçim_ ÇokluSeçim = ÇokluSeçim_.Kapalı, bool İşlemYaptıktanSonraSeç = true,
-                bool İşlemYapmadanÖnceSor = true)
+                bool İşlemYapmadanÖnceSor = true,
+                Dictionary<string, List<string>> Gruplar = null)
             {
                 this.Eklenebilir = Eklenebilir;
                 this.AdıDeğiştirilebilir = AdıDeğiştirilebilir;
@@ -46,6 +48,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 this.İşlemYapmadanÖnceSor = İşlemYapmadanÖnceSor;
                 this.GizliElemanBaşlangıcı = GizliElemanBaşlangıcı;
                 this.Yasakİçerik = Yasakİçerik;
+                this.Gruplar = Gruplar;
             }
             public void TümTuşlarıKapat()
             {
@@ -128,12 +131,27 @@ namespace ArgeMup.HazirKod.Ekranlar
             }
         }
         public List<string> Sabit_Elemanlar, Tüm_Elemanlar;
-        public enum İşlemTürü { YeniEklendi, ElemanSeçildi, AdıDeğiştirildi, KonumDeğişikliğiKaydedildi, Gizlendi, GörünürDurumaGetirildi, Silindi };
-
+        public enum İşlemTürü { YeniEklendi, ElemanSeçildi, AdıDeğiştirildi, KonumDeğişikliğiKaydedildi, Gizlendi, GörünürDurumaGetirildi, Silindi, GrupGüncellendi };
+        public Dictionary<string, List<string>> Gruplar
+        {
+            get
+            {
+                return Ayarlar?.Gruplar;
+            }
+        }
+        public bool Gruplar_Değişti
+        {
+            get
+            {
+                return Gruplar_Değişti_;
+            }
+        }
         public delegate bool GeriBildirim_İşlemi_(string Adı, İşlemTürü Türü, string YeniAdı = null);
+        
         string ListeninAçıklaması;
         Ayarlar_ Ayarlar;
         List<string> Tüm_Elemanlar_KonumDeğişikliğindenÖnce;
+        bool Gruplar_Değişti_;
 
         public ListeKutusu()
         {
@@ -166,7 +184,33 @@ namespace ArgeMup.HazirKod.Ekranlar
             Tüm_Elemanlar = Tüm_Elemanlar.Distinct().ToList();
             if (!this.Ayarlar.GizliOlanlarıGöster) Tüm_Elemanlar = Tüm_Elemanlar.Where(x => !x.StartsWith(this.Ayarlar.GizliElemanBaşlangıcı)).ToList();
 
-            SeçimKutusu.SelectionMode = this.Ayarlar.ÇokluSeçim == Ayarlar_.ÇokluSeçim_.Kapalı ? SelectionMode.One : this.Ayarlar.ÇokluSeçim == Ayarlar_.ÇokluSeçim_.SolFareTuşuİle ? SelectionMode.MultiSimple : SelectionMode.MultiExtended;
+            if (this.Ayarlar.ÇokluSeçim == Ayarlar_.ÇokluSeçim_.Kapalı)
+            {
+                SeçimKutusu.SelectionMode = SelectionMode.One;
+                SeçimKutusu.ContextMenuStrip = null;
+            }
+            else
+            {
+                SeçimKutusu.SelectionMode = this.Ayarlar.ÇokluSeçim == Ayarlar_.ÇokluSeçim_.SolFareTuşuİle ? SelectionMode.MultiSimple : SelectionMode.MultiExtended;
+
+                if (this.Ayarlar.Gruplar == null) SeçimKutusu.ContextMenuStrip = null;
+                else
+                {
+                    SeçimKutusu.ContextMenuStrip = SağTuşMenü_Grup;
+                    SağTuşMenü_Grup_Listesi.Items.Clear();
+
+                    if (this.Ayarlar.Gruplar.Count == 0)
+                    {
+                        SağTuşMenü_Grup_Listesi.Text = "Yeni grup adı";
+                    }
+                    else
+                    {
+                        SağTuşMenü_Grup_Listesi.Items.AddRange(this.Ayarlar.Gruplar.Keys.ToArray());
+                        SağTuşMenü_Grup_Listesi.SelectedIndex = 0;
+                    }
+                }
+            }
+
             İpucunuDüzenle();
             Sırala();
 
@@ -246,6 +290,61 @@ namespace ArgeMup.HazirKod.Ekranlar
         private void SeçimKutusu_DoubleClick(object sender, EventArgs e)
         {
             base.OnDoubleClick(null);
+        }
+
+        private void SağTuşMenü_Grup_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            SağTuşMenü_Grup_Listesi_TextChanged(null, null);
+        }
+        private void SağTuşMenü_Grup_Listesi_TextChanged(object sender, EventArgs e)
+        {
+            bool içi_dolu_mu = SağTuşMenü_Grup_Listesi.Text.DoluMu();
+            SağTuşMenü_Grup_Ekle.Enabled = içi_dolu_mu && SeçimKutusu.SelectedItems.Count > 0;
+
+            bool zaten_var = içi_dolu_mu && Ayarlar.Gruplar.ContainsKey(SağTuşMenü_Grup_Listesi.Text);
+
+            SağTuşMenü_Grup_Sil.Enabled = zaten_var;
+            SağTuşMenü_Grup_Listele.Enabled = zaten_var && Ayarlar.Gruplar[SağTuşMenü_Grup_Listesi.Text].Count > 0;
+
+            SağTuşMenü_Grup_Listele.Text = "Gruptakileri " + (zaten_var ? "( " + Ayarlar.Gruplar[SağTuşMenü_Grup_Listesi.Text].Count + " ) " : null) + "listele";
+        }
+        private void SağTuşMenü_Grup_Seç_Click(object sender, EventArgs e)
+        {
+            AramaÇubuğu.Text = SağTuşMenü_Grup_Listesi.Text;
+            SeçimKutusu.Items.Clear();
+            SeçimKutusu.Enabled = true;
+
+            SeçilenEleman_Adları = Ayarlar.Gruplar[SağTuşMenü_Grup_Listesi.Text];  
+        }
+        private void SağTuşMenü_Grup_Ekle_Click(object sender, EventArgs e)
+        {
+            bool zaten_var = Ayarlar.Gruplar.ContainsKey(SağTuşMenü_Grup_Listesi.Text);
+            if (zaten_var)
+            {
+                Ayarlar.Gruplar[SağTuşMenü_Grup_Listesi.Text].AddRange(SeçilenEleman_Adları);
+                Ayarlar.Gruplar[SağTuşMenü_Grup_Listesi.Text] = Ayarlar.Gruplar[SağTuşMenü_Grup_Listesi.Text].Distinct().ToList();
+            }
+            else
+            {
+                Ayarlar.Gruplar.Add(SağTuşMenü_Grup_Listesi.Text, SeçilenEleman_Adları);
+                SağTuşMenü_Grup_Listesi.Items.Add(SağTuşMenü_Grup_Listesi.Text);
+            }
+
+            GeriBildirim_İşlemi?.Invoke(null, İşlemTürü.GrupGüncellendi);
+            Gruplar_Değişti_ = true;
+        }
+        private void SağTuşMenü_Grup_Sil_Click(object sender, EventArgs e)
+        {
+            string mesaj = "Listedeki grup silinecek. İşleme devam etmek istiyor musunuz?" +
+                Environment.NewLine + Environment.NewLine +
+                Adı.Text;
+            if (!OnayAl(mesaj)) return;
+
+            Ayarlar.Gruplar.Remove(SağTuşMenü_Grup_Listesi.Text);
+            SağTuşMenü_Grup_Listesi.Items.Remove(SağTuşMenü_Grup_Listesi.Text);
+
+            GeriBildirim_İşlemi?.Invoke(null, İşlemTürü.GrupGüncellendi);
+            Gruplar_Değişti_ = true;
         }
 
         private void Adı_TextChanged(object sender, EventArgs e)

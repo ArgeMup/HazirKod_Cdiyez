@@ -90,7 +90,7 @@ namespace ArgeMup.HazirKod
 
     public class Rastgele
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
         static System.Random rnd = new System.Random();
         public static double Sayı(double EnKüçük = 0, double EnBüyük = double.MaxValue)
         {
@@ -106,11 +106,12 @@ namespace ArgeMup.HazirKod
         {
             byte[] Parola = new byte[DiziElemanSayısı_Bayt];
 
-            if (rnd_2 == null) rnd_2 = System.Security.Cryptography.RNGCryptoServiceProvider.Create();
+            if (rnd_2 == null) rnd_2 = System.Security.Cryptography.RandomNumberGenerator.Create();
             rnd_2.GetNonZeroBytes(Parola);
 
             return Parola;
         }
+
         public static string Yazı(int KarakterSayısı = 10)
         {
             return Dönüştürme.D_HexYazı.BaytDizisinden( BaytDizisi(KarakterSayısı / 2) );

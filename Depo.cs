@@ -62,7 +62,7 @@ namespace ArgeMup.HazirKod
         IDepo_Eleman Bul(string ElemanAdıDizisi, bool YoksaOluştur = false, bool BağımsızKopyaOluştur = false);
         List<IDepo_Eleman> Bul(string ElemanAdıDizisi, Predicate<IDepo_Eleman> Kıstas);
         string YazıyaDönüştür(string ElemanAdıDizisi, bool SadeceElemanları = false, bool DoğrulamaKoduEkle = true);
-        void Ekle(string ElemanAdıDizisi, string Eleman, bool DoğrulamaKoduOlmalı = true);
+        void Ekle(string ElemanAdıDizisi, string YazıOlarakElemanlar, bool DoğrulamaKoduOlmalı = true);
         void Sil(string ElemanAdıDizisi, bool Sadeceİçeriğini = false, bool SadeceElemanlarını = false);
         /// <summary>
         /// <br>ElemanAdıDizisi ile seçilen elemana ait içerik veya alt elemanları sıralamak için kullanılabilir</br>
@@ -134,7 +134,7 @@ namespace ArgeMup.HazirKod
 
     public class Depo_
     {
-        public const string Sürüm = "V1.3";
+        public const string Sürüm = "V1.4";
         public bool EnAzBir_ElemanAdıVeyaİçeriği_Değişti
         {
             get
@@ -920,57 +920,68 @@ namespace ArgeMup.HazirKod
                 Eleman_ bulunan = Bul_Getir(ElemanAdıDizisi);
                 if (bulunan == null) return "";
 
-                string eleman_adı_ve_içeriği = "";
+                System.Text.StringBuilder eleman_adı_ve_içeriği = new System.Text.StringBuilder();
                 int BirÖncekiSeviye = -5;
 
                 if (SadeceElemanları)
                 {
                     _YazıyaDönüştür_(bulunan, -1);
 
-                    int konum_n = eleman_adı_ve_içeriği.IndexOf(Depo_Ayraçlar.Eleman);
-                    eleman_adı_ve_içeriği = eleman_adı_ve_içeriği.Substring(konum_n + 1);
+                    string gecici = eleman_adı_ve_içeriği.ToString();
+                    int konum_n = gecici.IndexOf(Depo_Ayraçlar.Eleman);
+                    eleman_adı_ve_içeriği = new System.Text.StringBuilder(gecici.Substring(konum_n + 1));
                 }
                 else
                 {
                     _YazıyaDönüştür_(bulunan, 0);
                 }
 
-                if (DoğrulamaKoduEkle && !string.IsNullOrEmpty(eleman_adı_ve_içeriği))
+                string elemanAdıVeİçeriği = eleman_adı_ve_içeriği.ToString();
+                if (DoğrulamaKoduEkle && !string.IsNullOrEmpty(elemanAdıVeİçeriği))
                 {
-                    eleman_adı_ve_içeriği = Depo_Ayraçlar.Seviye_DoğrulamaKodu + ArgeMup.HazirKod.DoğrulamaKodu.Üret.Yazıdan(eleman_adı_ve_içeriği) + Depo_Ayraçlar.Eleman + eleman_adı_ve_içeriği;
+                    elemanAdıVeİçeriği = Depo_Ayraçlar.Seviye_DoğrulamaKodu + ArgeMup.HazirKod.DoğrulamaKodu.Üret.Yazıdan(elemanAdıVeİçeriği) + Depo_Ayraçlar.Eleman + elemanAdıVeİçeriği;
                 }
 
-                return eleman_adı_ve_içeriği;
+                return elemanAdıVeİçeriği;
 
                 void _YazıyaDönüştür_(Eleman_ Eleman, int Seviye)
                 {
                     if (Eleman == null || Eleman.İçiBoşOlduğuİçinSilinecek) return;
 
-                    //Seviye belirteci
-                    if (Seviye <= 9) eleman_adı_ve_içeriği += Seviye.ToString() + Depo_Ayraçlar.AdıVeİçerik;
+                    // Seviye belirteci
+                    if (Seviye <= 9)
+                    {
+                        eleman_adı_ve_içeriği.Append(Seviye);
+                        eleman_adı_ve_içeriği.Append(Depo_Ayraçlar.AdıVeİçerik);
+                    }
                     else
                     {
                         int seviye_farkı = Seviye - BirÖncekiSeviye;
-                        if (seviye_farkı == 1) eleman_adı_ve_içeriği += Depo_Ayraçlar.Seviye_ArtıBir;
-                        else if (seviye_farkı == 0) eleman_adı_ve_içeriği += Depo_Ayraçlar.Seviye_Eşittir;
-                        else if (seviye_farkı == -1) eleman_adı_ve_içeriği += Depo_Ayraçlar.Seviye_EksiBir;
-                        else eleman_adı_ve_içeriği += Seviye.ToString() + Depo_Ayraçlar.AdıVeİçerik;
+                        if (seviye_farkı == 1) eleman_adı_ve_içeriği.Append(Depo_Ayraçlar.Seviye_ArtıBir);
+                        else if (seviye_farkı == 0) eleman_adı_ve_içeriği.Append(Depo_Ayraçlar.Seviye_Eşittir);
+                        else if (seviye_farkı == -1) eleman_adı_ve_içeriği.Append(Depo_Ayraçlar.Seviye_EksiBir);
+                        else
+                        {
+                            eleman_adı_ve_içeriği.Append(Seviye);
+                            eleman_adı_ve_içeriği.Append(Depo_Ayraçlar.AdıVeİçerik);
+                        }
                     }
                     BirÖncekiSeviye = Seviye;
 
-                    //Adı
-                    eleman_adı_ve_içeriği += Depo_Ayraçlar.KullancıYazısı_Depoya_Göre_Uygunlaştır(Eleman.Adı);
+                    // Adı
+                    eleman_adı_ve_içeriği.Append(Depo_Ayraçlar.KullancıYazısı_Depoya_Göre_Uygunlaştır(Eleman.Adı));
 
-                    //İçeriği
+                    // İçeriği
                     foreach (string içerik in Eleman.İçeriği)
                     {
-                        eleman_adı_ve_içeriği += Depo_Ayraçlar.AdıVeİçerik + Depo_Ayraçlar.KullancıYazısı_Depoya_Göre_Uygunlaştır(içerik);
+                        eleman_adı_ve_içeriği.Append(Depo_Ayraçlar.AdıVeİçerik);
+                        eleman_adı_ve_içeriği.Append(Depo_Ayraçlar.KullancıYazısı_Depoya_Göre_Uygunlaştır(içerik));
                     }
 
-                    //bitiş karakteri
-                    eleman_adı_ve_içeriği += Depo_Ayraçlar.Eleman;
+                    // Bitiş karakteri
+                    eleman_adı_ve_içeriği.Append(Depo_Ayraçlar.Eleman);
 
-                    //Alt elemanları
+                    // Alt elemanları
                     if (Eleman._Elemanları != null)
                     {
                         foreach (Eleman_ AltEleman in Eleman._Elemanları)

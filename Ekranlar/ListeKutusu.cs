@@ -60,6 +60,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             }
         }
         public event GeriBildirim_İşlemi_ GeriBildirim_İşlemi;
+        [System.ComponentModel.Browsable(false), System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public int SeçilenEleman_SıraNo
         {
             get
@@ -69,6 +70,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 return adı == null ? -1 : Tüm_Elemanlar.IndexOf(adı);
             }
         }
+        [System.ComponentModel.Browsable(false), System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public string SeçilenEleman_Adı
         {
             get
@@ -94,6 +96,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 }
             }
         }
+        [System.ComponentModel.Browsable(false), System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public List<string> SeçilenEleman_Adları
         {
             get
@@ -117,6 +120,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 }
             }
         }
+        [System.ComponentModel.Browsable(false), System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public List<int> SeçilenEleman_SıraNoları
         {
             get

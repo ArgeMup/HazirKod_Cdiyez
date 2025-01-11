@@ -124,7 +124,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
 
         #region IDonanımHaberlleşmesi
-        bool IDonanımHaberleşmesi.BağlantıKurulduMu()
+        int IDonanımHaberleşmesi.BağlantıKurulduMu()
         {
             throw new Exception("Udp için Kullanılamaz");
         }

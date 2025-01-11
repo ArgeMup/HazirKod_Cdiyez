@@ -7,7 +7,8 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
     public interface IDonanımHaberleşmesi
     {
-        bool BağlantıKurulduMu();
+        /// <returns> <= 0 ise Bağlantı kurulmadı, tersi durumda bağlantı kuruldu </returns>
+        int BağlantıKurulduMu();
         void Durdur();
 
         void Gönder(byte[] Bilgi, string Alıcı = null);

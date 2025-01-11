@@ -120,9 +120,9 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
 
         #region IDonanımHaberlleşmesi
-        bool IDonanımHaberleşmesi.BağlantıKurulduMu()
+        int IDonanımHaberleşmesi.BağlantıKurulduMu()
         {
-            return Uygulama == null ? false : !Uygulama.HasExited;
+            return Uygulama == null ? 0 : Uygulama.HasExited ? 0 : 1;
         }
         void IDonanımHaberleşmesi.Durdur()
         {

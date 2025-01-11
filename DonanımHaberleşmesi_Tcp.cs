@@ -201,9 +201,9 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
 
         #region IDonanımHaberlleşmesi
-        bool IDonanımHaberleşmesi.BağlantıKurulduMu()
+        int IDonanımHaberleşmesi.BağlantıKurulduMu()
         {
-            return İstemci == null ? false : İstemci.Connected;
+            return İstemci == null ? 0 : İstemci.Connected ? 1 : 0;
         }
         void IDonanımHaberleşmesi.Durdur()
         {
@@ -383,9 +383,9 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
 
         #region IDonanımHaberlleşmesi
-        bool IDonanımHaberleşmesi.BağlantıKurulduMu()
+        int IDonanımHaberleşmesi.BağlantıKurulduMu()
         {
-            return DonanımHaberleşmesi == null ? false : DonanımHaberleşmesi.BağlantıKurulduMu();
+            return DonanımHaberleşmesi == null ? 0 : DonanımHaberleşmesi.BağlantıKurulduMu();
 
             //Güvenli bağlantı kurulmasını değil, fiziksel bağlantı kurulmasını belirtiyor
             //Güvenli bağlantı için GeriBildirim_Türü_.BağlantıKuruldu beklenmeli
@@ -523,7 +523,7 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
 
                     if (!Sunucu.Pending())
                     {
-                        KeyValuePair<string, IDonanımHaberleşmesi>[] BağlantısıKopanlar = İstemciler.Where(x => !x.Value.BağlantıKurulduMu()).ToArray();
+                        KeyValuePair<string, IDonanımHaberleşmesi>[] BağlantısıKopanlar = İstemciler.Where(x => x.Value.BağlantıKurulduMu() <= 0).ToArray();
                         foreach (var biri in BağlantısıKopanlar)
                         {
                             biri.Value.Durdur();
@@ -592,9 +592,9 @@ namespace ArgeMup.HazirKod.DonanımHaberleşmesi
         }
         
         #region IDonanımHaberlleşmesi
-        bool IDonanımHaberleşmesi.BağlantıKurulduMu()
+        int IDonanımHaberleşmesi.BağlantıKurulduMu()
         {
-            return İstemciler.Count > 0;
+            return İstemciler.Count;
         }
         void IDonanımHaberleşmesi.Durdur()
         {

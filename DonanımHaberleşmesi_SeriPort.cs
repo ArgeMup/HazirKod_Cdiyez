@@ -148,9 +148,9 @@
             }
 
             #region IDonanımHaberlleşmesi
-            bool IDonanımHaberleşmesi.BağlantıKurulduMu()
+            int IDonanımHaberleşmesi.BağlantıKurulduMu()
             {
-                return SeriPort == null ? false : SeriPort.IsOpen;
+                return SeriPort == null ? 0 : SeriPort.IsOpen ? 1 : 0;
             }
             void IDonanımHaberleşmesi.Durdur()
             {

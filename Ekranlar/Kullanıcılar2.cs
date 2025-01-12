@@ -335,13 +335,13 @@ namespace ArgeMup.HazirKod.Ekranlar
         [Değişken_.Niteliği.Adını_Değiştir("K")] public List<Ayarlar_Kullanıcı2_> Kişiler = new List<Ayarlar_Kullanıcı2_>();
         [Değişken_.Niteliği.Adını_Değiştir("R")] public Dictionary<string, bool[]> Roller = new Dictionary<string, bool[]>();
 
-        [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public string SihirliKelime = "ArGeMuP Kullanıcılar_Ayarlar_";
-        [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public int İzinDizisiElemanSayısı; //anlamlı eleman / enum -> "abc_def" / enum.Yazdır -> "abc def" ve anlamsız eleman / enum -> "abc_def_" / enum.Yazdır -> "abc def "
-        [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public Ayarlar_Kullanıcı2_ GeçerliKullanıcı;
-        [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public bool ParolaKontrolüGerekiyorMu;
+        [Değişken_.Niteliği.Kesinlikle_Kullanma] public string SihirliKelime = "ArGeMuP Kullanıcılar_Ayarlar_";
+        [Değişken_.Niteliği.Kesinlikle_Kullanma] public int İzinDizisiElemanSayısı; //anlamlı eleman / enum -> "abc_def" / enum.Yazdır -> "abc def" ve anlamsız eleman / enum -> "abc_def_" / enum.Yazdır -> "abc def "
+        [Değişken_.Niteliği.Kesinlikle_Kullanma] public Ayarlar_Kullanıcı2_ GeçerliKullanıcı;
+        [Değişken_.Niteliği.Kesinlikle_Kullanma] public bool ParolaKontrolüGerekiyorMu;
 
-        [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sabiti = Rastgele.Sayı(4, 8);
-        [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sayısı = 0;
+        [Değişken_.Niteliği.Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sabiti = Rastgele.Sayı(4, 8);
+        [Değişken_.Niteliği.Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sayısı = 0;
 
         public void Başlat(int İzinDizisiElemanSayısı = 0, bool TamKontrol = false, string SihirliKelime = null)
         {
@@ -449,7 +449,7 @@ namespace ArgeMup.HazirKod.Ekranlar
         [Değişken_.Niteliği.Adını_Değiştir("K", 1)] public string Parolası;
         [Değişken_.Niteliği.Adını_Değiştir("K", 2)] public string RolAdı;
 
-        [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public bool[] Rol_İzinleri;
+        [Değişken_.Niteliği.Kesinlikle_Kullanma] public bool[] Rol_İzinleri;
         public bool İzinliMi(Enum İzin)
         {
             return Rol_İzinleri[Convert.ToInt32(İzin)];

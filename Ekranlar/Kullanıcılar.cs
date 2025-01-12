@@ -550,19 +550,19 @@ namespace ArgeMup.HazirKod.Ekranlar
             [Değişken_.Niteliği.Adını_Değiştir("K")] public Dictionary<string, string> KullanıcılarVeParolalar = new Dictionary<string, string>(); //Sadece parolası olan kullanıcıları tutar
             [Değişken_.Niteliği.Adını_Değiştir("A")] public string Ayarlar_Alt_Yazı;
 
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public string KökParola = null;
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public byte[] KökParola_Dizi = null;
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public bool ParolaKontrolüGerekiyorMu = true;
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public string SihirliKelime;
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public string AyarlarDosyaYolu;
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public Ayarlar_Kullanıcı_ GeçerliKullanıcı;
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public IEnumerable<Enum> Tümİzinler; //anlamlı eleman / enum -> "abc_def" / enum.Yazdır -> "abc def" | anlamsız eleman / enum -> "abc_def_" / enum.Yazdır -> "abc def "
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public Enum İzin_AyarlardaDeğişiklikYapabilir;
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public Ayarlar_Alt_ Ayarlar_Alt;
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public GeriBildirimİşlemi_Önyüz_Ayarlar_Değişti GeriBildirimİşlemi_Ayarlar_Değişti;
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public string ÖnyüzBaşlığı;
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sabiti = Rastgele.Sayı(4, 8);
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sayısı;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public string KökParola = null;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public byte[] KökParola_Dizi = null;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public bool ParolaKontrolüGerekiyorMu = true;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public string SihirliKelime;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public string AyarlarDosyaYolu;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public Ayarlar_Kullanıcı_ GeçerliKullanıcı;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public IEnumerable<Enum> Tümİzinler; //anlamlı eleman / enum -> "abc_def" / enum.Yazdır -> "abc def" | anlamsız eleman / enum -> "abc_def_" / enum.Yazdır -> "abc def "
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public Enum İzin_AyarlardaDeğişiklikYapabilir;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public Ayarlar_Alt_ Ayarlar_Alt;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public GeriBildirimİşlemi_Önyüz_Ayarlar_Değişti GeriBildirimİşlemi_Ayarlar_Değişti;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] public string ÖnyüzBaşlığı;
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sabiti = Rastgele.Sayı(4, 8);
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] int HatalıGirişDenemesi_Sayısı;
 
             #region Yardımcı Sınıflar
             public class Ayarlar_Alt_
@@ -575,7 +575,7 @@ namespace ArgeMup.HazirKod.Ekranlar
                 [Değişken_.Niteliği.Adını_Değiştir("K", 0)] public string Adı;
                 [Değişken_.Niteliği.Adını_Değiştir("K", 1)] public string RolAdı;
 
-                [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] public bool[] Rol_İzinleri;
+                [Değişken_.Niteliği.Kesinlikle_Kullanma] public bool[] Rol_İzinleri;
 
                 public bool İzinliMi(Enum İzin)
                 {
@@ -607,7 +607,7 @@ namespace ArgeMup.HazirKod.Ekranlar
             }
             #endregion
             #region İşlemler
-            [Değişken_.Niteliği.Bunu_Kesinlikle_Kullanma] static Değişken_ Değişken = new Değişken_() { Filtre_BoşVeyaVarsayılanDeğerdeİse_HariçTut = true };
+            [Değişken_.Niteliği.Kesinlikle_Kullanma] static Değişken_ Değişken = new Değişken_() { Filtre_BoşVeyaVarsayılanDeğerdeİse_HariçTut = true };
             public static object Sınıf_Oluştur(Type Tipi, string İçerik)
             {
                 Depo_ Depo = new Depo_(İçerik);

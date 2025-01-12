@@ -11,7 +11,7 @@ namespace ArgeMup.HazirKod
 {
     public class Değişken_
     {
-        public const string Sürüm = "V1.2";
+        public const string Sürüm = "V1.3";
 
         public BindingFlags Filtre_TipTürü = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
         public IEnumerable<string> Filtre_Değişkenİsimleri = null;
@@ -44,6 +44,9 @@ namespace ArgeMup.HazirKod
                 Değişken.GetCustomAttribute<System.Runtime.CompilerServices.CompilerGeneratedAttribute>() != null   //getter setter leri atla
                ) return false;
 
+            if (Değişken.GetCustomAttribute<Niteliği.Kesinlikle_KullanAttribute>() != null) return true;
+            if (Değişken.GetCustomAttribute<Niteliği.Kesinlikle_KullanmaAttribute>() != null) return false;
+
             //Nitelik kontrolü
             if (!NitelikKontrolü_Ve_Filtreleme_Yap) return true;
 
@@ -54,8 +57,8 @@ namespace ArgeMup.HazirKod
                 if (Basit_Tipte_Mi(Değişken.FieldType, out _) && AdınıDeğiştir.KullanılacakSıraNo >= 0) SıraNo = AdınıDeğiştir.KullanılacakSıraNo;
             }
 
-            if (Değişken.GetCustomAttribute<Niteliği.Bunu_Kesinlikle_KullanAttribute>() != null) return true;
-            if (Değişken.GetCustomAttribute<Niteliği.Bunu_Kesinlikle_KullanmaAttribute>() != null) return false;
+            if (Değişken.GetCustomAttribute<Niteliği.Filtre_Kapsamında_Olsa_Bile_Kesinlikle_KullanAttribute>() != null) return true;
+            if (Değişken.GetCustomAttribute<Niteliği.Filtre_Kapsamında_Olsa_Bile_Kesinlikle_KullanmaAttribute>() != null) return false;
             
             //Filtre kontrolü
             if (Filtre_Değişkenİsimleri != null)
@@ -423,17 +426,31 @@ namespace ArgeMup.HazirKod
 
             /// <summary>
             /// Belirtilen nesneyi dahil eder
-            /// <br>Bir filtre ile çakışması önemsizdir</br>
+            /// <br>Diğer kıstaslar önemsizdir</br>
             /// </summary>
             [AttributeUsage(AttributeTargets.Field)]
-            public class Bunu_Kesinlikle_KullanAttribute : Attribute { }
+            public class Kesinlikle_KullanAttribute : Attribute { }
 
             /// <summary>
             /// Belirtilen nesneyi hariç tutar
-            /// <br>Bir filtre ile çakışması önemsizdir</br>
+            /// <br>Diğer kıstaslar önemsizdir</br>
             /// </summary>
             [AttributeUsage(AttributeTargets.Field)]
-            public class Bunu_Kesinlikle_KullanmaAttribute : Attribute { }
+            public class Kesinlikle_KullanmaAttribute : Attribute { }
+
+            /// <summary>
+            /// Belirtilen nesneyi dahil eder
+            /// <br>Filtreye uyan fakat istisna oluşturmak gereken durumlarda kullanılabilir</br>
+            /// </summary>
+            [AttributeUsage(AttributeTargets.Field)]
+            public class Filtre_Kapsamında_Olsa_Bile_Kesinlikle_KullanAttribute : Attribute { }
+
+            /// <summary>
+            /// Belirtilen nesneyi hariç tutar
+            /// <br>Filtreye uyan fakat istisna oluşturmak gereken durumlarda kullanılabilir</br>
+            /// </summary>
+            [AttributeUsage(AttributeTargets.Field)]
+            public class Filtre_Kapsamında_Olsa_Bile_Kesinlikle_KullanmaAttribute : Attribute { }
         }
         #endregion
     }

@@ -79,39 +79,76 @@ namespace ArgeMup.HazirKod.Ekİşlemler
         }
         public static bool BenzerMi(this string Girdi, string Kıstas, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
         {
-            if (Girdi.BoşMu() || Kıstas.BoşMu()) return false;
-            
-            string Ayraçç = Ayraç.ToString();
-            if (Kıstas == Ayraçç) return true;
+            if (string.IsNullOrEmpty(Girdi) || string.IsNullOrEmpty(Kıstas)) return false;
 
-            if (!BüyükKüçükHarfDuyarlı)
+            if (Kıstas.Length == 1 && Kıstas[0] == Ayraç) return true;
+
+            int Kıstas_Uzunluğu = Kıstas.Length;
+            int Girdi_Uzunluğu = Girdi.Length;
+            bool AynıMı(char a, char b) => BüyükKüçükHarfDuyarlı ? a == b : char.ToLowerInvariant(a) == char.ToLowerInvariant(b);
+
+            if (Kıstas[0] != Ayraç)
             {
-                Girdi = Girdi.ToLower();
-                Kıstas = Kıstas.ToLower();
+                int Baş_Uzunluğu = 0;
+                while (Baş_Uzunluğu < Kıstas_Uzunluğu && Kıstas[Baş_Uzunluğu] != Ayraç) Baş_Uzunluğu++;
+
+                if (Girdi_Uzunluğu < Baş_Uzunluğu) return false;
+
+                for (int i = 0; i < Baş_Uzunluğu; i++)
+                {
+                    if (!AynıMı(Girdi[i], Kıstas[i])) return false;
+                }
             }
 
-            if (Kıstas.StartsWith(Ayraçç)) Kıstas = Kıstas.TrimStart(Ayraç);
-            else
+            if (Kıstas[Kıstas_Uzunluğu - 1] != Ayraç)
             {
-                string ilk_kıstas = Kıstas.Split(Ayraç)[0];
-                if (!Girdi.StartsWith(ilk_kıstas)) return false;
+                int Bitiş_Başlangıcı = Kıstas_Uzunluğu - 1;
+                while (Bitiş_Başlangıcı >= 0 && Kıstas[Bitiş_Başlangıcı] != Ayraç) Bitiş_Başlangıcı--;
+                Bitiş_Başlangıcı++;
+
+                int Bitiş_Uzunluğu = Kıstas_Uzunluğu - Bitiş_Başlangıcı;
+                if (Girdi_Uzunluğu < Bitiş_Uzunluğu) return false;
+
+                for (int i = 0; i < Bitiş_Uzunluğu; i++)
+                {
+                    if (!AynıMı(Girdi[Girdi_Uzunluğu - Bitiş_Uzunluğu + i], Kıstas[Bitiş_Başlangıcı + i])) return false;
+                }
             }
 
-            if (Kıstas.EndsWith(Ayraçç)) Kıstas = Kıstas.TrimEnd(Ayraç);
-            else
-            {
-                string[] kıstas_lar = Kıstas.Split(Ayraç);
-                string son_kıstas = kıstas_lar[kıstas_lar.Length - 1];
-                if (!Girdi.EndsWith(son_kıstas)) return false;
-            }
+            int Girdi_Konumu = 0;
+            int Kıstas_Konumu = 0;
 
-            int konum = 0;
-            foreach (string kst in Kıstas.Split(Ayraç))
+            while (Kıstas_Konumu < Kıstas_Uzunluğu)
             {
-                konum = Girdi.IndexOf(kst, konum);
-                if (konum < 0) return false;
+                int Sonraki_İçKıstas = Kıstas_Konumu;
+                while (Sonraki_İçKıstas < Kıstas_Uzunluğu && Kıstas[Sonraki_İçKıstas] != Ayraç) Sonraki_İçKıstas++;
 
-                konum += kst.Length;
+                int İçKıstas_Uzunluğu = Sonraki_İçKıstas - Kıstas_Konumu;
+                if (İçKıstas_Uzunluğu > 0)
+                {
+                    bool İçKıstas_Bulundu = false;
+                    while (Girdi_Konumu + İçKıstas_Uzunluğu <= Girdi_Uzunluğu)
+                    {
+                        int i = 0;
+                        for (; i < İçKıstas_Uzunluğu; i++)
+                        {
+                            if (!AynıMı(Girdi[Girdi_Konumu + i], Kıstas[Kıstas_Konumu + i])) break;
+                        }
+
+                        if (i == İçKıstas_Uzunluğu)
+                        {
+                            Girdi_Konumu += İçKıstas_Uzunluğu;
+                            İçKıstas_Bulundu = true;
+                            break;
+                        }
+
+                        Girdi_Konumu++;
+                    }
+
+                    if (!İçKıstas_Bulundu) return false;
+                }
+
+                Kıstas_Konumu = Sonraki_İçKıstas + 1;
             }
 
             return true;

@@ -240,7 +240,7 @@ namespace ArgeMup.HazirKod
             Klasör_ kls = new Klasör_(Klasörü, Filtre_Dosya: Filtre, DoğrulamaKodunuÜret: false, Filtre_BüyükKüçükHarfDuyarlı: Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç: Filtre_Ayraç, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_SayısınaGöre(AzamiToplamDosyaSayısı);
 		}
-        public static bool Sil_SayısınaVeBoyutunaGöre(string Klasörü, int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt, IEnumerable<string> Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
+        public static bool Sil_SayısınaVeBoyutunaGöre(string Klasörü, int AzamiToplamDosyaSayısı, long TümDosyaların_KapladığıAlan_bayt, IEnumerable<string> Filtre = null, bool Filtre_BüyükKüçükHarfDuyarlı = true, char Filtre_Ayraç = '*', int EşZamanlıİşlemSayısı = Klasör.EşZamanlıİşlemSayısı_Sabiti)
         {
             Klasör_ kls = new Klasör_(Klasörü, Filtre_Dosya: Filtre, DoğrulamaKodunuÜret: false, Filtre_BüyükKüçükHarfDuyarlı: Filtre_BüyükKüçükHarfDuyarlı, Filtre_Ayraç: Filtre_Ayraç, EşZamanlıİşlemSayısı: EşZamanlıİşlemSayısı);
             return kls.Dosya_Sil_SayısınaVeBoyutunaGöre(AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt);
@@ -1054,7 +1054,7 @@ namespace ArgeMup.HazirKod
                 if (!Temkinli.Dosya.Sil(Kök + @"\" + dsy.Yolu)) Interlocked.Increment(ref HataOldu);
             }
         }
-        public bool Dosya_Sil_SayısınaVeBoyutunaGöre(int AzamiToplamDosyaSayısı, int TümDosyaların_KapladığıAlan_bayt)
+        public bool Dosya_Sil_SayısınaVeBoyutunaGöre(int AzamiToplamDosyaSayısı, long TümDosyaların_KapladığıAlan_bayt)
         {
             // En yeni AzamiToplamDosyaSayısı kadar dosya tutulur
             // Haricindekiler TümDosyaların_KapladığıAlan_bayt aşıyorsa eskiden yeniye doğru silinir

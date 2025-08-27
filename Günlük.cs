@@ -6,6 +6,7 @@ using ArgeMup.HazirKod.Dönüştürme;
 using System.Runtime.CompilerServices;
 using ArgeMup.HazirKod.DonanımHaberleşmesi;
 using ArgeMup.HazirKod.ArkaPlan;
+using System.Text;
 
 namespace ArgeMup.HazirKod
 {
@@ -19,7 +20,6 @@ namespace ArgeMup.HazirKod
         public static int BaytDizisi_BirSatirdakiBilgiSayisi = 16;
         public static string Şablon_Tarih_Saat_MiliSaniye = "dd.MM.yyyy-HH:mm:ss.fff";
 
-        static string Yolu = null;
         static int UdpSunucusuErişimNoktası = 0;
 
         /// <summary>
@@ -33,18 +33,15 @@ namespace ArgeMup.HazirKod
         /// </param>
         /// <param name="UdpSunucusuErişimNoktası">1 den küçük değerlerde bu özellik kapalıdır</param>
         /// <exception cref="Exception">Klasör oluşturulamadı</exception>
-        public static void Başlat(string Klasörü = "", int UdpSunucusununErişimNoktası = 0, int AzamiToplamDosyaSayısı = 50, int TümDosyaların_KapladığıAlan_bayt = 50 * 1024 * 1024 /*50 MiB*/)
+        public static void Başlat(string Klasörü = "", int UdpSunucusununErişimNoktası = 0, int AzamiToplamDosyaSayısı = 50, long TümDosyaların_KapladığıAlan_bayt = 50 * 1024 * 1024 /*50 MiB*/)
         {
             if (Klasörü != null)
             {
                 if (Klasörü == "") Klasörü = @"\\?\" + Klasör.Depolama(Klasör.Kapsamı.Geçici) + @"\Gunluk";
+                else Klasörü = Klasörü.TrimEnd('\\');
                 Klasör.Oluştur(Klasörü);
 
-                Yolu = Klasörü + @"\" + D_TarihSaat.Yazıya(DateTime.Now, D_TarihSaat.Şablon_DosyaAdı) + ".Gunluk";
-
-                Dosya.Sil_SayısınaVeBoyutunaGöre(Klasörü, AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt, new string[] { "*.Gunluk" });
-
-                Dosyalama = new Öğütücü_<string>(İşlem_Dosyalama, AzamiElemanSayısı:5555);
+                Dosyalama = new Dosyalama_(Klasörü + "\\", 5000, AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt); 
             }
 
             if (UdpSunucusununErişimNoktası > 0)
@@ -60,7 +57,7 @@ namespace ArgeMup.HazirKod
         {
             if (Dosyalama != null)
             {
-                Dosyalama.Durdur();
+                Dosyalama.Dispose();
                 Dosyalama = null;
             }
 
@@ -76,7 +73,7 @@ namespace ArgeMup.HazirKod
             if (Seviyesi > GenelSeviye) return;
             if (Mesaj == null) Mesaj = "";
 
-            string içerik = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo;
+            string içerik = D_TarihSaat.Yazıya(DateTime.UtcNow, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo;
             Mesaj = Mesaj.TrimEnd(' ', '\r', '\n');
 
             if (Mesaj.Contains("\r\n")) içerik += "\r\n\t" + Mesaj.Replace("\r\n", "\r\n\t");
@@ -84,13 +81,13 @@ namespace ArgeMup.HazirKod
             else if (Mesaj.Contains("\r")) içerik += "\r\t" + Mesaj.Replace("\r", "\r\t");
             else içerik += " " + Mesaj;
 
-            Ekle_(içerik.TrimEnd(' ', '\r', '\n'), Seviyesi, Hemen);
+            Ekle_(içerik, Seviyesi, Hemen);
         }
         public static void Ekle(byte[] BaytDizisi, int Adet = int.MinValue, int BaşlangıçKonumu = 0, Seviye Seviyesi = Seviye.Geveze, string ÖnYazı = null, [CallerFilePath] string ÇağıranDosya = "", [CallerLineNumber] int ÇağıranSatırNo = 0, bool Hemen = false)
         {
             if (Seviyesi > GenelSeviye) return;
 
-            string başlık = D_TarihSaat.Yazıya(DateTime.Now, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " " + ÖnYazı;
+            string başlık = D_TarihSaat.Yazıya(DateTime.UtcNow, Şablon_Tarih_Saat_MiliSaniye) + " " + Path.GetFileName(ÇağıranDosya) + ":" + ÇağıranSatırNo + " " + ÖnYazı;
 
             if (BaytDizisi == null) Ekle_(başlık + "null", Seviyesi, Hemen);
             else
@@ -125,12 +122,12 @@ namespace ArgeMup.HazirKod
                             else içerik += şimdiki;
                         }
 
-                        içerik += Environment.NewLine;
                         BaşlangıçKonumu += şimdiki_adet;
                         Adet -= şimdiki_adet;
+                        if (Adet > 0) içerik += Environment.NewLine;
                     }
 
-                    Ekle_(içerik.TrimEnd(Environment.NewLine.ToCharArray()), Seviyesi, Hemen);
+                    Ekle_(içerik, Seviyesi, Hemen);
                 }
             }
         }
@@ -145,18 +142,17 @@ namespace ArgeMup.HazirKod
                 default: break;
             }
 
-            Console.WriteLine(Mesaj);
-            #if DEBUG && NET7_0_OR_GREATER
-                System.Diagnostics.Debug.WriteLine(Mesaj);
-                #warning Günlük işlemleri ciddi oranda YAVAŞLADI
+            #if DEBUG
+                Console.WriteLine(Mesaj);
+
+                #if NET7_0_OR_GREATER
+                    System.Diagnostics.Debug.WriteLine(Mesaj);
+                    #warning Günlük işlemleri ciddi oranda YAVAŞLADI
+                #endif
             #endif
 
-            if (Dosyalama != null)
-            {
-                if (Hemen) İşlem_Dosyalama(Mesaj, null);
-                else Dosyalama.Ekle(Mesaj);
-            }
-
+            Dosyalama?.Ekle(Mesaj, Hemen);
+            
             if (UdpSunucusu != null)
             {
                 if (Hemen) İşlem_UdpSunucusu(Mesaj, null);  
@@ -165,17 +161,96 @@ namespace ArgeMup.HazirKod
         }
 
         #region Öğütücü
-        static Öğütücü_<string> Dosyalama = null;
-        static Öğütücü_<string> UdpSunucusu = null;
-
-        static void İşlem_Dosyalama(string içerik, object Hatırlatıcı)
+        static Dosyalama_ Dosyalama = null;
+        class Dosyalama_ : IDisposable
         {
-            try
+            private readonly StringBuilder Sb = new StringBuilder();
+            private readonly System.Threading.SemaphoreSlim Kilit = new System.Threading.SemaphoreSlim(1, 1);
+            private readonly System.Threading.Timer Zamanlayici;
+            private readonly int ZamanAşımı_msn;
+            private readonly int Kilit_Devralma_ZamanAşımı_msn = 10000;
+            private readonly string Şablon_Tarih = "dd_MM_yyyy";
+            private readonly string Şablon_Saat_MiliSaniye = "HH_mm_ss_fff";
+
+            string Dosya_Yolu_KökKlasör;
+            string Dosya_Yolu;
+            long Dosya_Boyutu = -1;
+            (int AzamiToplamDosyaSayısı, long TümDosyaların_KapladığıAlan_bayt)? İlkAçılışİşlemleri_Null_Yapıldı_Dolu_Yapılmadı;
+
+            public Dosyalama_(string KökKlasör, int ZamanAşımı_msn, int AzamiToplamDosyaSayısı, long TümDosyaların_KapladığıAlan_bayt)
             {
-                File.AppendAllText(Yolu, içerik + Environment.NewLine);
+                Dosya_Yolu_KökKlasör = KökKlasör;
+                İlkAçılışİşlemleri_Null_Yapıldı_Dolu_Yapılmadı = (AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt);
+                this.ZamanAşımı_msn = ZamanAşımı_msn;
+
+                Zamanlayici = new System.Threading.Timer(async _ => await SüreDoldu(), null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             }
-            catch (Exception) { }
+            public void Dispose()
+            {
+                Zamanlayici.Dispose();
+                Kilit.Dispose();
+                Sb.Clear();
+            }
+
+            public async System.Threading.Tasks.Task Ekle(string Mesaj, bool Hemen)
+            {
+                if (!await Kilit.WaitAsync(Kilit_Devralma_ZamanAşımı_msn)) return;
+
+                try
+                {
+                    Sb.AppendLine(Mesaj);
+
+                    Zamanlayici.Change(Hemen ? 1 : (Sb.Length > (512 * 1024 /*500 KiB*/) ? 100 : ZamanAşımı_msn), System.Threading.Timeout.Infinite);
+                }
+                finally
+                {
+                    Kilit.Release();
+                }
+            }
+            private async System.Threading.Tasks.Task SüreDoldu()
+            {
+                if (!await Kilit.WaitAsync(Kilit_Devralma_ZamanAşımı_msn))
+                {
+                    Zamanlayici.Change(ZamanAşımı_msn, System.Threading.Timeout.Infinite);
+                    return;
+                }
+
+                try
+                {
+                    string Mesajlar = Sb.ToString();
+                    int Boyutu = Sb.Length;
+                    Sb.Clear();
+
+                    if (İlkAçılışİşlemleri_Null_Yapıldı_Dolu_Yapılmadı != null)
+                    {
+                        (int AzamiToplamDosyaSayısı, long TümDosyaların_KapladığıAlan_bayt)? gecici = İlkAçılışİşlemleri_Null_Yapıldı_Dolu_Yapılmadı;
+                        İlkAçılışİşlemleri_Null_Yapıldı_Dolu_Yapılmadı = null;
+
+                        Dosya.Sil_SayısınaVeBoyutunaGöre(Dosya_Yolu_KökKlasör, gecici.Value.AzamiToplamDosyaSayısı, gecici.Value.TümDosyaların_KapladığıAlan_bayt, new string[] { "*.Gunluk" });
+                    }
+
+                    if (Dosya_Boyutu == -1 ||
+                        Dosya_Boyutu > (1 * 1024 * 1024 /*1 MiB*/) )
+                    {
+                        DateTime şimdi = DateTime.UtcNow;
+                        string Klasörü = Dosya_Yolu_KökKlasör + D_TarihSaat.Yazıya(şimdi, Şablon_Tarih);
+                        Directory.CreateDirectory(Klasörü);
+
+                        Dosya_Yolu = Klasörü + "\\" + D_TarihSaat.Yazıya(şimdi, Şablon_Saat_MiliSaniye) + ".Gunluk";
+                        Dosya_Boyutu = 0;
+                    }
+
+                    await File.AppendAllTextAsync(Dosya_Yolu, Mesajlar, Encoding.UTF8);
+                    Dosya_Boyutu += Boyutu;
+                }
+                finally
+                {
+                    Kilit.Release();
+                }
+            }
         }
+
+        static Öğütücü_<string> UdpSunucusu = null;
         static void İşlem_UdpSunucusu(string içerik, object Hatırlatıcı)
         {
             UdpVerici.Gönder(içerik + SatırSonu.Karakteri, UdpSunucusuErişimNoktası);

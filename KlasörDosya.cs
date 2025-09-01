@@ -46,18 +46,14 @@ namespace ArgeMup.HazirKod
         {
             if (!Directory.Exists(Yolu)) return;
 
-            string[] klsler = Directory.GetDirectories(Yolu, "*", SearchOption.AllDirectories);
-            for (int i = klsler.Length - 1; i >= 0; i--)
+            foreach (var dir in Directory.EnumerateDirectories(Yolu))
             {
-                _Sil_(klsler[i]);
+                Sil_İçiBoşOlanları(dir);
             }
-            _Sil_(Yolu);
 
-            void _Sil_(string _Yolu_)
+            if (!Directory.EnumerateFileSystemEntries(Yolu).Any())
             {
-                string[] dsy_lar = Directory.GetFiles(_Yolu_, "*.*", SearchOption.TopDirectoryOnly);
-                string[] kls_ler = Directory.GetDirectories(_Yolu_, "*", SearchOption.TopDirectoryOnly);
-                if (dsy_lar.Length == 0 && kls_ler.Length == 0) Sil(_Yolu_);
+                Directory.Delete(Yolu);
             }
         }
         public static bool Kopyala(string Kaynak, string Hedef, bool HedeftekiFazlaKlasörVeDosyalarıSil = false, bool DoğrulamaKodunuKontrolEt_Yavaşlatır = true, int EşZamanlıİşlemSayısı = EşZamanlıİşlemSayısı_Sabiti, bool AynıDoğrulamaKodunaSahipİse_DiğerFarklılıklarıGörmezdenGel = false)

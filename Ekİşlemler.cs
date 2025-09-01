@@ -155,7 +155,7 @@ namespace ArgeMup.HazirKod.Ekİşlemler
         }
         public static bool BenzerMi(this string Girdi, System.Collections.Generic.IEnumerable<string> Kıstaslar, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
         {
-            if (Girdi.BoşMu() || Kıstaslar == null) return false;
+            if (string.IsNullOrEmpty(Girdi) || Kıstaslar == null) return false;
 
             foreach (string Kıstas in Kıstaslar)
             {

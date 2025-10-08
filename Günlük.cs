@@ -20,6 +20,7 @@ namespace ArgeMup.HazirKod
         public static int BaytDizisi_BirSatirdakiBilgiSayisi = 16;
         public static string Şablon_Tarih_Saat_MiliSaniye = "dd.MM.yyyy-HH:mm:ss.fff";
         public static long Dosyalama_AzamiBoyutu_Bayt = 1 * 1024 * 1024 /*1 MiB*/;
+        public static int Aktarma_ZamanAşımı_msn = 5000;
 
         static int UdpSunucusuErişimNoktası = 0;
 
@@ -42,7 +43,7 @@ namespace ArgeMup.HazirKod
                 else Klasörü = Klasörü.TrimEnd('\\');
                 Klasör.Oluştur(Klasörü);
 
-                Dosyalama = new Dosyalama_(Klasörü + "\\", 5000, AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt); 
+                Dosyalama = new Dosyalama_(Klasörü + "\\", Aktarma_ZamanAşımı_msn, AzamiToplamDosyaSayısı, TümDosyaların_KapladığıAlan_bayt); 
             }
 
             if (UdpSunucusununErişimNoktası > 0)

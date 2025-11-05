@@ -33,20 +33,19 @@ namespace ArgeMup.HazirKod.Dönüştürme
 
     public static class D_HexYazı
     {
-        public const string Sürüm = "V1.1";
+        public const string Sürüm = "V1.2";
 
         public static byte[] BaytDizisine(string Girdi)
         {
             if (string.IsNullOrEmpty(Girdi)) return null;
 
-            int BaşlangıçKonumu = 0;
-            if (Girdi.StartsWith("0x")) BaşlangıçKonumu += 2;
+            ReadOnlySpan<char> span = Girdi.AsSpan();
 
-            return Enumerable.Range(BaşlangıçKonumu, Girdi.Length - BaşlangıçKonumu)
-                     .Where(x => x % 2 == 0)
-                     .Select(x => Convert.ToByte(Girdi.Substring(x, 2), 16))
-                     .ToArray();
+            if (span.Length >= 2 && span[0] == '0' && span[1] == 'x') span = span.Slice(2);
+
+            return Convert.FromHexString(span);
         }
+
         public static string BaytDizisinden(byte[] Girdi, int Adet = int.MinValue, int BaşlangıçKonumu = 0)
         {
             if (Girdi == null || Girdi.Length == 0) return "";
@@ -54,9 +53,7 @@ namespace ArgeMup.HazirKod.Dönüştürme
             if (Adet == int.MinValue) Adet = Girdi.Length - BaşlangıçKonumu;
             if (Adet > Girdi.Length - BaşlangıçKonumu) Adet = Girdi.Length - BaşlangıçKonumu;
 
-            string Çıktı = "";
-            for (int w = 0; w < Adet; w++) Çıktı += Girdi[w].ToString("X2");
-            return Çıktı;
+            return Convert.ToHexString(Girdi.AsSpan(BaşlangıçKonumu, Adet));
         }
     }
 

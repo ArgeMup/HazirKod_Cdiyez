@@ -21,17 +21,25 @@ namespace ArgeMup.HazirKod
         A.Kullanılacak her sınıfın içine alttaki region eklenmeli
         B.Sınıf içindeki her bir değişken [JsonInclude], [JsonIgnore] ile işaretlenerek filtrelenir.
         C.[JsonListKey(0)] [JsonListKey(1)] gibi birden fazla sınıf içi değişkene eklenerek dizi, liste gibi anahtarı olmayan nesnelerin karşılaştırma aşamasında düzgün eşleştirilebilmesi için eklenebilir, eklenmez ise indis sırasında kontrol edilir 
-        
-        #region ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci
-        partial void Karşılaştır_Yazdır(Siparis B, ref string aciklama, string yolOneki);
+        D.Sınıfın kendisi partial olarak işaretlenmeli
+        E.Gerekli ise IKarşılaştır_ eklenebilir
 
-        public virtual string Karşılaştır(Siparis B, string yolOneki = "")
+        public partial class Deneme_Sınıfı_ : ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci.IKarşılaştır_
         {
-            string aciklama = null;
-            Karşılaştır_Yazdır(B, ref aciklama, yolOneki);
-            return aciklama ?? string.Empty;
+            [JsonInclude]
+            public int Değişken_1 = 5;
+
+            #region ArgeMup.HazirKod.Sınıf_FarkBulucu_KoduÜreteci
+            partial void Karşılaştır_Yazdır(object NesneB, ref string aciklama, string yolOneki);
+
+            public virtual string Karşılaştır(object NesneB, string yolOneki = "")
+            {
+                string aciklama = null;
+                Karşılaştır_Yazdır(NesneB, ref aciklama, yolOneki);
+                return aciklama ?? string.Empty;
+            }
+            #endregion
         }
-        #endregion
 
         */
         #endregion
@@ -45,9 +53,8 @@ namespace ArgeMup.HazirKod
         #if DEBUG
             ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci.Karşılaştırma_için_gerekli_cs_dosyalarını_üret(
                 hedefKlasor: @"Uretilen\cs",
-                typeof(Siparis),
-                typeof(Musteri),
-                typeof(Kalem)
+                typeof(Deneme_Sınıfı_),
+                typeof(varsa Deneme_Sınıfı_ içindeki sınıf)
             );
         #endif
         */
@@ -55,14 +62,12 @@ namespace ArgeMup.HazirKod
 
         #region Adım 3
         /*
-        string sonuç = NesneA.Karşılaştır(NesneB);
-        işlemi ile aynı tip iki nesne arasındaki tüm farklar, tüm iç elemanlarıyla birlikte karşılaştırılır
-        */
-        #endregion
+        İşlem ile aynı tip iki nesne arasındaki tüm farklar, tüm iç elemanlarıyla birlikte karşılaştırılır
+        Değişken adı:NesneA:NesneB
 
-        #region Çıktı
-        /*
-        Değişken adı:Eski:Yeni
+        string Çıktı = NesneA.Karşılaştır(NesneB); veya
+        ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci.IKarşılaştır_ IKarşılaştır = NesneA;
+        string Çıktı = IKarşılaştır.Karşılaştır(NesneB);
 
         Kullanıcı:null:Dalguş
         Türü:null:Gıcık kuş
@@ -76,13 +81,16 @@ namespace ArgeMup.HazirKod
 
         #region Kütüphane
         //Bunlar debug değil iken kullanılıyor
+        public interface IKarşılaştır_
+        {
+            string Karşılaştır(object NesneB, string yolOneki = "");
+        }
         [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
         public class JsonListKeyAttribute : Attribute
         {
             public int Order { get; }
             public JsonListKeyAttribute(int order = 0) { Order = order; }
         }
-
         public static string DegerStr(object v)
         {
             if (v == null) return "null";
@@ -150,8 +158,9 @@ namespace ArgeMup.HazirKod
             var alanlar = JsonIncludeAlanlariAl(tip);
 
             // ── Karşılaştır_Yazdır implementasyonu ───────────────────
-            sb.AppendLine($"{g2}partial void Karşılaştır_Yazdır({tip.Name} B, ref string aciklama, string yolOneki)");
+            sb.AppendLine($"{g2}partial void Karşılaştır_Yazdır(object NesneB, ref string aciklama, string yolOneki)");
             sb.AppendLine($"{g2}{{");
+            sb.AppendLine($"{g3}var B = NesneB as {tip.Name};");
             sb.AppendLine($"{g3}var sb = new StringBuilder();");
             sb.AppendLine($"{g3}string _oncekiYol_ = null;");
             sb.AppendLine();

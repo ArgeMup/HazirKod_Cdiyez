@@ -22,20 +22,20 @@ namespace ArgeMup.HazirKod
         B.Sınıf içindeki her bir değişken [JsonInclude], [JsonIgnore] ile işaretlenerek filtrelenir.
         C.[JsonListKey(0)] [JsonListKey(1)] gibi birden fazla sınıf içi değişkene eklenerek dizi, liste gibi anahtarı olmayan nesnelerin karşılaştırma aşamasında düzgün eşleştirilebilmesi için eklenebilir, eklenmez ise indis sırasında kontrol edilir 
         D.Sınıfın kendisi partial olarak işaretlenmeli
-        E.Gerekli ise IKarşılaştır_ eklenebilir
+        E.Gerekli ise IDerinKarşılaştır_ eklenebilir
 
-        public partial class Deneme_Sınıfı_ : ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci.IKarşılaştır_
+        public partial class Deneme_Sınıfı_ : ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci.IDerinKarşılaştır_
         {
             [JsonInclude]
             public int Değişken_1 = 5;
 
-            #region ArgeMup.HazirKod.Sınıf_FarkBulucu_KoduÜreteci
-            partial void Karşılaştır_Yazdır(object NesneB, ref string aciklama, string yolOneki);
+            #region ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci
+            partial void DerinKarşılaştır_İç(object NesneB, ref string aciklama, string yolOneki);
 
-            public virtual string Karşılaştır(object NesneB, string yolOneki = "")
+            public virtual string DerinKarşılaştır(object NesneB, string yolOneki = "")
             {
                 string aciklama = null;
-                Karşılaştır_Yazdır(NesneB, ref aciklama, yolOneki);
+                DerinKarşılaştır_İç(NesneB, ref aciklama, yolOneki);
                 return aciklama ?? string.Empty;
             }
             #endregion
@@ -65,9 +65,9 @@ namespace ArgeMup.HazirKod
         İşlem ile aynı tip iki nesne arasındaki tüm farklar, tüm iç elemanlarıyla birlikte karşılaştırılır
         Değişken adı:NesneA:NesneB
 
-        string Çıktı = NesneA.Karşılaştır(NesneB); veya
-        ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci.IKarşılaştır_ IKarşılaştır = NesneA;
-        string Çıktı = IKarşılaştır.Karşılaştır(NesneB);
+        string Çıktı = NesneA.DerinKarşılaştır(NesneB); veya
+        ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci.IDerinKarşılaştır_ IDerinKarşılaştır = NesneA;
+        string Çıktı = IDerinKarşılaştır.DerinKarşılaştır(NesneB);
 
         Kullanıcı:null:Dalguş
         Türü:null:Gıcık kuş
@@ -80,10 +80,11 @@ namespace ArgeMup.HazirKod
         #endregion
 
         #region Kütüphane
+        public const string Sürüm = "V1.0";
         //Bunlar debug değil iken kullanılıyor
-        public interface IKarşılaştır_
+        public interface IDerinKarşılaştır_
         {
-            string Karşılaştır(object NesneB, string yolOneki = "");
+            string DerinKarşılaştır(object NesneB, string yolOneki = "");
         }
         [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
         public class JsonListKeyAttribute : Attribute
@@ -117,7 +118,7 @@ namespace ArgeMup.HazirKod
 #if DEBUG
         /// <summary>
         /// Verilen tiplerin her biri için ayrı bir .cs dosyası üretir.
-        /// Dosya adı: TipAdi.Karşılaştır.g.cs
+        /// Dosya adı: TipAdi.DerinKarşılaştır.g.cs
         /// </summary>
         public static void Karşılaştırma_için_gerekli_cs_dosyalarını_üret(string hedefKlasor, params Type[] tipler)
         {
@@ -127,7 +128,7 @@ namespace ArgeMup.HazirKod
             foreach (var tip in tipler)
             {
                 string kod = TamDosyaUret(tip);
-                string dosyaAdi = Path.Combine(hedefKlasor, $"{tip.Name}.Karsilastir.g.cs");
+                string dosyaAdi = Path.Combine(hedefKlasor, $"{tip.Name}.DerinKarsilastir.g.cs");
                 File.WriteAllText(dosyaAdi, kod, System.Text.Encoding.UTF8);
             }
         }
@@ -136,7 +137,8 @@ namespace ArgeMup.HazirKod
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine("// Otomatik üretildi — FarkKoduUreteci tarafından");
+            sb.AppendLine("// Otomatik üretildi — ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci tarafından");
+            sb.AppendLine($"// {ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci.Sürüm} {DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss.fff")}");
             sb.AppendLine("// Bu dosyayı elle düzenlemeyin.");
             sb.AppendLine();
             sb.AppendLine("using System;");
@@ -154,13 +156,14 @@ namespace ArgeMup.HazirKod
 
             sb.AppendLine($"{g}public partial class {tip.Name}");
             sb.AppendLine($"{g}{{");
-
+            
             var alanlar = JsonIncludeAlanlariAl(tip);
 
-            // ── Karşılaştır_Yazdır implementasyonu ───────────────────
-            sb.AppendLine($"{g2}partial void Karşılaştır_Yazdır(object NesneB, ref string aciklama, string yolOneki)");
+            // ── DerinKarşılaştır_İç implementasyonu ───────────────────
+            sb.AppendLine($"{g2}partial void DerinKarşılaştır_İç(object NesneB, ref string aciklama, string yolOneki)");
             sb.AppendLine($"{g2}{{");
-            sb.AppendLine($"{g3}var B = NesneB as {tip.Name};");
+            sb.AppendLine($"{g3}{tip.Name} B = NesneB as {tip.Name};");
+            sb.AppendLine($"{g3}if (B == null) throw new Exception(\"Bu sınıf karşılaştırmak için uygun değil {tip.Name}\");");
             sb.AppendLine($"{g3}var sb = new StringBuilder();");
             sb.AppendLine($"{g3}string _oncekiYol_ = null;");
             sb.AppendLine();
@@ -170,10 +173,10 @@ namespace ArgeMup.HazirKod
             sb.AppendLine($"{g2}}}");
             sb.AppendLine();
 
-            // ── Karşılaştır_NullKarsiHesapla implementasyonu ──────────
+            // ── DerinKarşılaştır_NullKarsiHesapla implementasyonu ──────────
             // solNull=true  → null:Deger  (A yok, B var)
             // solNull=false → Deger:null  (A var, B yok)
-            sb.AppendLine($"{g2}void Karşılaştır_NullKarsiHesapla(ref string aciklama, string yolOneki, bool solNull)");
+            sb.AppendLine($"{g2}void DerinKarşılaştır_NullKarsiHesapla(ref string aciklama, string yolOneki, bool solNull)");
             sb.AppendLine($"{g2}{{");
             sb.AppendLine($"{g3}var sb = new StringBuilder();");
             sb.AppendLine($"{g3}string _oncekiYol_ = null;");
@@ -183,10 +186,10 @@ namespace ArgeMup.HazirKod
             sb.AppendLine($"{g3}aciklama = sb.Length > 0 ? sb.ToString() : string.Empty;");
             sb.AppendLine($"{g2}}}");
             sb.AppendLine();
-            sb.AppendLine($"{g2}public string Karşılaştır_NullKarsi(string yolOneki = \"\", bool solNull = false)");
+            sb.AppendLine($"{g2}public string DerinKarşılaştır_NullKarsi(string yolOneki = \"\", bool solNull = false)");
             sb.AppendLine($"{g2}{{");
             sb.AppendLine($"{g3}string aciklama = null;");
-            sb.AppendLine($"{g3}Karşılaştır_NullKarsiHesapla(ref aciklama, yolOneki, solNull);");
+            sb.AppendLine($"{g3}DerinKarşılaştır_NullKarsiHesapla(ref aciklama, yolOneki, solNull);");
             sb.AppendLine($"{g3}return aciklama ?? string.Empty;");
             sb.AppendLine($"{g2}}}");
 
@@ -227,7 +230,7 @@ namespace ArgeMup.HazirKod
 
             if (SozlukMu(gercekTip))
             {
-                // Value tipini çıkar — sınıfsa Karşılaştır_NullKarsi, değilse DegerStr
+                // Value tipini çıkar — sınıfsa DerinKarşılaştır_NullKarsi, değilse DegerStr
                 Type valTip = gercekTip.GetGenericArguments().Length >= 2 ? gercekTip.GetGenericArguments()[1] : typeof(object);
                 Type valAlt = Nullable.GetUnderlyingType(valTip) ?? valTip;
                 bool valSinif = SinifMi(valAlt);
@@ -241,7 +244,7 @@ namespace ArgeMup.HazirKod
                     sb.AppendLine($"{g}        var _yol_{dv} = {YolKey(ad, $"_kv_{dv}.Key")};");
                     sb.AppendLine($"{g}        if (_kv_{dv}.Value != null)");
                     sb.AppendLine($"{g}        {{");
-                    sb.AppendLine($"{g}            var _nf_{dv} = (({valAlt.Name})_kv_{dv}.Value).Karşılaştır_NullKarsi(_yol_{dv}, solNull);");
+                    sb.AppendLine($"{g}            var _nf_{dv} = (({valAlt.Name})_kv_{dv}.Value).DerinKarşılaştır_NullKarsi(_yol_{dv}, solNull);");
                     sb.AppendLine($"{g}            if (!string.IsNullOrEmpty(_nf_{dv})) sb.Append(_nf_{dv});");
                     sb.AppendLine($"{g}        }}");
                 }
@@ -268,7 +271,7 @@ namespace ArgeMup.HazirKod
                     sb.AppendLine($"{g}        var _yol_{dv} = {YolKey(ad, $"_idx_{dv}.ToString()")};");
                     sb.AppendLine($"{g}        if (item != null)");
                     sb.AppendLine($"{g}        {{");
-                    sb.AppendLine($"{g}            var _nf_{dv} = item.Karşılaştır_NullKarsi(_yol_{dv}, solNull);");
+                    sb.AppendLine($"{g}            var _nf_{dv} = item.DerinKarşılaştır_NullKarsi(_yol_{dv}, solNull);");
                     sb.AppendLine($"{g}            if (!string.IsNullOrEmpty(_nf_{dv})) sb.Append(_nf_{dv});");
                     sb.AppendLine($"{g}        }}");
                 }
@@ -284,7 +287,7 @@ namespace ArgeMup.HazirKod
             {
                 sb.AppendLine($"{g}if (this.{ad} != null)");
                 sb.AppendLine($"{g}{{");
-                sb.AppendLine($"{g}    var _nf_{dv} = this.{ad}.Karşılaştır_NullKarsi({yol}, solNull);");
+                sb.AppendLine($"{g}    var _nf_{dv} = this.{ad}.DerinKarşılaştır_NullKarsi({yol}, solNull);");
                 sb.AppendLine($"{g}    if (!string.IsNullOrEmpty(_nf_{dv})) sb.Append(_nf_{dv});");
                 sb.AppendLine($"{g}}}");
             }
@@ -334,24 +337,24 @@ namespace ArgeMup.HazirKod
                 sb.AppendLine($"{g}if (this.{ad} == null && B.{ad} == null) {{ /* ikisi de null */ }}");
                 sb.AppendLine($"{g}else if (this.{ad} == null)");
                 sb.AppendLine($"{g}{{");
-                sb.AppendLine($"{g}    var _sf_{dv} = B.{ad}.Karşılaştır_NullKarsi({icYol}, solNull: true);");
+                sb.AppendLine($"{g}    var _sf_{dv} = B.{ad}.DerinKarşılaştır_NullKarsi({icYol}, solNull: true);");
                 sb.AppendLine($"{g}    if (!string.IsNullOrEmpty(_sf_{dv})) sb.Append(_sf_{dv});");
                 sb.AppendLine($"{g}}}");
                 sb.AppendLine($"{g}else if (B.{ad} == null)");
                 sb.AppendLine($"{g}{{");
-                sb.AppendLine($"{g}    var _sf_{dv} = this.{ad}.Karşılaştır_NullKarsi({icYol}, solNull: false);");
+                sb.AppendLine($"{g}    var _sf_{dv} = this.{ad}.DerinKarşılaştır_NullKarsi({icYol}, solNull: false);");
                 sb.AppendLine($"{g}    if (!string.IsNullOrEmpty(_sf_{dv})) sb.Append(_sf_{dv});");
                 sb.AppendLine($"{g}}}");
                 sb.AppendLine($"{g}else");
                 sb.AppendLine($"{g}{{");
-                sb.AppendLine($"{g}    var _sf_{dv} = this.{ad}.Karşılaştır(B.{ad}, {icYol});");
+                sb.AppendLine($"{g}    var _sf_{dv} = this.{ad}.DerinKarşılaştır(B.{ad}, {icYol});");
                 sb.AppendLine($"{g}    if (!string.IsNullOrEmpty(_sf_{dv})) sb.Append(_sf_{dv});");
                 sb.AppendLine($"{g}}}");
             }
             else
             {
                 sb.AppendLine($"{g}{{");
-                sb.AppendLine($"{g}    var _sf_{dv} = this.{ad}.Karşılaştır(B.{ad}, {icYol});");
+                sb.AppendLine($"{g}    var _sf_{dv} = this.{ad}.DerinKarşılaştır(B.{ad}, {icYol});");
                 sb.AppendLine($"{g}    if (!string.IsNullOrEmpty(_sf_{dv})) sb.Append(_sf_{dv});");
                 sb.AppendLine($"{g}}}");
             }
@@ -400,17 +403,17 @@ namespace ArgeMup.HazirKod
                     sb.AppendLine($"{g}    var _yol_{dv} = {YolKey(ad, $"_k_{dv}")};");
                     sb.AppendLine($"{g}    if (!_hasA_{dv})");
                     sb.AppendLine($"{g}    {{");
-                    sb.AppendLine($"{g}        var _nf_{dv} = _iB_{dv} != null ? _iB_{dv}.Karşılaştır_NullKarsi(_yol_{dv}, solNull: true) : string.Empty;");
+                    sb.AppendLine($"{g}        var _nf_{dv} = _iB_{dv} != null ? _iB_{dv}.DerinKarşılaştır_NullKarsi(_yol_{dv}, solNull: true) : string.Empty;");
                     sb.AppendLine($"{g}        if (!string.IsNullOrEmpty(_nf_{dv})) sb.Append(_nf_{dv});");
                     sb.AppendLine($"{g}    }}");
                     sb.AppendLine($"{g}    else if (!_hasB_{dv})");
                     sb.AppendLine($"{g}    {{");
-                    sb.AppendLine($"{g}        var _nf_{dv} = _iA_{dv} != null ? _iA_{dv}.Karşılaştır_NullKarsi(_yol_{dv}, solNull: false) : string.Empty;");
+                    sb.AppendLine($"{g}        var _nf_{dv} = _iA_{dv} != null ? _iA_{dv}.DerinKarşılaştır_NullKarsi(_yol_{dv}, solNull: false) : string.Empty;");
                     sb.AppendLine($"{g}        if (!string.IsNullOrEmpty(_nf_{dv})) sb.Append(_nf_{dv});");
                     sb.AppendLine($"{g}    }}");
                     sb.AppendLine($"{g}    else");
                     sb.AppendLine($"{g}    {{");
-                    sb.AppendLine($"{g}        var _ef_{dv} = _iA_{dv}.Karşılaştır(_iB_{dv}, _yol_{dv});");
+                    sb.AppendLine($"{g}        var _ef_{dv} = _iA_{dv}.DerinKarşılaştır(_iB_{dv}, _yol_{dv});");
                     sb.AppendLine($"{g}        if (!string.IsNullOrEmpty(_ef_{dv})) sb.Append(_ef_{dv});");
                     sb.AppendLine($"{g}    }}");
                 }
@@ -443,17 +446,17 @@ namespace ArgeMup.HazirKod
                     sb.AppendLine($"{g}    if (_iA_{dv} == null && _iB_{dv} == null) {{ /* ikisi de null */ }}");
                     sb.AppendLine($"{g}    else if (_iA_{dv} == null)");
                     sb.AppendLine($"{g}    {{");
-                    sb.AppendLine($"{g}        var _nf_{dv} = _iB_{dv}.Karşılaştır_NullKarsi(_yol_{dv}, solNull: true);");
+                    sb.AppendLine($"{g}        var _nf_{dv} = _iB_{dv}.DerinKarşılaştır_NullKarsi(_yol_{dv}, solNull: true);");
                     sb.AppendLine($"{g}        sb.Append(_nf_{dv});");
                     sb.AppendLine($"{g}    }}");
                     sb.AppendLine($"{g}    else if (_iB_{dv} == null)");
                     sb.AppendLine($"{g}    {{");
-                    sb.AppendLine($"{g}        var _nf_{dv} = _iA_{dv}.Karşılaştır_NullKarsi(_yol_{dv}, solNull: false);");
+                    sb.AppendLine($"{g}        var _nf_{dv} = _iA_{dv}.DerinKarşılaştır_NullKarsi(_yol_{dv}, solNull: false);");
                     sb.AppendLine($"{g}        sb.Append(_nf_{dv});");
                     sb.AppendLine($"{g}    }}");
                     sb.AppendLine($"{g}    else");
                     sb.AppendLine($"{g}    {{");
-                    sb.AppendLine($"{g}        var _ef_{dv} = _iA_{dv}.Karşılaştır(_iB_{dv}, _yol_{dv});");
+                    sb.AppendLine($"{g}        var _ef_{dv} = _iA_{dv}.DerinKarşılaştır(_iB_{dv}, _yol_{dv});");
                     sb.AppendLine($"{g}        if (!string.IsNullOrEmpty(_ef_{dv})) sb.Append(_ef_{dv});");
                     sb.AppendLine($"{g}    }}");
                 }
@@ -500,32 +503,32 @@ namespace ArgeMup.HazirKod
 
             if (valSinif)
             {
-                // Value sınıf — tüm null kombinasyonlarında Karşılaştır_NullKarsi çağır
+                // Value sınıf — tüm null kombinasyonlarında DerinKarşılaştır_NullKarsi çağır
                 sb.AppendLine($"{g}    var _yol_{dv} = {YolKey(ad, $"_k_{dv}")};");
                 sb.AppendLine($"{g}    if (!_avA_{dv})");
                 sb.AppendLine($"{g}    {{");
-                sb.AppendLine($"{g}        var _nf_{dv} = _vB_{dv} != null ? _vB_{dv}.Karşılaştır_NullKarsi(_yol_{dv}, solNull: true) : string.Empty;");
+                sb.AppendLine($"{g}        var _nf_{dv} = _vB_{dv} != null ? _vB_{dv}.DerinKarşılaştır_NullKarsi(_yol_{dv}, solNull: true) : string.Empty;");
                 sb.AppendLine($"{g}        if (!string.IsNullOrEmpty(_nf_{dv})) sb.Append(_nf_{dv});");
                 sb.AppendLine($"{g}    }}");
                 sb.AppendLine($"{g}    else if (!_avB_{dv})");
                 sb.AppendLine($"{g}    {{");
-                sb.AppendLine($"{g}        var _nf_{dv} = _vA_{dv} != null ? _vA_{dv}.Karşılaştır_NullKarsi(_yol_{dv}, solNull: false) : string.Empty;");
+                sb.AppendLine($"{g}        var _nf_{dv} = _vA_{dv} != null ? _vA_{dv}.DerinKarşılaştır_NullKarsi(_yol_{dv}, solNull: false) : string.Empty;");
                 sb.AppendLine($"{g}        if (!string.IsNullOrEmpty(_nf_{dv})) sb.Append(_nf_{dv});");
                 sb.AppendLine($"{g}    }}");
                 sb.AppendLine($"{g}    else if (_vA_{dv} == null && _vB_{dv} == null) {{ /* ikisi de null */ }}");
                 sb.AppendLine($"{g}    else if (_vA_{dv} == null)");
                 sb.AppendLine($"{g}    {{");
-                sb.AppendLine($"{g}        var _nf_{dv} = _vB_{dv}.Karşılaştır_NullKarsi(_yol_{dv}, solNull: true);");
+                sb.AppendLine($"{g}        var _nf_{dv} = _vB_{dv}.DerinKarşılaştır_NullKarsi(_yol_{dv}, solNull: true);");
                 sb.AppendLine($"{g}        sb.Append(_nf_{dv});");
                 sb.AppendLine($"{g}    }}");
                 sb.AppendLine($"{g}    else if (_vB_{dv} == null)");
                 sb.AppendLine($"{g}    {{");
-                sb.AppendLine($"{g}        var _nf_{dv} = _vA_{dv}.Karşılaştır_NullKarsi(_yol_{dv}, solNull: false);");
+                sb.AppendLine($"{g}        var _nf_{dv} = _vA_{dv}.DerinKarşılaştır_NullKarsi(_yol_{dv}, solNull: false);");
                 sb.AppendLine($"{g}        sb.Append(_nf_{dv});");
                 sb.AppendLine($"{g}    }}");
                 sb.AppendLine($"{g}    else");
                 sb.AppendLine($"{g}    {{");
-                sb.AppendLine($"{g}        var _ef_{dv} = _vA_{dv}.Karşılaştır(_vB_{dv}, _yol_{dv});");
+                sb.AppendLine($"{g}        var _ef_{dv} = _vA_{dv}.DerinKarşılaştır(_vB_{dv}, _yol_{dv});");
                 sb.AppendLine($"{g}        if (!string.IsNullOrEmpty(_ef_{dv})) sb.Append(_ef_{dv});");
                 sb.AppendLine($"{g}    }}");
             }

@@ -1,5 +1,7 @@
 ﻿// Copyright ArgeMup GNU GENERAL PUBLIC LICENSE Version 3 <http://www.gnu.org/licenses/> <https://github.com/ArgeMup/HazirKod_Cdiyez>
 
+using System;
+
 namespace ArgeMup.HazirKod.Ekİşlemler
 {
     public static class _Ekİşlemler_Yazı
@@ -79,76 +81,61 @@ namespace ArgeMup.HazirKod.Ekİşlemler
         }
         public static bool BenzerMi(this string Girdi, string Kıstas, bool BüyükKüçükHarfDuyarlı = true, char Ayraç = '*')
         {
-            if (string.IsNullOrEmpty(Girdi) || string.IsNullOrEmpty(Kıstas)) return false;
+            // 1. Erken çıkış: boş kontrol
+            if (string.IsNullOrEmpty(Girdi) || string.IsNullOrEmpty(Kıstas))
+                return false;
 
-            if (Kıstas.Length == 1 && Kıstas[0] == Ayraç) return true;
+            // 2. Erken çıkış: kıstas sadece tek ayraçsa her şeyle eşleşir
+            if (Kıstas.Length == 1 && Kıstas[0] == Ayraç)
+                return true;
 
-            int Kıstas_Uzunluğu = Kıstas.Length;
-            int Girdi_Uzunluğu = Girdi.Length;
-            bool AynıMı(char a, char b) => BüyükKüçükHarfDuyarlı ? a == b : char.ToLowerInvariant(a) == char.ToLowerInvariant(b);
+            // 3. Erken çıkış: hiç wildcard yoksa direkt karşılaştır (en hızlı yol)
+            StringComparison sc = BüyükKüçükHarfDuyarlı
+                ? StringComparison.Ordinal       // ToLower() yok, culture yok
+                : StringComparison.OrdinalIgnoreCase;
 
-            if (Kıstas[0] != Ayraç)
+            if (Kıstas.IndexOf(Ayraç) < 0)
+                return Girdi.Equals(Kıstas, sc);
+
+            // 4. Span: sıfır heap allocation — ToLower() ve Split() yok
+            ReadOnlySpan<char> g = Girdi.AsSpan();
+            ReadOnlySpan<char> k = Kıstas.AsSpan();
+
+            bool başAyraç = k[0] == Ayraç;
+            bool sonAyraç = k[k.Length - 1] == Ayraç;
+
+            // 5. Prefix kontrolü (allocation-free)
+            if (!başAyraç)
             {
-                int Baş_Uzunluğu = 0;
-                while (Baş_Uzunluğu < Kıstas_Uzunluğu && Kıstas[Baş_Uzunluğu] != Ayraç) Baş_Uzunluğu++;
-
-                if (Girdi_Uzunluğu < Baş_Uzunluğu) return false;
-
-                for (int i = 0; i < Baş_Uzunluğu; i++)
-                {
-                    if (!AynıMı(Girdi[i], Kıstas[i])) return false;
-                }
+                int sonu = k.IndexOf(Ayraç);
+                ReadOnlySpan<char> ilkSeg = sonu < 0 ? k : k.Slice(0, sonu);
+                if (!g.StartsWith(ilkSeg, sc)) return false;
             }
 
-            if (Kıstas[Kıstas_Uzunluğu - 1] != Ayraç)
+            // 6. Suffix kontrolü (allocation-free)
+            if (!sonAyraç)
             {
-                int Bitiş_Başlangıcı = Kıstas_Uzunluğu - 1;
-                while (Bitiş_Başlangıcı >= 0 && Kıstas[Bitiş_Başlangıcı] != Ayraç) Bitiş_Başlangıcı--;
-                Bitiş_Başlangıcı++;
-
-                int Bitiş_Uzunluğu = Kıstas_Uzunluğu - Bitiş_Başlangıcı;
-                if (Girdi_Uzunluğu < Bitiş_Uzunluğu) return false;
-
-                for (int i = 0; i < Bitiş_Uzunluğu; i++)
-                {
-                    if (!AynıMı(Girdi[Girdi_Uzunluğu - Bitiş_Uzunluğu + i], Kıstas[Bitiş_Başlangıcı + i])) return false;
-                }
+                int başı = k.LastIndexOf(Ayraç);
+                ReadOnlySpan<char> sonSeg = başı < 0 ? k : k.Slice(başı + 1);
+                if (!g.EndsWith(sonSeg, sc)) return false;
             }
 
-            int Girdi_Konumu = 0;
-            int Kıstas_Konumu = 0;
+            // 7. Tüm segmentleri sırayla tara — Split() ve string[] yok
+            int gi = 0; // girdi pozisyonu
+            int ki = 0; // kıstas okuma pozisyonu
 
-            while (Kıstas_Konumu < Kıstas_Uzunluğu)
+            while (ki < k.Length)
             {
-                int Sonraki_İçKıstas = Kıstas_Konumu;
-                while (Sonraki_İçKıstas < Kıstas_Uzunluğu && Kıstas[Sonraki_İçKıstas] != Ayraç) Sonraki_İçKıstas++;
+                if (k[ki] == Ayraç) { ki++; continue; }   // ayracı atla
 
-                int İçKıstas_Uzunluğu = Sonraki_İçKıstas - Kıstas_Konumu;
-                if (İçKıstas_Uzunluğu > 0)
-                {
-                    bool İçKıstas_Bulundu = false;
-                    while (Girdi_Konumu + İçKıstas_Uzunluğu <= Girdi_Uzunluğu)
-                    {
-                        int i = 0;
-                        for (; i < İçKıstas_Uzunluğu; i++)
-                        {
-                            if (!AynıMı(Girdi[Girdi_Konumu + i], Kıstas[Kıstas_Konumu + i])) break;
-                        }
+                int segBaş = ki;
+                while (ki < k.Length && k[ki] != Ayraç) ki++;
 
-                        if (i == İçKıstas_Uzunluğu)
-                        {
-                            Girdi_Konumu += İçKıstas_Uzunluğu;
-                            İçKıstas_Bulundu = true;
-                            break;
-                        }
+                ReadOnlySpan<char> seg = k.Slice(segBaş, ki - segBaş);
 
-                        Girdi_Konumu++;
-                    }
-
-                    if (!İçKıstas_Bulundu) return false;
-                }
-
-                Kıstas_Konumu = Sonraki_İçKıstas + 1;
+                int idx = g.Slice(gi).IndexOf(seg, sc);    // Span.IndexOf → sıfır allocation
+                if (idx < 0) return false;
+                gi += idx + seg.Length;
             }
 
             return true;

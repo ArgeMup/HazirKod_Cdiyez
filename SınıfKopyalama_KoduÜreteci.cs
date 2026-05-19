@@ -37,8 +37,7 @@ namespace ArgeMup.HazirKod
                 DerinKopyala_İç(kopya);
                 return kopya;
             }
-            //IDerinKopyala_ için
-            public object DerinKopyala_Nesne()
+            object ArgeMup.HazirKod.SınıfKopyalama_KoduÜreteci.IDerinKopyala_.DerinKopyala_Nesne()
             {
                 return DerinKopyala();
             }

@@ -18,11 +18,11 @@ namespace ArgeMup.HazirKod
     {
         #region Adım 1
         /*
-        A.Kullanılacak her sınıfın içine alttaki region eklenmeli
-        B.Sınıf içindeki her bir değişken [JsonInclude], [JsonIgnore] ile işaretlenerek filtrelenir.
-        C.[JsonListKey(0)] [JsonListKey(1)] gibi birden fazla sınıf içi değişkene eklenerek dizi, liste gibi anahtarı olmayan nesnelerin karşılaştırma aşamasında düzgün eşleştirilebilmesi için eklenebilir, eklenmez ise indis sırasında kontrol edilir 
-        D.Sınıfın kendisi partial olarak işaretlenmeli
-        E.Gerekli ise IDerinKarşılaştır_ eklenebilir
+        A. Kullanılacak her sınıfın içine alttaki region eklenmeli
+        B. Sınıf içindeki her bir değişken [Kesinlikle_Kullan]-[Kesinlikle_KullanMA]-(öncelikli olarak), [JsonInclude]-[JsonIgnore] ile işaretlenerek filtrelenir.
+        C. [JsonListKey(0)] [JsonListKey(1)] gibi birden fazla sınıf içi değişkene eklenerek dizi, liste gibi anahtarı olmayan nesnelerin karşılaştırma aşamasında düzgün eşleştirilebilmesi için eklenebilir, eklenmez ise indis sırasında kontrol edilir 
+        D. Sınıfın kendisi partial olarak işaretlenmeli
+        E. Gerekli ise IDerinKarşılaştır_ eklenebilir
 
         public partial class Deneme_Sınıfı_ : ArgeMup.HazirKod.SınıfKarşılaştırma_KoduÜreteci.IDerinKarşılaştır_
         {
@@ -551,9 +551,19 @@ namespace ArgeMup.HazirKod
 
         private static List<FieldInfo> JsonIncludeAlanlariAl(Type tip) =>
             tip.GetFields(BindingFlags.Public | BindingFlags.Instance)
-               .Where(f => f.IsDefined(typeof(JsonIncludeAttribute), inherit: false)
-                        && !f.IsDefined(typeof(JsonIgnoreAttribute), inherit: false))
+               .Where(f => AlanKullanilsinMi(f))
                .ToList();
+        private static bool AlanKullanilsinMi(FieldInfo f)
+        {
+            bool kullan = f.IsDefined(typeof(Kesinlikle_KullanAttribute), inherit: false);
+            bool kullanma = f.IsDefined(typeof(Kesinlikle_KullanMAAttribute), inherit: false);
+
+            if (kullan || kullanma)
+                return kullan && !kullanma;
+
+            return f.IsDefined(typeof(JsonIncludeAttribute), inherit: false)
+                && !f.IsDefined(typeof(JsonIgnoreAttribute), inherit: false);
+        }
 
         private static bool SozlukMu(Type t) => typeof(IDictionary).IsAssignableFrom(t);
 
@@ -590,6 +600,14 @@ namespace ArgeMup.HazirKod
         private static string Temizle(string s) =>
             new string(s.Where(c => char.IsLetterOrDigit(c) || c == '_').ToArray());
 #endif
+        #endregion
+
+        #region Nitelik
+        [AttributeUsage(AttributeTargets.Field)]
+        public class Kesinlikle_KullanAttribute : Attribute { }
+
+        [AttributeUsage(AttributeTargets.Field)]
+        public class Kesinlikle_KullanMAAttribute : Attribute { }
         #endregion
     }
 }
